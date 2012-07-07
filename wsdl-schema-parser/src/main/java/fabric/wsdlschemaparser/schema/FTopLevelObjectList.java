@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class FTopLevelObjectList {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(FTopLevelObjectList.class);
 
-    private final String targetNamespace;
+	private final String targetNamespace;
 
 	private List<FElement> topLevelElements;
 
@@ -48,7 +48,7 @@ public class FTopLevelObjectList {
 	 */
 	public FTopLevelObjectList(String targetNamespace) {
 		this.targetNamespace = targetNamespace;
-        topLevelElements = new LinkedList<FElement>( );
+		topLevelElements = new LinkedList<FElement>( );
 		topLevelTypes = new LinkedList<FSchemaType>( );
 	}
 
