@@ -1,4 +1,4 @@
-/** 10.07.2012 01:20 */
+/** 10.07.2012 01:24 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -119,7 +119,7 @@ public class FMessagePartImpl extends FWSDLElement implements FMessagePart
    * @return name of message part
    */
   @Override
-  public String getpartName()
+  public String getPartName()
   {
     return this.partName;
   }

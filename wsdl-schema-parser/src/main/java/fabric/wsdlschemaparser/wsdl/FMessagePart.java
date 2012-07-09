@@ -1,4 +1,4 @@
-/** 10.07.2012 01:18 */
+/** 10.07.2012 01:24 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -92,7 +92,7 @@ public interface FMessagePart
   public static final FMessagePartFactory factory = FMessagePartFactory.getInstance();
 
   public void setPartName(final String partName);
-  public String getpartName();
+  public String getPartName();
 
   public void setElementName(final QName elementName);
   public QName getElementName();
