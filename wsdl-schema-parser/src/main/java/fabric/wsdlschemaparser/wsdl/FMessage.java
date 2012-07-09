@@ -1,4 +1,4 @@
-/** 08.07.2012 00:27 */
+/** 10.07.2012 00:51 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.HashSet;
@@ -75,6 +75,6 @@ public interface FMessage
 
   public int partCount();
 
-  public boolean isMultipart();
   public boolean isSinglepart();
+  public boolean isMultipart();
 }

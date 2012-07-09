@@ -1,4 +1,4 @@
-/** 08.07.2012 00:27 */
+/** 10.07.2012 00:58 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -110,20 +110,6 @@ public class FMessageImpl extends FWSDLElement implements FMessage
   }
 
   /**
-   * Determine whether the message has multiple parts
-   * (parts have 'element' attribute set) or just one
-   * single part (part has 'type' attribute set).
-   *
-   * @return True if message has multiple parts, false
-   * otherwise
-   */
-  @Override
-  public boolean isMultipart()
-  {
-    return this.parts.size() > 1;
-  }
-
-  /**
    * Determine whether the message has only one part.
    *
    * For more information see the documentation of
@@ -135,7 +121,30 @@ public class FMessageImpl extends FWSDLElement implements FMessage
   @Override
   public boolean isSinglepart()
   {
-    return this.parts.size() == 1;
+    // We have only one part and it's 'type' attribute is set
+    return (this.parts.size() == 1 && this.parts.iterator().next().hasTypeAttribute());
+  }
+
+  /**
+   * Determine whether the message has multiple parts
+   * (parts have 'element' attribute set) or just one
+   * single part (part has 'type' attribute set).
+   *
+   * @return True if message has multiple parts, false
+   * otherwise
+   */
+  @Override
+  public boolean isMultipart()
+  {
+    boolean result = true;
+
+    // All parts have 'element' attribute set
+    for (FMessagePart part: this.parts)
+    {
+      result &= part.hasElementAttribute();
+    }
+
+    return (this.parts.size() > 0 && result);
   }
 
   /**

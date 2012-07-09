@@ -1,4 +1,4 @@
-/** 07.07.2012 20:20 */
+/** 10.07.2012 01:18 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -90,6 +90,15 @@ public interface FMessagePart
 
   /** Factory instance for object creation */
   public static final FMessagePartFactory factory = FMessagePartFactory.getInstance();
+
+  public void setPartName(final String partName);
+  public String getpartName();
+
+  public void setElementName(final QName elementName);
+  public QName getElementName();
+
+  public void setTypeName(final QName typeName);
+  public QName getTypeName();
 
   public boolean hasElementAttribute();
   public boolean hasTypeAttribute();

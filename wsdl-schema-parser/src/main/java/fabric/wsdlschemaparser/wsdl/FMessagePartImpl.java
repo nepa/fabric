@@ -1,4 +1,4 @@
-/** 07.07.2012 19:58 */
+/** 10.07.2012 01:20 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -100,6 +100,72 @@ public class FMessagePartImpl extends FWSDLElement implements FMessagePart
     {
       this.typeAttribute = typeName;
     }
+  }
+
+  /**
+   * Set name of the message part.
+   *
+   * @param partName Name of message part
+   */
+  @Override
+  public void setPartName(final String partName)
+  {
+    this.partName = partName;
+  }
+
+  /**
+   * Get name of the message part.
+   *
+   * @return name of message part
+   */
+  @Override
+  public String getpartName()
+  {
+    return this.partName;
+  }
+
+  /**
+   * Set QName value of the 'element' attribute.
+   *
+   * @param elementName QName value of the 'element' attribute
+   */
+  @Override
+  public void setElementName(final QName elementName)
+  {
+    this.elementAttribute = elementName;
+  }
+
+  /**
+   * Get QName value of the 'element' attribute.
+   *
+   * @return QName value of the 'element' attribute
+   */
+  @Override
+  public QName getElementName()
+  {
+    return this.elementAttribute;
+  }
+
+  /**
+   * Set QName value of the 'type' attribute.
+   *
+   * @param typeName QName value of the 'type' attribute
+   */
+  @Override
+  public void setTypeName(final QName typeName)
+  {
+    this.typeAttribute = typeName;
+  }
+
+  /**
+   * Get QName value of the 'type' attribute.
+   *
+   * @return QName value of the 'type' attribute
+   */
+  @Override
+  public QName getTypeName()
+  {
+    return this.typeAttribute;
   }
 
   /**
