@@ -1,4 +1,4 @@
-/** 05.07.2012 16:32 */
+/** 08.07.2012 00:17 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.slf4j.Logger;
@@ -156,7 +156,7 @@ public class FWSDL
         Object messageValue = messageObject.getValue();
 
         Message message = (Message)messageValue;
-        FMessage webserviceMessage = new FMessage(message.getQName().getLocalPart());
+        FMessageImpl webserviceMessage = FMessage.factory.create(message.getQName().getLocalPart());
         this.messages.add(webserviceMessage);
 
         LOGGER.debug(String.format("  └ Processing message '%s' with %d part%s...",
@@ -172,7 +172,7 @@ public class FWSDL
           Object partValue = partObject.getValue();
 
           Part part = (Part)partValue;
-          FMessagePart messagePart = new FMessagePart(part.getName(), part.getElementName(), part.getTypeName());
+          FMessagePartImpl messagePart = FMessagePart.factory.create(part.getName(), part.getElementName(), part.getTypeName());
           webserviceMessage.addPart(messagePart);
         }
       }
@@ -197,7 +197,7 @@ public class FWSDL
         Object value = object.getValue();
 
         PortType portType = (PortType)value;
-        FPortType serviceInterface = new FPortType(portType.getQName().getLocalPart());
+        FPortTypeImpl serviceInterface = FPortType.factory.create(portType.getQName().getLocalPart());
         this.portTypes.add(serviceInterface);
 
         LOGGER.debug(String.format("  └ Processing port type '%s' with %d operation%s...",
@@ -246,7 +246,7 @@ public class FWSDL
                 faultMessages.add(new FOperationFaultMessage(faultName, faultMessage));
               }
 
-              FOperation method = new FOperation(operation.getName(), methodType,
+              FOperationImpl method = FOperation.factory.create(operation.getName(), methodType,
                       new FOperationInputMessage(operation.getInput().getName(), operation.getInput().getMessage().getQName()),
                       new FOperationOutputMessage(operation.getOutput().getName(), operation.getOutput().getMessage().getQName()),
                       faultMessages);
@@ -299,7 +299,7 @@ public class FWSDL
                   (binding.getBindingOperations().size() != 1 ? "s" : "")));
 
           // Create new binding object
-          FBinding portTypeBinding = new FBinding(binding.getQName().getLocalPart(), binding.getPortType().getQName());
+          FBindingImpl portTypeBinding = FBinding.factory.create(binding.getQName().getLocalPart(), binding.getPortType().getQName());
 
           // Add per-binding information
           for (Object ee: binding.getExtensibilityElements())
@@ -414,7 +414,8 @@ public class FWSDL
             }
 
             // Create new binding operation object
-            FBindingOperation method = new FBindingOperation(operation.getName(), methodType, inputMessage, outputMessage, faultMessages);
+            FBindingOperationImpl method = FBindingOperation.factory.create(operation.getName(),
+                    methodType, inputMessage, outputMessage, faultMessages);
 
             // Add per-operation information
             for (Object ee: operation.getExtensibilityElements())
@@ -457,7 +458,7 @@ public class FWSDL
 
         // Create new webservice object
         Service service = (Service)serviceValue;
-        FService webservice = new FService(service.getQName().getLocalPart());
+        FServiceImpl webservice = FService.factory.create(service.getQName().getLocalPart());
         this.services.add(webservice);
 
         // Iterate over all endpoints
@@ -476,7 +477,7 @@ public class FWSDL
           FExtensibilityElement extensibilityElement = new FExtensibilityElement(elements.get(0));
 
           // Create new endpoint object and add it to service
-          FPort endpoint = new FPort(portName, binding.getQName(), extensibilityElement);
+          FPortImpl endpoint = FPort.factory.create(portName, binding.getQName(), extensibilityElement);
           webservice.addPort(endpoint);
         }
       }

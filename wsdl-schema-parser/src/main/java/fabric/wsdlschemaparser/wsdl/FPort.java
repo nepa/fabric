@@ -1,143 +1,81 @@
-/** 05.07.2012 19:28 */
+/** 08.07.2012 00:16 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.http.HTTPAddress;
-import javax.wsdl.extensions.soap.SOAPAddress;
 
 /**
- * This class represents a single port definition in a
- * WSDL document (WSDL 2.0: endpoint element). A port
- * specifies a concrete address for a referenced binding.
+ * Interface for a single port definition in a WSDL
+ * document. This file defines all method signatures
+ * for FPortImpl and contains a factory mechanism
+ * to create such objects.
  *
- * A port must not specify more than one address.
- * 
  * @author seidel
  */
-public class FPort extends FWSDLElement
+public interface FPort
 {
-  /** Name of the port */
-  private String portName;
+  /*****************************************************************
+   * FPortFactory inner class
+   *****************************************************************/
 
-  /** Reference to corresponding binding */
-  private QName bindingReference;
-
-  /** Extensibility element with address information */
-  private FExtensibilityElement addressInformation;
-
-  /**
-   * Parameterized constructor creates a new port (endpoint)
-   * with the given name, binding reference and address
-   * information.
-   *
-   * @param portName Name of the port
-   * @param bindingReference QName of referenced binding
-   * @param addressInformation Extensibility element with
-   * address information
-   */
-  public FPort(final String portName, final QName bindingReference, final FExtensibilityElement addressInformation)
+  public static final class FPortFactory
   {
-    this.portName = portName;
-    this.bindingReference = bindingReference;
-    this.addressInformation = addressInformation;
-  }
+    /** Factory instance for Singleton pattern */
+    private static FPortFactory instance;
 
-  /**
-   * Set name of the port (endpoint).
-   *
-   * @param portName Name of the port
-   */
-  public void setPortName(final String portName)
-  {
-    this.portName = portName;
-  }
-
-  /**
-   * Get name of the port (endpoint).
-   *
-   * @return Name of the port
-   */
-  public String getPortName()
-  {
-    return this.portName;
-  }
-
-  /**
-   * Set QName of the referenced binding.
-   *
-   * @param bindingReference QName of referenced binding
-   */
-  public void setBindingReference(final QName bindingReference)
-  {
-    this.bindingReference = bindingReference;
-  }
-
-  /**
-   * Get QName of the referenced binding.
-   *
-   * @return QName of referenced binding
-   */
-  public QName getBindingReference()
-  {
-    return this.bindingReference;
-  }
-
-  /**
-   * Set extensibility element with address information.
-   *
-   * @param addressInformation Extensibility element
-   * with address information
-   */
-  public void setAddressInformation(final FExtensibilityElement addressInformation)
-  {
-    this.addressInformation = addressInformation;
-  }
-
-  /**
-   * Get extensibility element with address information.
-   *
-   * @return Extensibility element with address information
-   */
-  public FExtensibilityElement getAddressInformation()
-  {
-    return this.addressInformation;
-  }
-
-  /**
-   * Print port (endpoint) in a human-readable form. That
-   * is the name of the port, as well as its type (binding
-   * reference) and endpoint address.
-   *
-   * @return String representation of FPort object
-   */
-  @Override
-  public String toString()
-  {
-    String result = "";
-
-    // Try to get URL of service endpoint
-    String endpointAddress = "";
-    ExtensibilityElement element = this.addressInformation.getExtensibilityElement();
-    if (element instanceof HTTPAddress)
+    /**
+     * Private constructor for Singleton pattern.
+     */
+    private FPortFactory()
     {
-      HTTPAddress address = (HTTPAddress)element;
-      endpointAddress += String.format("HTTP address '%s'", address.getLocationURI());
-    }
-    else if (element instanceof SOAPAddress)
-    {
-      SOAPAddress address = (SOAPAddress)element;
-      endpointAddress += String.format("SOAP address '%s'", address.getLocationURI());
-    }
-    else
-    {
-      endpointAddress += "unknown address";
+      // Empty implementation
     }
 
-    result += String.format("Endpoint (port): '%s' [Binding type '%s'] @ %s", this.portName,
-            (null != this.bindingReference ? this.bindingReference.getLocalPart() : "undefined"),
-            endpointAddress);
+    /**
+     * Create a new factory instance, if it does not
+     * yet exist, and return the object.
+     *
+     * @return FPortFactory object
+     */
+    public static synchronized FPortFactory getInstance()
+    {
+      if (null == FPortFactory.instance)
+      {
+        FPortFactory.instance = new FPortFactory();
+      }
 
-    return result;
+      return FPortFactory.instance;
+    }
+
+    /**
+     * Create a new FPortImpl object with the given name,
+     * binding reference and address information.
+     *
+     * @param portName Name of the port
+     * @param bindingReference QName of referenced binding
+     * @param addressInformation Extensibility element with
+     * address information
+     *
+     * @return FPortImpl object
+     */
+    public FPortImpl create(final String portName, final QName bindingReference, final FExtensibilityElement addressInformation)
+    {
+      return new FPortImpl(portName, bindingReference, addressInformation);
+    }
   }
+
+  /*****************************************************************
+   * FPort outer interface
+   *****************************************************************/
+
+  /** Factory instance for object creation */
+  public static final FPortFactory factory = FPortFactory.getInstance();
+
+  public void setPortName(final String portName);
+  public String getPortName();
+
+  public void setBindingReference(final QName bindingReference);
+  public QName getBindingReference();
+
+  public void setAddressInformation(final FExtensibilityElement addressInformation);
+  public FExtensibilityElement getAddressInformation();
 }

@@ -1,153 +1,80 @@
-/** 05.07.2012 20:33 */
+/** 08.07.2012 00:27 */
 package fabric.wsdlschemaparser.wsdl;
 
-import java.util.Set;
 import java.util.HashSet;
 
 /**
- * This class represents a single message within a
- * WSDL document. Each message may consist of one
- * or more message parts.
+ * Interface for a single message in a WSDL document. This
+ * file defines all method signatures for FMessageImpl and
+ * contains a factory mechanism to create such objects.
  *
  * @author seidel
  */
-public class FMessage extends FWSDLElement
+public interface FMessage
 {
-  /** Name of the message */
-  private String messageName;
+  /*****************************************************************
+   * FMessageFactory inner class
+   *****************************************************************/
 
-  /** Set of message parts */
-  private Set<FMessagePart> parts;
-
-  /**
-   * Parameterized constructor creates a new webservice message
-   * with the given name and an empty set of message parts.
-   *
-   * @param messageName Name of the message
-   */
-  public FMessage(final String messageName)
+  public static final class FMessageFactory
   {
-    this.messageName = messageName;
-    this.parts = new HashSet<FMessagePart>();
-  }
+    /** Factory instance for Singleton pattern */
+    private static FMessageFactory instance;
 
-  /**
-   * Set the name of the message.
-   *
-   * @param messageName Name of the message
-   */
-  public void setMessageName(final String messageName)
-  {
-    this.messageName = messageName;
-  }
-
-  /**
-   * Get the name of the message.
-   *
-   * @return Name of the message
-   */
-  public String getMessageName()
-  {
-    return this.messageName;
-  }
-
-  /**
-   * Add a new message part to the message.
-   *
-   * @param part Message part to add
-   */
-  public void addPart(final FMessagePart part)
-  {
-    this.parts.add(part);
-  }
-
-  /**
-   * Add multiple new message parts to the message.
-   *
-   * @param parts Set of message parts to add
-   */
-  public void addParts(final HashSet<FMessagePart> parts)
-  {
-    this.parts.addAll(parts);
-  }
-
-  /**
-   * Set the message parts of the message.
-   *
-   * @param parts Set of message parts
-   */
-  public void setParts(final HashSet<FMessagePart> parts)
-  {
-    this.parts = parts;
-  }
-
-  /**
-   * Get a set off all message parts.
-   *
-   * @return Set of message parts
-   */
-  public HashSet<FMessagePart> getParts()
-  {
-    return (HashSet<FMessagePart>)this.parts;
-  }
-
-  /**
-   * Return the number of message parts that are
-   * defined within the current message object.
-   *
-   * @return Number of message parts
-   */
-  public int partCount()
-  {
-    return this.parts.size();
-  }
-
-  /**
-   * Determine whether the message has multiple parts
-   * (parts have 'element' attribute set) or just one
-   * single part (part has 'type' attribute set).
-   *
-   * @return True if message has multiple parts, false
-   * otherwise
-   */
-  public boolean isMultipart()
-  {
-    return this.parts.size() > 1;
-  }
-
-  /**
-   * Determine whether the message has only one part.
-   *
-   * For more information see the documentation of
-   * isMultipart().
-   *
-   * @return True if message has one single part, false
-   * otherwise
-   */
-  public boolean isSinglepart()
-  {
-    return this.parts.size() == 1;
-  }
-
-  /**
-   * Create a human-readable form of a message and all
-   * message parts that are defined within it.
-   *
-   * @return String representation of FMessage object
-   */
-  @Override
-  public String toString()
-  {
-    String result = "";
-
-    result = String.format("Message: '%s' (%d part%s)", this.messageName,
-            this.partCount(), (this.partCount() != 1 ? "s" : ""));
-
-    for (FMessagePart part: this.parts)
+    /**
+     * Private constructor for Singleton pattern.
+     */
+    private FMessageFactory()
     {
-      result += "\n\t" + part.toString();
+      // Empty implementation
     }
 
-    return result;
+    /**
+     * Create a new factory instance, if it does not
+     * yet exist, and return the object.
+     *
+     * @return FMessageFactory object
+     */
+    public static synchronized FMessageFactory getInstance()
+    {
+      if (null == FMessageFactory.instance)
+      {
+        FMessageFactory.instance = new FMessageFactory();
+      }
+
+      return FMessageFactory.instance;
+    }
+
+    /**
+     * Create a new FMessageImpl object with the given message name.
+     *
+     * @param messageName Name of the message
+     *
+     * @return FMessageImpl object
+     */
+    public FMessageImpl create(final String messageName)
+    {
+      return new FMessageImpl(messageName);
+    }
   }
+
+  /*****************************************************************
+   * FMessage outer interface
+   *****************************************************************/
+
+  /** Factory instance for object creation */
+  public static final FMessageFactory factory = FMessageFactory.getInstance();
+
+  public void setMessageName(final String messageName);
+  public String getMessageName();
+
+  public void addPart(final FMessagePart part);
+  public void addParts(final HashSet<FMessagePart> parts);
+  public void setParts(final HashSet<FMessagePart> parts);
+  public HashSet<FMessagePart> getParts();
+
+  public int partCount();
+
+  public boolean isMultipart();
+  public boolean isSinglepart();
 }

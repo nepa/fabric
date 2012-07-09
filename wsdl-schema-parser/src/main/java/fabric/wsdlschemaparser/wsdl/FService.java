@@ -1,115 +1,77 @@
-/** 05.07.2012 18:54 */
+/** 08.07.2012 00:18 */
 package fabric.wsdlschemaparser.wsdl;
 
-import java.util.Set;
 import java.util.HashSet;
 
 /**
- * This class represents a single service definition in a WSDL
- * document. A service is a group of ports (endpoints), that
- * on their part each define a concrete service address.
+ * Interface for a single service definition in a WSDL
+ * document. This file defines all method signatures
+ * for FServiceImpl and contains a factory mechanism
+ * to create such objects.
  *
  * @author seidel
  */
-public class FService extends FWSDLElement
+public interface FService
 {
-  /** Name of the service */
-  private String serviceName;
+  /*****************************************************************
+   * FServiceFactory inner class
+   *****************************************************************/
 
-  /** Set of service ports (endpoints) */
-  private Set<FPort> ports;
-
-  /**
-   * Parameterized constructor creates a new service
-   * with the given name.
-   *
-   * @param serviceName Name of the service
-   */
-  public FService(final String serviceName)
+  public static final class FServiceFactory
   {
-    this.serviceName = serviceName;
-    this.ports = new HashSet<FPort>();
-  }
+    /** Factory instance for Singleton pattern */
+    private static FServiceFactory instance;
 
-  /**
-   * Set name of the service.
-   *
-   * @param serviceName Name of the service
-   */
-  public void setServiceName(final String serviceName)
-  {
-    this.serviceName = serviceName;
-  }
-
-  /**
-   * Get name of the service.
-   *
-   * @return Name of the service
-   */
-  public String getServiceName()
-  {
-    return this.serviceName;
-  }
-
-  /**
-   * Add a single port (endpoint) to the service.
-   *
-   * @param port Port to add
-   */
-  public void addPort(final FPort port)
-  {
-    this.ports.add(port);
-  }
-
-  /**
-   * Add a set of ports (endpoints) to the service.
-   *
-   * @param ports Set of ports to add
-   */
-  public void addPorts(final HashSet<FPort> ports)
-  {
-    this.ports.addAll(ports);
-  }
-
-  /**
-   * Set ports (endpoints) of the service.
-   *
-   * @param ports Set of ports
-   */
-  public void setPorts(final HashSet<FPort> ports)
-  {
-    this.ports = ports;
-  }
-
-  /**
-   * Get ports (endpoints) of the service.
-   *
-   * @return Ports of the service
-   */
-  public HashSet<FPort> getPorts()
-  {
-    return (HashSet<FPort>)this.ports;
-  }
-
-  /**
-   * Print service in a human-readable form. That is the
-   * name of the service, as well as a list of all ports
-   * (endpoints) that are defined within the service.
-   *
-   * @return String representation of FService object
-   */
-  @Override
-  public String toString()
-  {
-    String result = "";
-
-    result += String.format("Service: '%s'", this.serviceName);
-
-    for (FPort endpoint: this.ports)
+    /**
+     * Private constructor for Singleton pattern.
+     */
+    private FServiceFactory()
     {
-      result += "\n\t" + endpoint.toString();
+      // Empty implementation
     }
 
-    return result;
+    /**
+     * Create a new factory instance, if it does not
+     * yet exist, and return the object.
+     *
+     * @return FServiceFactory object
+     */
+    public static synchronized FServiceFactory getInstance()
+    {
+      if (null == FServiceFactory.instance)
+      {
+        FServiceFactory.instance = new FServiceFactory();
+      }
+
+      return FServiceFactory.instance;
+    }
+
+    /**
+     * Create a new FServiceImpl object with the given
+     * service name.
+     *
+     * @param serviceName Name of the service
+     *
+     * @return FServiceImpl object
+     */
+    public FServiceImpl create(final String serviceName)
+    {
+      return new FServiceImpl(serviceName);
+    }
   }
+
+  /*****************************************************************
+   * FService outer interface
+   *****************************************************************/
+
+  /** Factory instance for object creation */
+  public static final FServiceFactory factory = FServiceFactory.getInstance();
+
+  public void setServiceName(final String serviceName);
+  public String getServiceName();
+
+  public void addPort(final FPort port);
+  public void addPorts(final HashSet<FPort> ports);
+  public void setPorts(final HashSet<FPort> ports);
+  public HashSet<FPort> getPorts();
 }

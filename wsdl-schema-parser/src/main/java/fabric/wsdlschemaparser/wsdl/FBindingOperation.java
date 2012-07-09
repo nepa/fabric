@@ -1,338 +1,120 @@
-/** 05.07.2012 20:41 */
+/** 07.07.2012 22:23 */
 package fabric.wsdlschemaparser.wsdl;
 
-import java.util.Set;
 import java.util.HashSet;
 
 /**
- * This class represents a single webservice operation defined
- * in the port type bindings of a WSDL document. Each method
- * may consist of an input, an output and multiple fault
- * messages, depending on its type (one-way, request-response,
- * solicit-response or notification).
+ * Interface for a single binding operation in a WSDL
+ * document. This file defines all method signatures
+ * for FBindingOperationImpl and contains a factory
+ * mechanism to create such objects.
  *
  * @author seidel
  */
-public class FBindingOperation extends FWSDLElement
+public interface FBindingOperation
 {
-  /** Name of the binding operation */
-  private String bindingOperationName;
+  /*****************************************************************
+   * FBindingOperationFactory inner class
+   *****************************************************************/
 
-  /** Extensibility elements with per-operation information */
-  private Set<FExtensibilityElement> perOperationInformations;
-
-  /** Binding operation input message */
-  private FBindingOperationInputMessage inputMessage;
-
-  /** Binding operation output message */
-  private FBindingOperationOutputMessage outputMessage;
-
-  /** Set of binding operation fault messages */
-  private Set<FBindingOperationFaultMessage> faultMessages;
-
-  /**
-   * Parameterized constructor will create a new webservice
-   * operation for the port type binding of a WSDL document
-   * with the given name, type and messages.
-   *
-   * The binding operation type is solely used for implicit
-   * message naming. It is not possible to retrieve the type
-   * of a binding operation after creation, as the operation
-   * type is not relevant for WSDL binding elements.
-   *
-   * @param bindingOperationName Name of the operation
-   * @param bindingOperationType Type of the operation
-   * @param inputMessage Input message of operation (optional)
-   * @param outputMessage Output message of operation (optional)
-   *
-   * @throws IllegalArgumentException Invalid operation type
-   */
-  public FBindingOperation(final String bindingOperationName, final FOperationType bindingOperationType,
-          final FBindingOperationInputMessage inputMessage, final FBindingOperationOutputMessage outputMessage) throws IllegalArgumentException
+  public static final class FBindingOperationFactory
   {
-    this.bindingOperationName = bindingOperationName;
-    this.perOperationInformations = new HashSet<FExtensibilityElement>();
-    this.faultMessages = new HashSet<FBindingOperationFaultMessage>();
+    /** Factory instance for Singleton pattern */
+    private static FBindingOperationFactory instance;
 
-    // One-way operation
-    if (FOperationType.ONE_WAY == bindingOperationType)
+    /**
+     * Private constructor for Singleton pattern.
+     */
+    private FBindingOperationFactory()
     {
-      // Set name to 'operation name', if none is set
-      if (null == inputMessage.getBindingOperationMessageName())
+      // Empty implementation
+    }
+
+    /**
+     * Create a new factory instance, if it does not
+     * yet exist, and return the object.
+     *
+     * @return FBindingOperationFactory object
+     */
+    public static synchronized FBindingOperationFactory getInstance()
+    {
+      if (null == FBindingOperationFactory.instance)
       {
-        inputMessage.setBindingOperationMessageName(bindingOperationName);
+        FBindingOperationFactory.instance = new FBindingOperationFactory();
       }
 
-      this.inputMessage = inputMessage;
+      return FBindingOperationFactory.instance;
     }
-    // Request-response operation
-    else if (FOperationType.REQUEST_RESPONSE == bindingOperationType)
+
+    /**
+     * Create a new FBindingOperationImpl object with the
+     * given name, type and messages.
+     *
+     * The binding operation type is solely used for implicit
+     * message naming. It is not possible to retrieve the type
+     * of a binding operation after creation, as the operation
+     * type is not relevant for WSDL binding elements.
+     *
+     * @param bindingOperationName Name of the operation
+     * @param bindingOperationType Type of the operation
+     * @param inputMessage Input message of operation (optional)
+     * @param outputMessage Output message of operation (optional)
+     *
+     * @return FBindingOperationImpl object
+     */
+    public FBindingOperationImpl create(final String bindingOperationName, final FOperationType bindingOperationType,
+            final FBindingOperationInputMessage inputMessage, final FBindingOperationOutputMessage outputMessage)
     {
-      // Set name to 'Request', if none is set
-      if (null == inputMessage.getBindingOperationMessageName())
-      {
-        inputMessage.setBindingOperationMessageName("Request");
-      }
-      // Set name to 'Response', if none is set
-      if (null == outputMessage.getBindingOperationMessageName())
-      {
-        outputMessage.setBindingOperationMessageName("Response");
-      }
-
-      this.inputMessage = inputMessage;
-      this.outputMessage = outputMessage;
+      return new FBindingOperationImpl(bindingOperationName, bindingOperationType, inputMessage, outputMessage);
     }
-    // Solicit-response operation
-    else if (FOperationType.SOLICIT_RESPONSE == bindingOperationType)
+
+    /**
+     * Create a new FBindingOperationImpl object with the
+     * given name, type, messages and faults.
+     *
+     * The binding operation type is solely used for implicit
+     * message naming. It is not possible to retrieve the type
+     * of a binding operation after creation, as the operation
+     * type is not relevant for WSDL binding elements.
+     *
+     * @param bindingOperationName Name of the operation
+     * @param bindingOperationType Type of the operation
+     * @param inputMessage Input message of operation (optional)
+     * @param outputMessage Output message of operation (optional)
+     * @param faultMessages Set of fault messages (optional)
+     */
+    public FBindingOperationImpl create(final String bindingOperationName, final FOperationType bindingOperationType,
+            final FBindingOperationInputMessage inputMessage, final FBindingOperationOutputMessage outputMessage,
+            final HashSet<FBindingOperationFaultMessage> faultMessages)
     {
-      // Set name to 'Solicit', if none is set
-      if (null == outputMessage.getBindingOperationMessageName())
-      {
-        outputMessage.setBindingOperationMessageName("Solicit");
-      }
-      // Set name to 'Response', if none is set
-      if (null == inputMessage.getBindingOperationMessageName())
-      {
-        inputMessage.setBindingOperationMessageName("Response");
-      }
-
-      this.outputMessage = outputMessage;
-      this.inputMessage = inputMessage;
-    }
-    // Notification operation
-    else if (FOperationType.NOTIFICATION == bindingOperationType)
-    {
-      // Set name to 'operation name', if none is set
-      if (null == outputMessage.getBindingOperationMessageName())
-      {
-        outputMessage.setBindingOperationMessageName(bindingOperationName);
-      }
-
-      this.outputMessage = outputMessage;
-    }
-    // Invalid operation type
-    else
-    {
-      throw new IllegalArgumentException(String.format("Type of webservice operation '%s' is invalid.", bindingOperationName));
+      return new FBindingOperationImpl(bindingOperationName, bindingOperationType, inputMessage, outputMessage, faultMessages);
     }
   }
 
-  /**
-   * Parameterized constructor will create a new webservice
-   * operation for the port type binding of a WSDL document
-   * with the given name, type, messages and faults.
-   * 
-   * For more information see documentation of other constructor.
-   *
-   * @param bindingOperationName Name of the operation
-   * @param bindingOperationType Type of the operation
-   * @param inputMessage Input message of operation (optional)
-   * @param outputMessage Output message of operation (optional)
-   * @param faultMessages Set of fault messages (optional)
-   */
-  public FBindingOperation(final String bindingOperationName, final FOperationType bindingOperationType,
-          final FBindingOperationInputMessage inputMessage, final FBindingOperationOutputMessage outputMessage,
-          final HashSet<FBindingOperationFaultMessage> faultMessages)
-  {
-    this(bindingOperationName, bindingOperationType, inputMessage, outputMessage);
-    this.faultMessages = faultMessages;
-  }
+  /*****************************************************************
+   * FBindingOperation outer interface
+   *****************************************************************/
 
-  /**
-   * Set name of the binding operation.
-   *
-   * @param bindingOperationName Name of the binding operation
-   */
-  public void setBindingOperationName(final String bindingOperationName)
-  {
-    this.bindingOperationName = bindingOperationName;
-  }
+  /** Factory instance for object creation */
+  public static final FBindingOperationFactory factory = FBindingOperationFactory.getInstance();
 
-  /**
-   * Get name of the binding operation.
-   *
-   * @return Name of the binding operation
-   */
-  public String getBindingOperationName()
-  {
-    return this.bindingOperationName;
-  }
+  public void setBindingOperationName(final String bindingOperationName);
+  public String getBindingOperationName();
 
-  /**
-   * Add extensibility element with per-operation information.
-   *
-   * @param perOperationInformation Extensibility element with
-   * per-operation information
-   */
-  public void addPerOperationInformation(final FExtensibilityElement perOperationInformation)
-  {
-    this.perOperationInformations.add(perOperationInformation);
-  }
+  public void addPerOperationInformation(final FExtensibilityElement perOperationInformation);
+  public void addPerOperationInformations(final HashSet<FExtensibilityElement> perOperationInformations);
+  public void setPerOperationInformations(final HashSet<FExtensibilityElement> perOperationInformations);
+  public HashSet<FExtensibilityElement> getPerOperationInformations();
 
-  /**
-   * Add a set of extensibility elements with per-operation
-   * information.
-   *
-   * @param perOperationInformations Set of extensibility
-   * elements with per-operation information
-   */
-  public void addPerOperationInformations(final HashSet<FExtensibilityElement> perOperationInformations)
-  {
-    this.perOperationInformations.addAll(perOperationInformations);
-  }
+  public void setInputMessage(final FBindingOperationInputMessage bindingOperationInputMessage);
+  public FBindingOperationInputMessage getInputMessage();
 
-  /**
-   * Set extensibility elements with per-operation information.
-   *
-   * @param perOperationInformations Set of extensibility
-   * elements with per-operation information
-   */
-  public void setPerOperationInformations(final HashSet<FExtensibilityElement> perOperationInformations)
-  {
-    this.perOperationInformations = perOperationInformations;
-  }
+  public void setOutputMessage(final FBindingOperationOutputMessage bindingOperationOutputMessage);
+  public FBindingOperationOutputMessage getOutputMessage();
 
-  /**
-   * Get extensibility elements with per-operation information.
-   *
-   * @return Set of extensibility elements with per-operation
-   * information
-   */
-  public HashSet<FExtensibilityElement> getPerOperationInformations()
-  {
-    return (HashSet<FExtensibilityElement>)this.perOperationInformations;
-  }
-
-  /**
-   * Set input message of the binding operation.
-   *
-   * @param bindingOperationInputMessage Input message
-   */
-  public void setInputMessage(final FBindingOperationInputMessage bindingOperationInputMessage)
-  {
-    this.inputMessage = bindingOperationInputMessage;
-  }
-
-  /**
-   * Get input message of the binding operation (if any).
-   *
-   * @return Input message or 'null' if none is set
-   */
-  public FBindingOperationInputMessage getInputMessage()
-  {
-    return this.inputMessage;
-  }
-
-  /**
-   * Set output message of the binding operation.
-   *
-   * @param bindingOperationOutputMessage Output message
-   */
-  public void setOutputMessage(final FBindingOperationOutputMessage bindingOperationOutputMessage)
-  {
-    this.outputMessage = bindingOperationOutputMessage;
-  }
-
-  /**
-   * Get output message of the binding operation (if any).
-   *
-   * @return Output message or 'null' if none is set
-   */
-  public FBindingOperationOutputMessage getOutputMessage()
-  {
-    return this.outputMessage;
-  }
-
-  /**
-   * Add fault message to the binding operation.
-   *
-   * @param bindingOperationFaultMessage Fault message
-   */
-  public void addFaultMessage(final FBindingOperationFaultMessage bindingOperationFaultMessage)
-  {
-    this.faultMessages.add(bindingOperationFaultMessage);
-  }
-
-  /**
-   * Add a set of multiple fault messages to the binding
-   * operation.
-   *
-   * @param bindingOperationFaultMessages Set of fault messages
-   */
-  public void addFaultMessages(final HashSet<FBindingOperationFaultMessage> bindingOperationFaultMessages)
-  {
-    this.faultMessages.addAll(bindingOperationFaultMessages);
-  }
-
-  /**
-   * Set fault messages of the binding operation.
-   *
-   * @param bindingOperationFaultMessages Set of fault messages
-   */
-  public void setFaultMessages(final HashSet<FBindingOperationFaultMessage> bindingOperationFaultMessages)
-  {
-    this.faultMessages = bindingOperationFaultMessages;
-  }
-
-  /**
-   * Get fault messages of the binding operation (if any).
-   *
-   * @return Set of fault messages
-   */
-  public HashSet<FBindingOperationFaultMessage> getFaultMessages()
-  {
-    return (HashSet<FBindingOperationFaultMessage>)this.faultMessages;
-  }
-
-  /**
-   * Get a specific fault message of the binding operation
-   * (if it exists).
-   *
-   * @param messageName Name of the fault message
-   *
-   * @return Fault message with the given name or 'null'
-   * if it does not exist
-   */
-  public FBindingOperationFaultMessage getFaultMessage(final String messageName)
-  {
-    for (FBindingOperationFaultMessage message: this.faultMessages)
-    {
-      if (messageName.equals(message.getBindingOperationMessageName()))
-      {
-        return message;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Print a human-readable form of the binding operation.
-   *
-   * @return String representation of FBindingOperation object
-   */
-  @Override
-  public String toString()
-  {
-    String result = "";
-
-    // Concatenate names of all fault messages
-    String faults = "";
-    for (FBindingOperationFaultMessage faultMessage: this.faultMessages)
-    {
-      faults += faultMessage.getBindingOperationMessageName() + ", ";
-    }
-
-    // Remove last comma and space from fault message string
-    if (faults.length() > 1)
-    {
-      faults = faults.substring(0, faults.length() - 2);
-    }
-
-    // Print method name, input/output arguments and faults
-    result += String.format("Operation: %s(%s): %s%s", this.bindingOperationName, this.inputMessage.toString(),
-            this.outputMessage.toString(), (("").equals(faults) ? "" : " [Faults: " + faults + "]"));
-
-    return result;
-  }
+  public void addFaultMessage(final FBindingOperationFaultMessage bindingOperationFaultMessage);
+  public void addFaultMessages(final HashSet<FBindingOperationFaultMessage> bindingOperationFaultMessages);
+  public void setFaultMessages(final HashSet<FBindingOperationFaultMessage> bindingOperationFaultMessages);
+  public HashSet<FBindingOperationFaultMessage> getFaultMessages();
+  public FBindingOperationFaultMessage getFaultMessage(final String messageName);
 }
