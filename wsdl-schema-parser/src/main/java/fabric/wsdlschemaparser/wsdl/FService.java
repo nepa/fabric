@@ -1,4 +1,4 @@
-/** 08.07.2012 00:18 */
+/** 11.07.2012 01:46 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.HashSet;
@@ -74,4 +74,6 @@ public interface FService
   public void addPorts(final HashSet<FPort> ports);
   public void setPorts(final HashSet<FPort> ports);
   public HashSet<FPort> getPorts();
+  
+  public int portCount();
 }

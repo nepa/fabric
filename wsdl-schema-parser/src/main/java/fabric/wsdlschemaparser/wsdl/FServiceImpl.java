@@ -1,4 +1,4 @@
-/** 08.07.2012 00:19 */
+/** 11.07.2012 01:55 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -95,6 +95,18 @@ public class FServiceImpl extends FWSDLElement implements FService
   public HashSet<FPort> getPorts()
   {
     return (HashSet<FPort>)this.ports;
+  }
+
+  /**
+   * Return the number of ports that are defined
+   * within the current service object.
+   *
+   * @return Number of ports
+   */
+  @Override
+  public int portCount()
+  {
+    return this.ports.size();
   }
 
   /**
