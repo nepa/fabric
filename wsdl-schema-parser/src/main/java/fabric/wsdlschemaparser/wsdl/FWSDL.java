@@ -1,4 +1,4 @@
-/** 08.07.2012 00:17 */
+/** 11.07.2012 20:39 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.slf4j.Logger;
@@ -323,25 +323,22 @@ public class FWSDL
 
             // Determine operation type
             FOperationType methodType = FOperationType.INVALID;
-            if (null != operation.getOperation())
+            OperationType style = operation.getOperation().getStyle();
+            if (OperationType.ONE_WAY == style)
             {
-              OperationType style = operation.getOperation().getStyle();
-              if (OperationType.ONE_WAY == style)
-              {
-                methodType = FOperationType.ONE_WAY;
-              }
-              else if (OperationType.REQUEST_RESPONSE == style)
-              {
-                methodType = FOperationType.REQUEST_RESPONSE;
-              }
-              else if (OperationType.SOLICIT_RESPONSE == style)
-              {
-                methodType = FOperationType.SOLICIT_RESPONSE;
-              }
-              else if (OperationType.NOTIFICATION == style)
-              {
-                methodType = FOperationType.NOTIFICATION;
-              }
+              methodType = FOperationType.ONE_WAY;
+            }
+            else if (OperationType.REQUEST_RESPONSE == style)
+            {
+              methodType = FOperationType.REQUEST_RESPONSE;
+            }
+            else if (OperationType.SOLICIT_RESPONSE == style)
+            {
+              methodType = FOperationType.SOLICIT_RESPONSE;
+            }
+            else if (OperationType.NOTIFICATION == style)
+            {
+              methodType = FOperationType.NOTIFICATION;
             }
 
             LOGGER.debug(String.format("      └ Processing binding operation '%s()' of type '%s'...",

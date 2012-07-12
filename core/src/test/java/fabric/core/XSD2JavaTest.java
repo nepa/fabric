@@ -28,6 +28,11 @@ public class XSD2JavaTest {
     private static final String SCHEMAS = RESOURCES + "schemas/";
 
     /**
+     * Output directory for generated code
+     */
+    private static final String OUTPUT_DIR = "target";
+
+    /**
      * Properties file
      */
     private static final String PROPERTIES = RESOURCES + "javaTypeGen.properties";
@@ -304,7 +309,7 @@ public class XSD2JavaTest {
      */
     private List<SourceFile> generateSourceFilesAutomatically(String xsd) {
         List<SourceFile> ret = null;
-        String[] params = {"-x", SCHEMAS + xsd + ENDING_XSD, "-p", PROPERTIES, "-m", USE_TYPE_GEN, "-v"};
+        String[] params = {"-x", SCHEMAS + xsd + ENDING_XSD, "-p", PROPERTIES, "-m", USE_TYPE_GEN, "-o", OUTPUT_DIR, "-v"};
         Main core = new Main(params);
 
         Class c = core.getClass();

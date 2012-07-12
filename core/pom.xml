@@ -67,18 +67,11 @@
     <resources>
       <resource>
         <!-- Include 'javaTypeGen.properties' and other resources. -->
-        <directory>src/main/resources</directory>
-      </resource>
-      <resource>
-        <!-- Include property files from 'de.uniluebeck.sourcegen.java'. -->
-        <directory>src/main/java</directory>
-        <includes>
-          <include>**/*.properties</include>
-        </includes>
+        <directory>src/test/resources</directory>
       </resource>
       <resource>
         <!-- Include Java code for MainTest from test resources. -->
-        <directory>src/test/resources</directory>
+        <directory>src/test/java</directory>
         <includes>
           <include>**/*.java</include>
         </includes>
