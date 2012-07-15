@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import fabric.module.exi.FabricEXIModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -39,16 +38,23 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import test.CppModule;
 import de.uniluebeck.itm.tr.util.Logging;
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FabricSchemaTreeItemHandler;
-import fabric.module.api.FabricSchemaTreeWalker;
-import fabric.module.api.ModuleRegistry;
+
+import fabric.wsdlschemaparser.wsdl.FWSDL;
+import fabric.wsdlschemaparser.schema.FSchema;
+
+import fabric.module.api.FModuleRegistry;
+import fabric.module.api.FItemHandlerBase;
+import fabric.module.api.FSchemaTreeWalker;
+import fabric.module.api.FSchemaTreeItemHandler;
+import fabric.module.api.FWSDLProcessor;
+import fabric.module.api.FWSDLItemHandler;
+
+import fabric.module.cpp.test.CppModule;
 import fabric.module.dot.FabricDotGraphModule;
 import fabric.module.typegen.FabricTypeGenModule;
-import fabric.wsdlschemaparser.schema.FSchema;
-import fabric.wsdlschemaparser.wsdl.FWSDL;
+import fabric.module.exi.FabricEXIModule;
 
 public class Main {
 
@@ -63,8 +69,13 @@ public class Main {
     private Workspace workspace = null;
 
     private final Properties properties = new Properties();
-    private final ModuleRegistry registry = new ModuleRegistry();
-    private final List<FabricSchemaTreeItemHandler> treeItemHandlers = new ArrayList<FabricSchemaTreeItemHandler>();
+    private final FModuleRegistry registry = new FModuleRegistry();
+
+    /** WSDL handlers */
+    private final List<FWSDLItemHandler> wsdlHandlers = new ArrayList<FWSDLItemHandler>();
+
+    /** XML Schema handlers */
+    private final List<FSchemaTreeItemHandler> schemaHandlers = new ArrayList<FSchemaTreeItemHandler>();
 
     public Main(String[] args) {
 
@@ -141,7 +152,25 @@ public class Main {
                 for (String moduleName : line.getOptionValue('m').split(",")) {
                     moduleName = moduleName.trim();
                     Main.log.debug("Creating instance of module {}", moduleName);
-                    treeItemHandlers.add(registry.get(moduleName).getHandler(workspace));
+
+                    ArrayList<FItemHandlerBase> handlers = this.registry.get(moduleName).getHandlers(this.workspace);
+                    for (FItemHandlerBase handler: handlers) {
+                        // Add an XML Schema handler
+                        if (handler instanceof FSchemaTreeItemHandler) {
+                            FSchemaTreeItemHandler schemaHandler = (FSchemaTreeItemHandler)handler;
+                            this.schemaHandlers.add(schemaHandler);
+                        }
+                        // Add a WSDL handler
+                        else if (handler instanceof FWSDLItemHandler) {
+                            FWSDLItemHandler wsdlHandler = (FWSDLItemHandler)handler;
+                            this.wsdlHandlers.add(wsdlHandler);
+                        }
+                        // Catch unknown handler
+                        else {
+                            throw new IllegalStateException(String.format("Module provided unknown handler type '%s'.",
+                                    handler.getClass().getSimpleName()));
+                        }
+                    }
                 }
             }
 
@@ -163,23 +192,49 @@ public class Main {
             System.exit(1);
         }
 
-        // Handle the two different file types
+        // Handle the different file types
         try {
-            if (wsdlFile != null) {
-                FWSDL wsdl = new FWSDL(wsdlFile);
+            FWSDL wsdl = null;
+            FSchema schema = null;
+
+            // Create FWSDL object
+            if (null != this.wsdlFile) {
+                wsdl = new FWSDL(this.wsdlFile);
+
+                // Extract inline XML Schema (if any)
+                if (null != wsdl.getSchema()) {
+                    schema = wsdl.getSchema();
+                }
+            }
+            // Create FSchema object
+            else if (null != this.schemaFile) {
+                schema = new FSchema(this.schemaFile);
+            }
+
+            // Process WSDL elements (if any)
+            if (null != wsdl) {
+                Main.log.debug("Handling WSDL elements.");
                 System.out.println(wsdl.toString());
 
-            } else if (schemaFile != null) {
-                FSchema schema = new FSchema(schemaFile);
+                FWSDLProcessor processor = new FWSDLProcessor();
+                for (FWSDLItemHandler wsdlHandler: this.wsdlHandlers) {
+                    processor.process(wsdl, wsdlHandler);
+                }
+            }
+
+            // Walk XML Schema tree (if any)
+            if (null != schema) {
+                Main.log.debug("Walking XML Schema tree.");
                 System.out.println(schema.toString());
 
-                FabricSchemaTreeWalker tw = new FabricSchemaTreeWalker();
-                for (FabricSchemaTreeItemHandler h : treeItemHandlers) {
-                    tw.walk(schema, h);
+                FSchemaTreeWalker treeWalker = new FSchemaTreeWalker();
+                for (FSchemaTreeItemHandler schemaHandler: this.schemaHandlers) {
+                    treeWalker.walk(schema, schemaHandler);
                 }
-
-                workspace.generate();
             }
+
+            // Generate code from workspace
+            this.workspace.generate();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -203,7 +258,7 @@ public class Main {
      * @param options
      * @param registry
      */
-    private void usage(Options options, ModuleRegistry registry) {
+    private void usage(Options options, FModuleRegistry registry) {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(120, Main.class.getCanonicalName(), null, options, null);
         System.out.println(registry.toString());

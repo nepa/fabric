@@ -23,49 +23,33 @@
  */
 package fabric.module.dot;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FModuleBase;
-import fabric.module.api.FItemHandlerBase;
+import fabric.module.api.Module;
+import fabric.module.api.ModuleFactory;
 
 /**
- * Fabric module used for creating Graphviz dot visualisations of the Schema object tree.
+ * ISSUE: Marked as deprecated in 07/2012 by seidel.
  *
- * @author Marco Wegner
+ * @deprecated Unused file, will be removed soon.
  */
-public class FabricDotGraphModule implements FModuleBase {
+public class DotModuleFactory implements ModuleFactory {
+	private static final String DOT_OUTFILE = "dot.outfile";
 
-    /**
-     * Option key used for the Dot graph output file.
-     */
-    private static final String KEY_DOT_OUTFILE = "dot.outfile";
-    private Properties properties = null;
+	@Override
+	public String getName() {
+		return "dot";
+	}
 
-    /**
-     * Constructs a new module.
-     */
-    public FabricDotGraphModule(Properties p) {
-        this.properties = p;
-        this.properties.put(FabricDotGraphModule.KEY_DOT_OUTFILE, "dotfile.dot");
-    }
+	@Override
+	public String getDescription() {
+		return "Creates a Graphviz DOT file. Options are '" + DOT_OUTFILE + "'";
+	}
 
-    @Override
-    public String getName() {
-        return "dot";
-    }
-
-    @Override
-    public String getDescription() {
-        return String.format("Creates a Graphviz DOT file. Valid options are '%s'.", FabricDotGraphModule.KEY_DOT_OUTFILE);
-    }
-
-    @Override
-    public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception {
-        ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
-        handlers.add(new FabricDotGraphHandler(workspace, this.properties));
-
-        return handlers;
-    }
+	@Override
+	public Module create(Properties properties, Workspace workspace) throws Exception {
+		return new DotModule(new File(properties.getProperty(DOT_OUTFILE, "dotfile.dot")), workspace);
+	}
 }

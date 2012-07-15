@@ -21,51 +21,45 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package fabric.module.dot;
+package fabric.module.api;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FModuleBase;
-import fabric.module.api.FItemHandlerBase;
 
 /**
- * Fabric module used for creating Graphviz dot visualisations of the Schema object tree.
+ * ISSUE: Marked as deprecated in 07/2012 by seidel.
  *
- * @author Marco Wegner
+ * @deprecated Unused file, will be removed soon.
  */
-public class FabricDotGraphModule implements FModuleBase {
+public class ModuleFactoryRegistry {
+	private Map<String, ModuleFactory> moduleFactories = new HashMap<String, ModuleFactory>();
 
-    /**
-     * Option key used for the Dot graph output file.
-     */
-    private static final String KEY_DOT_OUTFILE = "dot.outfile";
-    private Properties properties = null;
+	public void register(ModuleFactory factory) throws Exception {
 
-    /**
-     * Constructs a new module.
-     */
-    public FabricDotGraphModule(Properties p) {
-        this.properties = p;
-        this.properties.put(FabricDotGraphModule.KEY_DOT_OUTFILE, "dotfile.dot");
-    }
+		if (moduleFactories.containsKey(factory.getName()))
+			throw new Exception("Factory of name " + factory.getName() + " already exists.");
 
-    @Override
-    public String getName() {
-        return "dot";
-    }
+		moduleFactories.put(factory.getName(), factory);
 
-    @Override
-    public String getDescription() {
-        return String.format("Creates a Graphviz DOT file. Valid options are '%s'.", FabricDotGraphModule.KEY_DOT_OUTFILE);
-    }
+	}
 
-    @Override
-    public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception {
-        ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
-        handlers.add(new FabricDotGraphHandler(workspace, this.properties));
+	public Module create(String name, Properties properties, Workspace workspace) throws Exception {
+		
+		if (!moduleFactories.containsKey(name))
+			throw new Exception("Factory of name " + name + " unknown.");
 
-        return handlers;
-    }
+		return moduleFactories.get(name).create(properties, workspace);
+	}
+
+	public Map<String, String> getNameAndDescriptions() {
+		Map<String, String> nameAndDescription = new HashMap<String, String>();
+		
+		for(ModuleFactory factory : moduleFactories.values())
+			nameAndDescription.put(factory.getName(), factory.getDescription());
+			
+		return nameAndDescription;
+	}
 }

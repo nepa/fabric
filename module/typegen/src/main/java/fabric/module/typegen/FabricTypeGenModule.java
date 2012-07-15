@@ -1,14 +1,15 @@
-/** 05.03.2012 11:56 */
+/** 15.07.2012 15:38 */
 package fabric.module.typegen;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FabricModule;
-import fabric.module.api.FabricSchemaTreeItemHandler;
+import fabric.module.api.FModuleBase;
+import fabric.module.api.FItemHandlerBase;
 import fabric.module.typegen.exceptions.FabricTypeGenException;
 
 /**
@@ -19,7 +20,7 @@ import fabric.module.typegen.exceptions.FabricTypeGenException;
  *
  * @author seidel
  */
-public class FabricTypeGenModule implements FabricModule
+public class FabricTypeGenModule implements FModuleBase
 {
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(FabricTypeGenModule.class);
@@ -99,16 +100,19 @@ public class FabricTypeGenModule implements FabricModule
    *
    * @param workspace Workspace object for type class output
    *
-   * @return FabricTypeGenHandler object
+   * @return List with one FabricTypeGenHandler object
    *
    * @throws Exception Error during handler instantiation
    */
   @Override
-  public FabricSchemaTreeItemHandler getHandler(Workspace workspace) throws Exception
+  public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
   {
     this.validateProperties();
 
-    return new FabricTypeGenHandler(workspace, this.properties);
+    ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
+    handlers.add(new FabricTypeGenHandler(workspace, this.properties));
+
+    return handlers;
   }
 
   /**

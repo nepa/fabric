@@ -1,4 +1,4 @@
-/** 19.10.2011 12:09 */
+/** 13.07.2012 16:08 */
 package fabric.module.typegen;
 
 import org.slf4j.Logger;
@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FabricDefaultHandler;
+import fabric.module.api.FDefaultSchemaHandler;
 
 import fabric.wsdlschemaparser.schema.FComplexType;
 import fabric.wsdlschemaparser.schema.FElement;
@@ -26,7 +26,7 @@ import fabric.module.typegen.base.TypeGen;
  *
  * @author seidel, reichart
  */
-public class FabricTypeGenHandler extends FabricDefaultHandler
+public class FabricTypeGenHandler extends FDefaultSchemaHandler
 {
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(FabricTypeGenHandler.class);
@@ -105,9 +105,11 @@ public class FabricTypeGenHandler extends FabricDefaultHandler
    * Handle end of a top-level schema element.
    *
    * @param element FElement object
+   *
+   * @throws Exception Error during processing
    */
   @Override
-  public void endTopLevelElement(FElement element)
+  public void endTopLevelElement(FElement element) throws Exception
   {
     LOGGER.debug("Called endTopLevelElement().");
 
@@ -140,9 +142,11 @@ public class FabricTypeGenHandler extends FabricDefaultHandler
    *
    * @param element FElement object
    * @param parent Parent FComplexType object
+   *
+   * @throws Exception Error during processing
    */
   @Override
-  public void endLocalElement(FElement element, FComplexType parent)
+  public void endLocalElement(FElement element, FComplexType parent) throws Exception
   {
     LOGGER.debug("Called endLocalElement().");
 
@@ -272,9 +276,11 @@ public class FabricTypeGenHandler extends FabricDefaultHandler
    *
    * @param type FSimpleType object
    * @param parent Parent FElement object
+   *
+   * @throws Exception Error during processing
    */
   @Override
-  public void endLocalSimpleType(FSimpleType type, FElement parent)
+  public void endLocalSimpleType(FSimpleType type, FElement parent) throws Exception
   {
     LOGGER.debug("Called endLocalSimpleType().");
 
@@ -366,9 +372,11 @@ public class FabricTypeGenHandler extends FabricDefaultHandler
    *
    * @param type FComplexType object
    * @param parent Parent FElement object
+   *
+   * @throws Exception Error during processing
    */
   @Override
-  public void endLocalComplexType(FComplexType type, FElement parent)
+  public void endLocalComplexType(FComplexType type, FElement parent) throws Exception
   {
     LOGGER.debug("Called endLocalComplexType().");
 

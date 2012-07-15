@@ -1,14 +1,15 @@
-/** 16.11.2011 21:06 */
+/** 15.07.2012 15:45 */
 package fabric.module.exi;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FabricModule;
-import fabric.module.api.FabricSchemaTreeItemHandler;
+import fabric.module.api.FModuleBase;
+import fabric.module.api.FItemHandlerBase;
 import fabric.module.exi.exceptions.FabricEXIException;
 import fabric.module.typegen.FabricTypeGenModule;
 
@@ -21,7 +22,7 @@ import fabric.module.typegen.FabricTypeGenModule;
  * 
  * @author seidel
  */
-public class FabricEXIModule implements FabricModule
+public class FabricEXIModule implements FModuleBase
 {
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(FabricEXIModule.class);
@@ -116,16 +117,19 @@ public class FabricEXIModule implements FabricModule
    * 
    * @param workspace Workspace object for EXI class output
    * 
-   * @return FabricEXIHandler object
+   * @return List with one FabricEXIHandler object
    *
    * @throws Exception Error during handler instantiation 
    */
   @Override
-  public FabricSchemaTreeItemHandler getHandler(Workspace workspace) throws Exception
+  public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
   {
     this.validateProperties();
 
-    return new FabricEXIHandler(workspace, this.properties);
+    ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
+    handlers.add(new FabricEXIHandler(workspace, this.properties));
+
+    return handlers;
   }
 
   /**

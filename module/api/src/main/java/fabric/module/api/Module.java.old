@@ -21,51 +21,19 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package fabric.module.dot;
-
-import java.util.ArrayList;
-import java.util.Properties;
+package fabric.module.api;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FModuleBase;
-import fabric.module.api.FItemHandlerBase;
+import fabric.wsdlschemaparser.schema.FSchema;
 
 /**
- * Fabric module used for creating Graphviz dot visualisations of the Schema object tree.
+ * ISSUE: Marked as deprecated in 07/2012 by seidel.
  *
- * @author Marco Wegner
+ * @deprecated Unused file, will be removed soon.
  */
-public class FabricDotGraphModule implements FModuleBase {
+public interface Module {
 
-    /**
-     * Option key used for the Dot graph output file.
-     */
-    private static final String KEY_DOT_OUTFILE = "dot.outfile";
-    private Properties properties = null;
-
-    /**
-     * Constructs a new module.
-     */
-    public FabricDotGraphModule(Properties p) {
-        this.properties = p;
-        this.properties.put(FabricDotGraphModule.KEY_DOT_OUTFILE, "dotfile.dot");
-    }
-
-    @Override
-    public String getName() {
-        return "dot";
-    }
-
-    @Override
-    public String getDescription() {
-        return String.format("Creates a Graphviz DOT file. Valid options are '%s'.", FabricDotGraphModule.KEY_DOT_OUTFILE);
-    }
-
-    @Override
-    public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception {
-        ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
-        handlers.add(new FabricDotGraphHandler(workspace, this.properties));
-
-        return handlers;
-    }
+	void handle(Workspace workspace, FSchema schema) throws Exception;
+	
+	void done() throws Exception;
 }

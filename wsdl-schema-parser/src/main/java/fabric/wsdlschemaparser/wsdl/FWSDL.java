@@ -1,4 +1,4 @@
-/** 11.07.2012 20:39 */
+/** 15.07.2012 20:04 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.slf4j.Logger;
@@ -132,6 +132,7 @@ public class FWSDL
           LOGGER.debug(String.format("Adding inline schema to FSchema object:\n %s", schemaDocument.toString()));
 
           // Create Fabric schema object from XML Schema
+          this.schema = new FSchema();
           this.schema.addSchema(schemaDocument, wsdlFile.toURI());
         }
       }
@@ -486,7 +487,7 @@ public class FWSDL
    */
   private void init()
   {
-    this.schema = new FSchema();
+    this.schema = null;
 
     this.messages = new HashSet<FMessage>();
     this.portTypes = new HashSet<FPortType>();
@@ -557,7 +558,7 @@ public class FWSDL
     String result = "";
 
     // Print inline XML Schema (if any)
-    if (this.schema.toString().length() > 0)
+    if (null != this.schema && this.schema.toString().length() > 0)
     {
       result += "\nInline XML Schema:\n" + this.schema.toString();
     }

@@ -21,51 +21,46 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package fabric.module.dot;
+package fabric.module.api;
 
 import java.util.ArrayList;
-import java.util.Properties;
-
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FModuleBase;
-import fabric.module.api.FItemHandlerBase;
 
 /**
- * Fabric module used for creating Graphviz dot visualisations of the Schema object tree.
+ * Basic module interface in Fabric.
+ *
+ * A module has a name and description as well and can supply default
+ * values for any properties which are used to customise the behaviour
+ * of this module.
  *
  * @author Marco Wegner
  */
-public class FabricDotGraphModule implements FModuleBase {
+public interface FModuleBase {
 
     /**
-     * Option key used for the Dot graph output file.
+     * Returns this module's name.
+     *
+     * @return The module name.
      */
-    private static final String KEY_DOT_OUTFILE = "dot.outfile";
-    private Properties properties = null;
+    public abstract String getName();
 
     /**
-     * Constructs a new module.
+     * Returns this module's description.
+     *
+     * @return The module description.
      */
-    public FabricDotGraphModule(Properties p) {
-        this.properties = p;
-        this.properties.put(FabricDotGraphModule.KEY_DOT_OUTFILE, "dotfile.dot");
-    }
-
-    @Override
-    public String getName() {
-        return "dot";
-    }
-
-    @Override
-    public String getDescription() {
-        return String.format("Creates a Graphviz DOT file. Valid options are '%s'.", FabricDotGraphModule.KEY_DOT_OUTFILE);
-    }
-
-    @Override
-    public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception {
-        ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
-        handlers.add(new FabricDotGraphHandler(workspace, this.properties));
-
-        return handlers;
-    }
+    public abstract String getDescription();
+    
+    /**
+     * Creates and returns all handlers of this module, e.g. to
+     * walk an XML Schema object tree or the elements of a WSDL
+     * document.
+     * 
+     * @param workspace Workspace for code write-out
+     * 
+     * @return List of item handlers.
+     * 
+     * @throws Exception Error during handler instantiation
+     */
+    public abstract ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception;
 }

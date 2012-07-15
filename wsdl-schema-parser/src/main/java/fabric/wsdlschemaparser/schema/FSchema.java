@@ -61,7 +61,8 @@ public class FSchema {
     public FSchema(File xsdFile) throws Exception {
         log.info("Parsing XML Schema from file: " + xsdFile);
         addSchema(xsdFile);
-        topLevelObjectList = generateSchemaTrees(this.schemata);
+        // TODO seidel: Moved line to addSchema(Schema schema, URI location)
+        // topLevelObjectList = generateSchemaTrees(this.schemata);
     }
 
     /**
@@ -102,6 +103,9 @@ public class FSchema {
         this.prefixMap.put(schema.getTargetNamespace(), newPrefix);
 
         loadAllReferencedSchemata(schema);
+
+        // TODO seidel: Moved line here from FSchema(File xsdFile)
+        topLevelObjectList = generateSchemaTrees(this.schemata);
     }
 
     /**

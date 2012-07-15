@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
-import fabric.module.api.FabricDefaultHandler;
+import fabric.module.api.FDefaultSchemaHandler;
 
 import fabric.wsdlschemaparser.schema.FComplexType;
 import fabric.wsdlschemaparser.schema.FElement;
@@ -38,7 +38,7 @@ import fabric.module.exi.java.FixValueContainer.ListData;
  * 
  * @author seidel
  */
-public class FabricEXIHandler extends FabricDefaultHandler
+public class FabricEXIHandler extends FDefaultSchemaHandler
 {
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(FabricEXIHandler.class);

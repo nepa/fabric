@@ -21,9 +21,6 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * 
- */
 package fabric.module.dot;
 
 import java.util.Properties;
@@ -32,7 +29,7 @@ import de.uniluebeck.sourcegen.Workspace;
 import de.uniluebeck.sourcegen.dot.DGraphEdge;
 import de.uniluebeck.sourcegen.dot.DGraphFile;
 import de.uniluebeck.sourcegen.dot.DGraphNode;
-import fabric.module.api.FabricDefaultHandler;
+import fabric.module.api.FDefaultSchemaHandler;
 import fabric.wsdlschemaparser.schema.FComplexType;
 import fabric.wsdlschemaparser.schema.FElement;
 import fabric.wsdlschemaparser.schema.FSchemaObject;
@@ -45,7 +42,7 @@ import fabric.wsdlschemaparser.schema.FSimpleType;
  * @author Marco Wegner
  * @see <a href="http://www.graphviz.org">Graphviz Dot Homepage</a>
  */
-public class FabricDotGraphHandler extends FabricDefaultHandler {
+public class FabricDotGraphHandler extends FDefaultSchemaHandler {
 
     /**
      * The Graphviz dot attributes used for top-level-element nodes.
