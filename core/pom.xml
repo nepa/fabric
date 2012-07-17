@@ -106,11 +106,11 @@
     </dependency>
     <dependency>
       <groupId>de.uniluebeck.itm</groupId>
-      <artifactId>fabric.module.protobuf</artifactId>
+      <artifactId>fabric.module.cpp</artifactId>
     </dependency>
     <dependency>
       <groupId>de.uniluebeck.itm</groupId>
-      <artifactId>fabric.module.cpp</artifactId>
+      <artifactId>fabric.module.protobuf</artifactId>
     </dependency>
 
     <dependency>
