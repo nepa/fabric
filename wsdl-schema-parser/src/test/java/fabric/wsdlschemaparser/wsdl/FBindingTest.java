@@ -1,4 +1,4 @@
-/** 10.07.2012 19:15 */
+/** 17.07.2012 13:17 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -74,11 +74,11 @@ public class FBindingTest
     FExtensibilityElement secondElement = new FExtensibilityElement(new UnknownExtensibilityElement());
 
     // Test addPerBindingInformation()
-    assertEquals("Per-binding information count must be zero.", 0, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be zero.", 0, binding.perBindingInformationCount());
     binding.addPerBindingInformation(firstElement);
-    assertEquals("Per-binding information count must be one.", 1, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be one.", 1, binding.perBindingInformationCount());
     binding.addPerBindingInformation(secondElement);
-    assertEquals("Per-binding information count must be two.", 2, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be two.", 2, binding.perBindingInformationCount());
 
     // Reset binding object
     binding = FBinding.factory.create("bar", qName);
@@ -87,17 +87,17 @@ public class FBindingTest
     HashSet<FExtensibilityElement> elements = new HashSet<FExtensibilityElement>();
     elements.add(firstElement);
     elements.add(secondElement);
-    assertEquals("Per-binding information count must be zero.", 0, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be zero.", 0, binding.perBindingInformationCount());
     binding.addPerBindingInformations(elements);
-    assertEquals("Per-binding information count must be two.", 2, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be two.", 2, binding.perBindingInformationCount());
 
     // Reset binding object
     binding = FBinding.factory.create("foobar", qName);
 
     // Test setPerBindingInformations()
-    assertEquals("Per-binding information count must be zero.", 0, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be zero.", 0, binding.perBindingInformationCount());
     binding.setPerBindingInformations(elements);
-    assertEquals("Per-binding information count must be two.", 2, binding.getPerBindingInformations().size());
+    assertEquals("Per-binding information count must be two.", 2, binding.perBindingInformationCount());
 
     // Test getPerBindingInformations()
     Iterator iterator = binding.getPerBindingInformations().iterator();

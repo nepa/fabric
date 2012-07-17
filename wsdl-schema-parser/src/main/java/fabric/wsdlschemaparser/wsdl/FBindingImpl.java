@@ -1,4 +1,4 @@
-/** 07.07.2012 19:21 */
+/** 17.07.2012 13:14 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -139,6 +139,20 @@ public class FBindingImpl extends FWSDLElement implements FBinding
   public HashSet<FExtensibilityElement> getPerBindingInformations()
   {
     return (HashSet<FExtensibilityElement>)this.perBindingInformations;
+  }
+
+  /**
+   * Return the number of extensibility elements with
+   * per-binding information that are defined within
+   * the current binding object.
+   *
+   * @return Number of extensibility elements with
+   * per-binding information
+   */
+  @Override
+  public int perBindingInformationCount()
+  {
+    return this.perBindingInformations.size();
   }
 
   /**

@@ -1,4 +1,4 @@
-/** 07.07.2012 21:32 */
+/** 17.07.2012 13:09 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -210,6 +210,20 @@ public class FBindingOperationImpl extends FWSDLElement implements FBindingOpera
   }
 
   /**
+   * Return the number of extensibility elements with
+   * per-operation information that are defined within
+   * the current binding operation object.
+   *
+   * @return Number of extensibility elements with
+   * per-operation information
+   */
+  @Override
+  public int perOperationInformationCount()
+  {
+    return this.perOperationInformations.size();
+  }
+
+  /**
    * Set input message of the binding operation.
    *
    * @param bindingOperationInputMessage Input message
@@ -319,6 +333,18 @@ public class FBindingOperationImpl extends FWSDLElement implements FBindingOpera
     }
 
     return null;
+  }
+
+  /**
+   * Return the number of fault messages that are defined
+   * within the current binding operation object.
+   *
+   * @return Number of fault messages
+   */
+  @Override
+  public int faultMessageCount()
+  {
+    return this.faultMessages.size();
   }
 
   /**

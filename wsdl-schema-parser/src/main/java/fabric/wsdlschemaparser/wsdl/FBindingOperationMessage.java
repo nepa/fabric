@@ -1,4 +1,4 @@
-/** 03.07.2012 17:16 */
+/** 17.07.2012 13:14 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -82,6 +82,19 @@ abstract public class FBindingOperationMessage extends FWSDLElement
   public HashSet<FExtensibilityElement> getPerMessageInformations()
   {
     return (HashSet<FExtensibilityElement>)this.perMessageInformations;
+  }
+
+  /**
+   * Return the number of extensibility elements with
+   * per-message information that are defined within
+   * the current binding operation message object.
+   *
+   * @return Number of extensibility elements with
+   * per-message information
+   */
+  public int perMessageInformationCount()
+  {
+    return this.perMessageInformations.size();
   }
 
   /**

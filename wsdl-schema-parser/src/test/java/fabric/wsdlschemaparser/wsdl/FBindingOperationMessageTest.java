@@ -1,4 +1,4 @@
-/** 10.07.2012 12:56 */
+/** 17.07.2012 13:19 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -66,11 +66,11 @@ public class FBindingOperationMessageTest
     FExtensibilityElement secondElement = new FExtensibilityElement(new UnknownExtensibilityElement());
 
     // Test addPerMessageInformation()
-    assertEquals("Per-message information count must be zero.", 0, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be zero.", 0, message.perMessageInformationCount());
     message.addPerMessageInformation(firstElement);
-    assertEquals("Per-message information count must be one.", 1, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be one.", 1, message.perMessageInformationCount());
     message.addPerMessageInformation(secondElement);
-    assertEquals("Per-message information count must be two.", 2, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be two.", 2, message.perMessageInformationCount());
 
     // Reset message object
     message = new FBindingOperationInputMessage("bar");
@@ -79,17 +79,17 @@ public class FBindingOperationMessageTest
     HashSet<FExtensibilityElement> elements = new HashSet<FExtensibilityElement>();
     elements.add(firstElement);
     elements.add(secondElement);
-    assertEquals("Per-message information count must be zero.", 0, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be zero.", 0, message.perMessageInformationCount());
     message.addPerMessageInformations(elements);
-    assertEquals("Per-message information count must be two.", 2, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be two.", 2, message.perMessageInformationCount());
 
     // Reset message object
     message = new FBindingOperationInputMessage("bar");
 
     // Test setPerMessageInformations()
-    assertEquals("Per-message information count must be zero.", 0, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be zero.", 0, message.perMessageInformationCount());
     message.setPerMessageInformations(elements);
-    assertEquals("Per-message information count must be two.", 2, message.getPerMessageInformations().size());
+    assertEquals("Per-message information count must be two.", 2, message.perMessageInformationCount());
 
     // Test getPerMessageInformations()
     Iterator iterator = message.getPerMessageInformations().iterator();

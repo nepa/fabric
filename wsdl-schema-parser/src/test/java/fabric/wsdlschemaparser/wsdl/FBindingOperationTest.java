@@ -1,4 +1,4 @@
-/** 10.07.2012 18:36 */
+/** 17.07.2012 13:18 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -107,11 +107,11 @@ public class FBindingOperationTest
     FExtensibilityElement secondElement = new FExtensibilityElement(new UnknownExtensibilityElement());
 
     // Test addPerOperationInformation()
-    assertEquals("Per-operation information count must be zero.", 0, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be zero.", 0, bindingOperation.perOperationInformationCount());
     bindingOperation.addPerOperationInformation(firstElement);
-    assertEquals("Per-operation information count must be one.", 1, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be one.", 1, bindingOperation.perOperationInformationCount());
     bindingOperation.addPerOperationInformation(secondElement);
-    assertEquals("Per-operation information count must be two.", 2, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be two.", 2, bindingOperation.perOperationInformationCount());
 
     // Reset binding operation object
     bindingOperation = FBindingOperation.factory.create("bar", FOperationType.ONE_WAY, input, output);
@@ -120,17 +120,17 @@ public class FBindingOperationTest
     HashSet<FExtensibilityElement> elements = new HashSet<FExtensibilityElement>();
     elements.add(firstElement);
     elements.add(secondElement);
-    assertEquals("Per-operation information count must be zero.", 0, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be zero.", 0, bindingOperation.perOperationInformationCount());
     bindingOperation.addPerOperationInformations(elements);
-    assertEquals("Per-operation information count must be two.", 2, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be two.", 2, bindingOperation.perOperationInformationCount());
 
     // Reset binding operation object
     bindingOperation = FBindingOperation.factory.create("foobar", FOperationType.ONE_WAY, input, output);
 
     // Test setPerOperationInformations()
-    assertEquals("Per-operation information count must be zero.", 0, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be zero.", 0, bindingOperation.perOperationInformationCount());
     bindingOperation.setPerOperationInformations(elements);
-    assertEquals("Per-operation information count must be two.", 2, bindingOperation.getPerOperationInformations().size());
+    assertEquals("Per-operation information count must be two.", 2, bindingOperation.perOperationInformationCount());
 
     // Test getPerOperationInformations()
     Iterator iterator = bindingOperation.getPerOperationInformations().iterator();
@@ -156,11 +156,11 @@ public class FBindingOperationTest
     FBindingOperationFaultMessage secondFault = new FBindingOperationFaultMessage("secondFault");
 
     // Test addFaultMessage()
-    assertEquals("Fault message count must be zero.", 0, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be zero.", 0, bindingOperation.faultMessageCount());
     bindingOperation.addFaultMessage(firstFault);
-    assertEquals("Fault message count must be one.", 1, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be one.", 1, bindingOperation.faultMessageCount());
     bindingOperation.addFaultMessage(secondFault);
-    assertEquals("Fault message count must be two.", 2, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be two.", 2, bindingOperation.faultMessageCount());
 
     // Reset binding operation object
     bindingOperation = FBindingOperation.factory.create("bar", FOperationType.ONE_WAY, input, output);
@@ -169,17 +169,17 @@ public class FBindingOperationTest
     HashSet<FBindingOperationFaultMessage> faults = new HashSet<FBindingOperationFaultMessage>();
     faults.add(firstFault);
     faults.add(secondFault);
-    assertEquals("Fault message count must be zero.", 0, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be zero.", 0, bindingOperation.faultMessageCount());
     bindingOperation.addFaultMessages(faults);
-    assertEquals("Fault message count must be two.", 2, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be two.", 2, bindingOperation.faultMessageCount());
 
     // Reset binding operation object
     bindingOperation = FBindingOperation.factory.create("foobar", FOperationType.ONE_WAY, input, output);
 
     // Test setFaultMessages()
-    assertEquals("Fault message count must be zero.", 0, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be zero.", 0, bindingOperation.faultMessageCount());
     bindingOperation.setFaultMessages(faults);
-    assertEquals("Fault message count must be two.", 2, bindingOperation.getFaultMessages().size());
+    assertEquals("Fault message count must be two.", 2, bindingOperation.faultMessageCount());
 
     // Test getFaultMessages()
     Iterator iterator = bindingOperation.getFaultMessages().iterator();

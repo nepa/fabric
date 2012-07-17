@@ -1,4 +1,4 @@
-/** 07.07.2012 21:12 */
+/** 17.07.2012 12:52 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.HashSet;
@@ -107,4 +107,6 @@ public interface FOperation
   public void setFaultMessages(final HashSet<FOperationFaultMessage> operationFaultMessages);
   public HashSet<FOperationFaultMessage> getFaultMessages();
   public FOperationFaultMessage getFaultMessage(final String messageName);
+
+  public int faultMessageCount();
 }

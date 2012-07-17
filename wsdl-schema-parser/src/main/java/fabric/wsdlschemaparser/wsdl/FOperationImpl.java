@@ -1,4 +1,4 @@
-/** 07.07.2012 21:05 */
+/** 17.07.2012 12:54 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -305,6 +305,18 @@ public class FOperationImpl extends FWSDLElement implements FOperation
     }
 
     return null;
+  }
+
+  /**
+   * Return the number of fault messages that are
+   * defined within the current operation object.
+   *
+   * @return Number of fault messages
+   */
+  @Override
+  public int faultMessageCount()
+  {
+    return this.faultMessages.size();
   }
 
   /**

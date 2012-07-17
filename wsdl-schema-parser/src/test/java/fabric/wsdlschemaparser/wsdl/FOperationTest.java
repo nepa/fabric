@@ -1,4 +1,4 @@
-/** 10.07.2012 12:57 */
+/** 17.07.2012 13:16 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -113,11 +113,11 @@ public class FOperationTest
     FOperationFaultMessage secondFault = new FOperationFaultMessage("secondFault", qName);
 
     // Test addFaultMessage()
-    assertEquals("Fault message count must be zero.", 0, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be zero.", 0, operation.faultMessageCount());
     operation.addFaultMessage(firstFault);
-    assertEquals("Fault message count must be one.", 1, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be one.", 1, operation.faultMessageCount());
     operation.addFaultMessage(secondFault);
-    assertEquals("Fault message count must be two.", 2, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be two.", 2, operation.faultMessageCount());
 
     // Reset operation object
     operation = FOperation.factory.create("bar", FOperationType.ONE_WAY, input, output);
@@ -126,17 +126,17 @@ public class FOperationTest
     HashSet<FOperationFaultMessage> faults = new HashSet<FOperationFaultMessage>();
     faults.add(firstFault);
     faults.add(secondFault);
-    assertEquals("Fault message count must be zero.", 0, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be zero.", 0, operation.faultMessageCount());
     operation.addFaultMessages(faults);
-    assertEquals("Fault message count must be two.", 2, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be two.", 2, operation.faultMessageCount());
 
     // Reset operation object
     operation = FOperation.factory.create("foobar", FOperationType.ONE_WAY, input, output);
 
     // Test setFaultMessages()
-    assertEquals("Fault message count must be zero.", 0, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be zero.", 0, operation.faultMessageCount());
     operation.setFaultMessages(faults);
-    assertEquals("Fault message count must be two.", 2, operation.getFaultMessages().size());
+    assertEquals("Fault message count must be two.", 2, operation.faultMessageCount());
 
     // Test getFaultMessages()
     Iterator iterator = operation.getFaultMessages().iterator();

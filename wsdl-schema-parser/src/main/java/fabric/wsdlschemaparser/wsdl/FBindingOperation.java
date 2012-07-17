@@ -1,4 +1,4 @@
-/** 07.07.2012 22:23 */
+/** 17.07.2012 13:04 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.HashSet;
@@ -106,6 +106,8 @@ public interface FBindingOperation
   public void setPerOperationInformations(final HashSet<FExtensibilityElement> perOperationInformations);
   public HashSet<FExtensibilityElement> getPerOperationInformations();
 
+  public int perOperationInformationCount();
+
   public void setInputMessage(final FBindingOperationInputMessage bindingOperationInputMessage);
   public FBindingOperationInputMessage getInputMessage();
 
@@ -117,4 +119,6 @@ public interface FBindingOperation
   public void setFaultMessages(final HashSet<FBindingOperationFaultMessage> bindingOperationFaultMessages);
   public HashSet<FBindingOperationFaultMessage> getFaultMessages();
   public FBindingOperationFaultMessage getFaultMessage(final String messageName);
+
+  public int faultMessageCount();
 }

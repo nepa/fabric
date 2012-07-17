@@ -1,4 +1,4 @@
-/** 07.07.2012 22:03 */
+/** 17.07.2012 12:55 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.HashSet;
@@ -78,6 +78,8 @@ public interface FBinding
   public void addPerBindingInformations(final HashSet<FExtensibilityElement> perBindingInformations);
   public void setPerBindingInformations(final HashSet<FExtensibilityElement> perBindingInformations);
   public HashSet<FExtensibilityElement> getPerBindingInformations();
+
+  public int perBindingInformationCount();
 
   public void addBindingOperation(final FBindingOperation operation);
   public void addBindingOperations(final HashSet<FBindingOperation> operations);
