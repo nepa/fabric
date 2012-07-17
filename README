@@ -1,40 +1,49 @@
 ----------------------------------------
   FABRIC
 ----------------------------------------
+
 Fabric is a framework for code generation based on several scientific
-publications [1,2,3]. It is comprised of components for
-  - parsing XML Schema and WSDL files into a tree, for
+publications [1,2,3,4]. It is comprised of components for
+
+  - parsing XML Schema and WSDL files into a tree structure, for
 
   - a module API to walk the tree for codegeneration, and for
 
-  - code generation (C, C++, Java) using simple APIs instead of
+  - code generation (Java, C, C++) using simple APIs instead of
     writing to stdout.
 
-In addition, a number of modules are contained that generate code
-  - microFibre: An XML (de-)compression scheme usable for
-    ressource-constraint devices [2,3] that generates code for
-    Java and C++.
+In addition, a number of modules are contained that generate code:
 
-  - macroFibre: An XML (de-)serialization scheme for
-    ressource-constraint devices [3] that generates code for
-    Java and C++.
-
-  - XML: XML (de-)serialization for easy conversion from/to
-    macroFibre/microFibre.
-
-  - protobuf: Converts XML Schema files to Google protobuf
-    (http://code.google.com/p/protobuf/) files.
-
-In 2011/12 the Fabric framework was extended by two more modules:
   - typegen: A generator to create JavaBean-like container
-    classes from XML schema documents for both Java and C++.
+    classes from XML Schema documents for both Java and C++.
 
   - exi: An implementation of the Efficient XML Interchange
     specification (http://www.w3.org/TR/exi) for XML (de-)
-    compression
+    serialization.
+
+  - midgen4j: A framework to create a universal service provider
+    for various message-oriented Java middleware technologies.
+
+Formerly, the framework also contained the following modules,
+which are no longer included and/or maintained:
+
+  - microFibre: An XML (de-)compression scheme usable for
+    ressource-constraint devices [2,3] that generates code
+    for Java and C++.
+
+  - macroFibre: An XML (de-)serialization scheme for
+    ressource-constraint devices [3] that generates code
+    for Java and C++.
+
+  - XML: XML (de-)serialization for easy conversion from/to
+    microFibre/macroFibre.
+
+  - protobuf: Converts XML Schema files to Google protobuf
+    (http://code.google.com/p/protobuf) files.
 
 Fabric works as follows:
-  1.) Input files are XML Schema and WSDL files which are parsed
+
+  1.) Input files are XML Schema or WSDL documents, which are parsed
     into a tree. This tree contains most information from the schema
     but abstracts away from all the nasty details of XML Schema
     and WSDL. It automatically resolves all imports, references,
@@ -47,61 +56,75 @@ Fabric works as follows:
     language-specific APIs to add components to the files (e.g., a
     Java class). To such elements, further stuff can be added (e.g.,
     methods). The benefit over directly writing code to stdout is
-    that code can be added at any time in any order. Once the
-    generation is done, the workspace can be serialized to the disk.
+    that code can be added at any time and in almost any order. Once
+    the generation is done, the workspace can be serialized to disk.
 
-  3.) A set of modules is invoked to handle the parsed tree. Modules are
-    basically tree-walkers that react to events that are the result
-    from walking the tree (e.g., handling a root element of a schema).
+  3.) A set of modules is invoked to handle the parsed documents. Each
+    module may provide multiple item handlers, e.g. to walk the object
+    tree of an XML Schema or to process the elements of a WSDL file.
 
-  4.) The workspace is written to the disk.
-
-----------------------------------------
-CONTACT
-----------------------------------------
-Any feedback will be greatly appreciated, at the GitHub project page
-(https://github.com/pfisterer/fabric) or by contacting
-Dennis Pfisterer (fabric__A_T__farberg__de).
-
-For feedback on the type generator or EXI module, please visit the
-Fabric fork at https://www.github.com/nepa/fabric and contact one
-of its maintainers.
+  4.) Eventually, the workspace is written to disk.
 
 ----------------------------------------
-INSTALLATION / BUILDING
+  CONTACT / WEBSITE
 ----------------------------------------
-No installation is required. To build fabric, you need Java 6 or higher
- and Maven 2 or higher (http://maven.apache.org/).
+
+Any feedback concerning Fabric or one of its modules is greatly
+appreciated. The GitHub fork https://github.com/nepa/fabric is
+currently maintained by:
+
+  Sascha Seidel <NetPanther@gmx.net>
+
+Further information about the Fabric framework can be found at:
+
+  http://www.nptech.de/fabric
+
+----------------------------------------
+  INSTALLATION / BUILDING
+----------------------------------------
+
+No installation is required. To build Fabric, you need at
+least Java 6 and Maven 2 or later (http://maven.apache.org).
 
 Before cloning this repository, be sure to enable automatic
-conversion of CRLF/LF on your machine using "git config
---global core.autocrlf input". For more information, please
-refer to http://help.github.com/dealing-with-lineendings/
+conversion of CRLF/LF on your machine using:
 
-Clone the repository using
-"git clone git://github.com/pfisterer/fabric.git"
+  git config --global core.autocrlf input
 
-To build, run "mvn install", this will build fabric and place the
-generated jar file in target/ and in your local Maven repository.
+For more information, please refer to:
+
+  https://help.github.com/articles/dealing-with-line-endings
+
+Clone the repository using:
+
+  git clone git://github.com/nepa/fabric.git
+
+To build the project, run "mvn install" from the command line.
+This will build Fabric and place the generated jar file in
+target/ and in your local Maven repository.
+
+If you encounter dependency problems, read third-party/INSTALL.
 
 ----------------------------------------
-USAGE
+  USAGE
 ----------------------------------------
 
   java -jar core/target/fabric.core-1.0.one-jar.jar --help
 
 ----------------------------------------
-LICENSE
+  LICENSE
 ----------------------------------------
-Fabric is licenced under a BSD license. For details, see
-src/etc/license-header.txt
 
-If you use Fabric for scientific publications, I appreciate
-if the papers below are referenced.
+Fabric is released under the Modified BSD license. For more
+details, please see src/etc/license-header.txt.
+
+When you use Fabric for scientific publications, we would
+appreciate if the papers below are referenced.
 
 ----------------------------------------
-REFERENCES
+  REFERENCES
 ----------------------------------------
+
 [1] Dennis Pfisterer, Horst Hellbrueck, and Stefan Fischer. Fabric:
   Towards data type-centric middleware synthesis. In Proceedings
   of the Euro-American Workshop on Middleware for Sensor Networks
@@ -117,3 +140,6 @@ REFERENCES
 [3] Dennis Pfisterer: Comprehensive Development Support for Wireless
   Sensor Networks, PhD Thesis, Institute of Telematics, University
   of Luebeck, Germany, 2007.
+
+[4] Sascha Seidel: Metaebene - Fabric als Code Generation Framework
+  für Java, C und C++. In Proceedings of LinuxTag Berlin, May 2012.
