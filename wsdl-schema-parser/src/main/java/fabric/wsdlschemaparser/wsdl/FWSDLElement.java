@@ -1,4 +1,4 @@
-/** 05.07.2012 18:50 */
+/** 17.07.2012 14:18 */
 package fabric.wsdlschemaparser.wsdl;
 
 /**
@@ -31,4 +31,24 @@ abstract public class FWSDLElement
    */
   @Override
   abstract public String toString();
+
+  /**
+   * Compare WSDL element with another object of the
+   * same type.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  abstract public boolean equals(Object object);
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  abstract public int hashCode();
 }

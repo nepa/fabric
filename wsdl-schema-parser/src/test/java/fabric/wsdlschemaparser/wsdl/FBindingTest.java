@@ -1,4 +1,4 @@
-/** 17.07.2012 13:17 */
+/** 19.07.2012 12:25 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -162,5 +162,28 @@ public class FBindingTest
 
       assertTrue("Binding must contain binding operation that was added previously.", operations.contains(bindingOperation));
     }
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    QName firstQName = new QName("namespaceURI", "firstLocalPart");
+    QName secondQName = new QName("namespaceURI", "secondLocalPart");
+    FBinding firstBinding = FBinding.factory.create("firstBinding", firstQName);
+    FBinding secondBinding = FBinding.factory.create("secondBinding", secondQName);
+
+    // Unequality
+    assertFalse("Binding objects with different names and QName values must not be equal.", firstBinding.equals(secondBinding));
+
+    secondBinding.setPortTypeReference(firstQName);
+    assertFalse("Binding objects with different QName values must not be equal.", firstBinding.equals(secondBinding));
+
+    // Equality
+    firstBinding.setBindingName("foobar");
+    secondBinding.setBindingName("foobar");
+    assertTrue("Binding objects must be equal.", firstBinding.equals(secondBinding));
   }
 }

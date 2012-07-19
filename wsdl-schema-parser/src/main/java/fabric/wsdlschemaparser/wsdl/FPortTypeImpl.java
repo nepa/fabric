@@ -1,4 +1,4 @@
-/** 08.07.2012 00:25 */
+/** 17.07.2012 15:03 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -132,5 +132,63 @@ public class FPortTypeImpl extends FWSDLElement implements FPortType
     }
 
     return result;
+  }
+
+  /**
+   * Compare port type object with another object of the
+   * same type, based on the attributes of the current
+   * class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FPortTypeImpl otherPortType = (FPortTypeImpl)object;
+
+      // Attribute values are equal
+      if (this.portTypeName.equals(otherPortType.getPortTypeName()) &&
+          this.operations.equals(otherPortType.getOperations()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+
+    hash = 61 * hash + (this.portTypeName != null ? this.portTypeName.hashCode() : 0);
+    hash = 61 * hash + (this.operations != null ? this.operations.hashCode() : 0);
+
+    return hash;
   }
 }

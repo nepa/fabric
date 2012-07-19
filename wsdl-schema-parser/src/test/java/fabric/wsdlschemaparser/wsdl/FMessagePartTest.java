@@ -1,4 +1,4 @@
-/** 10.07.2012 02:12 */
+/** 19.07.2012 12:16 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -99,5 +99,31 @@ public class FMessagePartTest
 
     part = new FMessagePartImpl("bar", qName, false);
     assertTrue("Part must only have 'type' attribute set.", !part.hasElementAttribute() && part.hasTypeAttribute());
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    QName qName = new QName("namespaceURI", "localPart");
+    FMessagePart firstPart = FMessagePart.factory.create("firstPart", qName, true);
+    FMessagePart secondPart = FMessagePart.factory.create("secondPart", qName, false);
+
+    // Unequality
+    assertFalse("Message parts with different names and attributes must not be equal.", firstPart.equals(secondPart));
+
+    firstPart.setPartName("foobar");
+    secondPart.setPartName("foobar");
+    assertFalse("Message parts with different attributes must not be equal.", firstPart.equals(secondPart));
+
+    secondPart.setElementName(qName);
+    // 'type' attribute is still set!
+    assertFalse("Message parts with different attributes must not be equal.", firstPart.equals(secondPart));
+
+    // Equality
+    secondPart.setTypeName(null);
+    assertTrue("Message parts must be equal.", firstPart.equals(secondPart));
   }
 }

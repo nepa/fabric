@@ -1,4 +1,4 @@
-/** 11.07.2012 02:38 */
+/** 19.07.2012 11:37 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -53,5 +53,23 @@ public class FExtensibilityElementTest
     element.setRequired(false);
     assertTrue("Element must not be required.", !element.getRequired());
     assertTrue("Element must not be required.", !element.isRequired()); // Test alias as well
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    ExtensibilityElement element = new UnknownExtensibilityElement();
+    FExtensibilityElement firstWrapper = new FExtensibilityElement(element);
+    FExtensibilityElement secondWrapper = new FExtensibilityElement(null);
+
+    // Unequality
+    assertFalse("Wrapper objects with different content must not be equal.", firstWrapper.equals(secondWrapper));
+
+    // Equality
+    secondWrapper.setExtensibilityElement(element);
+    assertTrue("Wrapper objects must be equal.", firstWrapper.equals(secondWrapper));
   }
 }

@@ -1,4 +1,4 @@
-/** 10.07.2012 02:19 */
+/** 19.07.2012 11:56 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -57,5 +57,27 @@ public class FOperationMessageTest
     message.setMessageAttribute(newQName);
     assertEquals("Message attribute must match new value.", "newLocalPart",
             message.getMessageAttribute().getLocalPart());
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    QName qName = new QName("namespaceURI", "localPart");
+    FOperationMessage firstInput = new FOperationInputMessage("foo", qName);
+    FOperationMessage secondInput = new FOperationInputMessage("bar", qName);
+    FOperationMessage output = new FOperationOutputMessage("foo", qName);
+
+    // Unequality
+    assertFalse("Message objects with different type must not be equal.", firstInput.equals(output));
+
+    assertFalse("Message objects with different names must not be equal.", firstInput.equals(secondInput));
+
+    // Equality
+    firstInput.setOperationMessageName("foobar");
+    secondInput.setOperationMessageName("foobar");
+    assertTrue("Message objects must be equal.", firstInput.equals(secondInput));
   }
 }

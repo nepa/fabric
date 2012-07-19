@@ -1,4 +1,4 @@
-/** 11.07.2012 02:00 */
+/** 19.07.2012 10:11 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -101,5 +101,34 @@ public class FServiceTest
 
       assertTrue("Service must contain port that was added previously.", ports.contains(port));
     }
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    FService firstService = FService.factory.create("foo");
+    FService secondService = FService.factory.create("bar");
+
+    QName qName = new QName("namespaceURI", "localPart");
+    FExtensibilityElement address = new FExtensibilityElement(new UnknownExtensibilityElement());
+    FPort firstPort = FPort.factory.create("firstPort", qName, address);
+    FPort secondPort = FPort.factory.create("secondPort", qName, address);
+
+    // Unequality
+    firstService.addPort(firstPort);
+    firstService.addPort(secondPort);
+    assertFalse("Service objects with different names and ports must not be equal.", firstService.equals(secondService));
+
+    // Adding in different order should not affect equality!
+    secondService.addPort(secondPort);
+    secondService.addPort(firstPort);
+    assertFalse("Service objects with different names must not be equal.", firstService.equals(secondService));
+
+    // Equality
+    secondService.setServiceName("foo");
+    assertTrue("Service objects must be equal.", firstService.equals(secondService));
   }
 }

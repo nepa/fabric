@@ -1,4 +1,4 @@
-/** 10.07.2012 00:58 */
+/** 17.07.2012 14:46 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -167,5 +167,62 @@ public class FMessageImpl extends FWSDLElement implements FMessage
     }
 
     return result;
+  }
+
+  /**
+   * Compare message object with another object of the same
+   * type, based on the attributes of the current class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FMessageImpl otherMessage = (FMessageImpl)object;
+      
+      // Attribute values are equal
+      if (this.messageName.equals(otherMessage.getMessageName()) &&
+          this.parts.equals(otherMessage.getParts()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+
+    hash = 37 * hash + (this.messageName != null ? this.messageName.hashCode() : 0);
+    hash = 37 * hash + (this.parts != null ? this.parts.hashCode() : 0);
+
+    return hash;
   }
 }

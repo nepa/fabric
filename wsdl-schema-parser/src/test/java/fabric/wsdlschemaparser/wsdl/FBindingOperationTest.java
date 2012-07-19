@@ -1,4 +1,4 @@
-/** 17.07.2012 13:18 */
+/** 19.07.2012 11:46 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -195,5 +195,31 @@ public class FBindingOperationTest
             bindingOperation.getFaultMessage("firstFault"));
     assertNull("Binding operation must not contait a fault message named 'thirdFault'.",
             bindingOperation.getFaultMessage("thirdFault"));
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    FBindingOperationInputMessage firstInput = new FBindingOperationInputMessage("firstInput");
+    FBindingOperationInputMessage secondInput = new FBindingOperationInputMessage("secondInput");
+    FBindingOperationOutputMessage output = new FBindingOperationOutputMessage("output");
+    FBindingOperation firstOperation = FBindingOperation.factory.create("foo", FOperationType.REQUEST_RESPONSE, firstInput, output);
+    FBindingOperation secondOperation = FBindingOperation.factory.create("bar", FOperationType.REQUEST_RESPONSE, secondInput, output);
+
+    // Notice: Operation type is solely used for implicit message naming in
+    // FBindingOperation, so we cannot reset it after calling the constructor.
+
+    // Unequality
+    assertFalse("Operation objects with different names and messages must not be equal.", firstOperation.equals(secondOperation));
+
+    secondOperation.setInputMessage(firstInput);
+    assertFalse("Operation objects with different names must not be equal.", firstOperation.equals(secondOperation));
+
+    // Equality
+    secondOperation.setBindingOperationName("foo");
+    assertTrue("Operation objects must be equal.", firstOperation.equals(secondOperation));
   }
 }

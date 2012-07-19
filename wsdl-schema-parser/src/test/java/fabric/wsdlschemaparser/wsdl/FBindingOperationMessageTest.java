@@ -1,4 +1,4 @@
-/** 17.07.2012 13:19 */
+/** 19.07.2012 10:25 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -99,5 +99,25 @@ public class FBindingOperationMessageTest
 
       assertTrue("Message must contain per-message information that was added previously.", elements.contains(element));
     }
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    FBindingOperationMessage firstMessage = new FBindingOperationInputMessage("foo");
+    FBindingOperationMessage secondMessage = new FBindingOperationOutputMessage("foo");
+    FBindingOperationMessage thirdMessage = new FBindingOperationOutputMessage("bar");
+
+    // Unequality
+    assertFalse("Input messages and output messages must not be equal.", firstMessage.equals(secondMessage));
+
+    assertFalse("Message objects with different names must not be equal.", secondMessage.equals(thirdMessage));
+
+    // Euqality
+    thirdMessage.setBindingOperationMessageName("foo");
+    assertTrue("Message objects must be equal.", secondMessage.equals(thirdMessage));
   }
 }

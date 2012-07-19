@@ -1,4 +1,4 @@
-/** 08.07.2012 00:16 */
+/** 17.07.2012 15:00 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -145,5 +145,64 @@ public class FPortImpl extends FWSDLElement implements FPort
             endpointAddress);
 
     return result;
+  }
+
+  /**
+   * Compare port object with another object of the same
+   * type, based on the attributes of the current class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FPortImpl otherPort = (FPortImpl)object;
+
+      // Attribute values are equal
+      if (this.portName.equals(otherPort.getPortName()) &&
+          this.bindingReference.equals(otherPort.getBindingReference()) &&
+          this.addressInformation.equals(otherPort.getAddressInformation()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+
+    hash = 37 * hash + (this.portName != null ? this.portName.hashCode() : 0);
+    hash = 37 * hash + (this.bindingReference != null ? this.bindingReference.hashCode() : 0);
+    hash = 37 * hash + (this.addressInformation != null ? this.addressInformation.hashCode() : 0);
+
+    return hash;
   }
 }

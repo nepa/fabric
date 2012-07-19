@@ -1,4 +1,4 @@
-/** 10.07.2012 17:49 */
+/** 19.07.2012 11:24 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -103,5 +103,35 @@ public class FPortTypeTest
 
       assertTrue("Port type must contain operation that was added previously.", operations.contains(operation));
     }
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    FPortType firstPortType = FPortType.factory.create("foo");
+    FPortType secondPortType = FPortType.factory.create("bar");
+
+    QName qName = new QName("namespaceURI", "localPart");
+    FOperationInputMessage input = new FOperationInputMessage("input", qName);
+    FOperationOutputMessage output = new FOperationOutputMessage("output", qName);
+    FOperation firstOperation = FOperation.factory.create("firstOperation", FOperationType.REQUEST_RESPONSE, input, output);
+    FOperation secondOperation = FOperation.factory.create("secondOperation", FOperationType.REQUEST_RESPONSE, input, output);
+
+    // Unequality
+    firstPortType.addOperation(firstOperation);
+    firstPortType.addOperation(secondOperation);
+    assertFalse("Port type objects with different names and operations must not be equal.", firstPortType.equals(secondPortType));
+
+    // Adding in different order should not affect equality!
+    secondPortType.addOperation(secondOperation);
+    secondPortType.addOperation(firstOperation);
+    assertFalse("Port type objects with different names must not be equal.", firstPortType.equals(secondPortType));
+
+    // Equality
+    secondPortType.setPortTypeName("foo");
+    assertTrue("Port type objects must be equal.", firstPortType.equals(secondPortType));
   }
 }

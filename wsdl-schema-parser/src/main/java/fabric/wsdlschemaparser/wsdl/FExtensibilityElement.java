@@ -1,4 +1,4 @@
-/** 05.07.2012 19:55 */
+/** 17.07.2012 15:08 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -127,5 +127,61 @@ public class FExtensibilityElement extends FWSDLElement
   public String toString()
   {
     return this.getImplementationName();
+  }
+
+  /**
+   * Compare extensibility element object with another object
+   * of the same type, based on the attributes of the current
+   * class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FExtensibilityElement otherExtensibilityElement = (FExtensibilityElement)object;
+
+      // Attribute values are equal
+      if (this.extensibilityElement.equals(otherExtensibilityElement.getExtensibilityElement()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 5;
+
+    hash = 13 * hash + (this.extensibilityElement != null ? this.extensibilityElement.hashCode() : 0);
+
+    return hash;
   }
 }

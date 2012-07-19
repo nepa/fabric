@@ -1,4 +1,4 @@
-/** 17.07.2012 13:14 */
+/** 17.07.2012 14:32 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -234,5 +234,67 @@ public class FBindingImpl extends FWSDLElement implements FBinding
     }
 
     return result;
+  }
+
+  /**
+   * Compare binding object with another object of the
+   * same type, based on the attributes of the current
+   * class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FBindingImpl otherBinding = (FBindingImpl)object;
+
+      // Attribute values are equal
+      if (this.bindingName.equals(otherBinding.getBindingName()) &&
+          this.portTypeReference.equals(otherBinding.getPortTypeReference()) &&
+          this.perBindingInformations.equals(otherBinding.getPerBindingInformations()) &&
+          this.operations.equals(otherBinding.getBindingOperations()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+
+    hash = 71 * hash + (this.bindingName != null ? this.bindingName.hashCode() : 0);
+    hash = 71 * hash + (this.portTypeReference != null ? this.portTypeReference.hashCode() : 0);
+    hash = 71 * hash + (this.perBindingInformations != null ? this.perBindingInformations.hashCode() : 0);
+    hash = 71 * hash + (this.operations != null ? this.operations.hashCode() : 0);
+
+    return hash;
   }
 }

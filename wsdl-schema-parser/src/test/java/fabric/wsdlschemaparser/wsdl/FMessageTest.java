@@ -1,4 +1,4 @@
-/** 10.07.2012 01:05 */
+/** 19.07.2012 12:03 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -131,5 +131,34 @@ public class FMessageTest
     message.addPart(secondPart);
     assertTrue("Message must still not be flagged as singlepart.", !message.isSinglepart());
     assertTrue("Message must still be flagged as multipart.", message.isMultipart());
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    FMessage firstMessage = FMessage.factory.create("firstMessage");
+    FMessage secondMessage = FMessage.factory.create("secondMessage");
+
+    QName qName = new QName("namespaceURI", "localPart");
+    FMessagePart firstPart = FMessagePart.factory.create("firstPart", qName, true);
+    FMessagePart secondPart = FMessagePart.factory.create("secondPart", qName, true);
+
+    // Unequality
+    firstMessage.addPart(firstPart);
+    firstMessage.addPart(secondPart);
+    assertFalse("Message objects with different names and parts must not be equal.", firstMessage.equals(secondMessage));
+
+    // Adding in different order should not affect equality!
+    secondMessage.addPart(secondPart);
+    secondMessage.addPart(firstPart);
+    assertFalse("Message objects with different names must not be equal.", firstMessage.equals(secondMessage));
+
+    // Equality
+    firstMessage.setMessageName("foobar");
+    secondMessage.setMessageName("foobar");
+    assertTrue("Message objects must be equal.", firstMessage.equals(secondMessage));
   }
 }

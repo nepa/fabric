@@ -1,4 +1,4 @@
-/** 10.07.2012 01:24 */
+/** 19.07.2012 12:15 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -256,5 +256,70 @@ public class FMessagePartImpl extends FWSDLElement implements FMessagePart
     result = String.format("Part: '%s' (%s)", this.partName, type);
 
     return result;
+  }
+
+  /**
+   * Compare message part object with another object of the
+   * same type, based on the attributes of the current class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FMessagePartImpl otherMessagePart = (FMessagePartImpl)object;
+
+      // Attribute values are equal
+      if (this.partName.equals(otherMessagePart.getPartName()) &&
+
+          // 'element' attrbute is optional, so it may be 'null'
+          (null == this.elementAttribute && null == otherMessagePart.getElementName() ||
+           null != this.elementAttribute && this.elementAttribute.equals(otherMessagePart.getElementName())) &&
+
+          // 'type' attribute is optional, so it may be 'null'
+          (null == this.typeAttribute && null == otherMessagePart.getTypeName() ||
+           null != this.typeAttribute && this.typeAttribute.equals(otherMessagePart.getTypeName())))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 5;
+
+    hash = 79 * hash + (this.partName != null ? this.partName.hashCode() : 0);
+    hash = 79 * hash + (this.elementAttribute != null ? this.elementAttribute.hashCode() : 0);
+    hash = 79 * hash + (this.typeAttribute != null ? this.typeAttribute.hashCode() : 0);
+
+    return hash;
   }
 }

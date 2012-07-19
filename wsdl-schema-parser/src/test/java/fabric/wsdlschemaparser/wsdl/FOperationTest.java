@@ -1,4 +1,4 @@
-/** 17.07.2012 13:16 */
+/** 19.07.2012 11:27 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -150,5 +150,32 @@ public class FOperationTest
     // Test getFaultMessage()
     assertNotNull("Operation must contain a fault message named 'firstFault'.", operation.getFaultMessage("firstFault"));
     assertNull("Operation must not contait a fault message named 'thirdFault'.", operation.getFaultMessage("thirdFault"));
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    QName qName = new QName("namespaceURI", "localPart");
+    FOperationInputMessage firstInput = new FOperationInputMessage("firstInput", qName);
+    FOperationInputMessage secondInput = new FOperationInputMessage("secondInput", qName);
+    FOperationOutputMessage output = new FOperationOutputMessage("output", qName);
+    FOperation firstOperation = FOperation.factory.create("foo", FOperationType.REQUEST_RESPONSE, firstInput, output);
+    FOperation secondOperation = FOperation.factory.create("bar", FOperationType.SOLICIT_RESPONSE, secondInput, output);
+
+    // Unequality
+    assertFalse("Operation objects with different names, types and messages must not be equal.", firstOperation.equals(secondOperation));
+
+    secondOperation.setInputMessage(firstInput);
+    assertFalse("Operation objects with different names and types must not be equal.", firstOperation.equals(secondOperation));
+
+    secondOperation.setOperationType(FOperationType.REQUEST_RESPONSE);
+    assertFalse("Operation objects with different names must not be equal.", firstOperation.equals(secondOperation));
+
+    // Equality
+    secondOperation.setOperationName("foo");
+    assertTrue("Operation objects must be equal.", firstOperation.equals(secondOperation));
   }
 }

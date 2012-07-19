@@ -1,4 +1,4 @@
-/** 11.07.2012 01:29 */
+/** 19.07.2012 10:20 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -67,5 +67,28 @@ public class FPortTest
     port.setAddressInformation(newAddressInformation);
     assertEquals("Address information must match new value.", "HTTPAddressImpl",
             port.getAddressInformation().getImplementationName());
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    QName firstQName = new QName("namespaceURI", "localPart");
+    QName secondQName = new QName("namespaceURI", "secondLocalPart");
+    FExtensibilityElement address = new FExtensibilityElement(new UnknownExtensibilityElement());
+    FPort firstPort = FPort.factory.create("foo", firstQName, address);
+    FPort secondPort = FPort.factory.create("bar", secondQName, address);
+
+    // Unequality
+    assertFalse("Port objects with different names and QName values must not be equal.", firstPort.equals(secondPort));
+
+    secondPort.setPortName("foo");
+    assertFalse("Port objects with different QName values must not be equal.", firstPort.equals(secondPort));
+
+    // Equality
+    secondPort.setBindingReference(firstQName);
+    assertTrue("Port objects must be equal.", firstPort.equals(secondPort));
   }
 }

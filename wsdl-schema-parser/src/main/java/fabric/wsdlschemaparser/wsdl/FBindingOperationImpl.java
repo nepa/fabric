@@ -1,4 +1,4 @@
-/** 17.07.2012 13:09 */
+/** 19.07.2012 11:31 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -371,9 +371,84 @@ public class FBindingOperationImpl extends FWSDLElement implements FBindingOpera
     }
 
     // Print method name, input/output arguments and faults
-    result += String.format("Operation: %s(%s): %s%s", this.bindingOperationName, this.inputMessage.toString(),
-            this.outputMessage.toString(), (("").equals(faults) ? "" : " [Faults: " + faults + "]"));
+    result += String.format("Operation: %s(%s): %s%s", this.bindingOperationName,
+            (null != this.inputMessage ? this.inputMessage.toString() : "-"),
+            (null != this.outputMessage ? this.outputMessage.toString() : "-"),
+            (("").equals(faults) ? "" : " [Faults: " + faults + "]"));
 
     return result;
+  }
+
+  /**
+   * Compare binding operation object with another object
+   * of the same type, based on the attributes of the
+   * current class.
+   *
+   * @param object Other object to compare with
+   *
+   * @return True if objects are equal, false otherwise
+   */
+  @Override
+  public boolean equals(Object object)
+  {
+    // Other object is null
+    if (null == object)
+    {
+      return false;
+    }
+
+    // Catch self-comparison
+    if (this == object)
+    {
+      return true;
+    }
+
+    // Objects are of the same class
+    if (this.getClass() == object.getClass())
+    {
+      // Safe cast to desired type
+      FBindingOperationImpl otherBindingOperation = (FBindingOperationImpl)object;
+
+      // Attribute values are equal
+      if (this.bindingOperationName.equals(otherBindingOperation.getBindingOperationName()) &&
+          this.perOperationInformations.equals(otherBindingOperation.getPerOperationInformations()) &&
+
+          // Input message is optional, so it may be 'null'
+          (null == this.inputMessage && null == otherBindingOperation.getInputMessage() ||
+           null != this.inputMessage && this.inputMessage.equals(otherBindingOperation.getInputMessage())) &&
+
+          // Output message is optional, so it may be 'null'
+          (null == this.outputMessage && null == otherBindingOperation.getOutputMessage() ||
+           null != this.outputMessage && this.outputMessage.equals(otherBindingOperation.getOutputMessage())) &&
+
+          // Fault messages are optional, so they may be 'null'
+          (null == this.faultMessages && null == otherBindingOperation.getFaultMessages() ||
+           null != this.faultMessages && this.faultMessages.equals(otherBindingOperation.getFaultMessages())))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Generate hash code for object comparison based on
+   * the attributes of the current class.
+   *
+   * @return Hash code for current object
+   */
+  @Override
+  public int hashCode()
+  {
+    int hash = 5;
+
+    hash = 17 * hash + (this.bindingOperationName != null ? this.bindingOperationName.hashCode() : 0);
+    hash = 17 * hash + (this.perOperationInformations != null ? this.perOperationInformations.hashCode() : 0);
+    hash = 17 * hash + (this.inputMessage != null ? this.inputMessage.hashCode() : 0);
+    hash = 17 * hash + (this.outputMessage != null ? this.outputMessage.hashCode() : 0);
+    hash = 17 * hash + (this.faultMessages != null ? this.faultMessages.hashCode() : 0);
+
+    return hash;
   }
 }
