@@ -1,4 +1,4 @@
-/** 15.07.2012 20:04 */
+/** 23.07.2012 15:07 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.net.URI;
 
 import javax.xml.namespace.QName;
 import javax.wsdl.Definition;
@@ -37,11 +38,11 @@ import org.apache.xmlbeans.XmlException;
 import fabric.wsdlschemaparser.schema.FSchema;
 
 /**
- * Fabric WSDL parser to import webservice descriptions and
- * transform them to an internal representation. That is a
- * set of collections, each containing distinct parts of
- * the WSDL document (e.g. types, message, interface, binding,
- * endpoint and service).
+ * WSDL parser to import webservice descriptions and transform
+ * them to an internal Fabric representation. That is a set of
+ * collections, each containing distinct parts of the WSDL
+ * document (e.g. types, messages, port types, bindings and
+ * services).
  *
  * Furthermore, this class will extract all inline XML Schema
  * code, so that it can be processed with existing Fabric
@@ -60,7 +61,7 @@ public class FWSDL
   /** Message definitions from WSDL file */
   private Set<FMessage> messages;
 
-  /** Port type (interface) definitions from WSDL file */
+  /** Port type definitions from WSDL file */
   private Set<FPortType> portTypes;
 
   /** Binding definitions from WSDL file */
@@ -76,27 +77,65 @@ public class FWSDL
    * the public getter methods.
    *
    * @param wsdlFile WSDL document to import
+   *
+   * @throws WSDLException Error reading WSDL definition
+   * from file
+   * @throws XmlException Error getting Schema document
+   * while extracting WSDL types
+   * @throws Exception Error adding Schema document to
+   * FSchema object
    */
   public FWSDL(final File wsdlFile) throws WSDLException, XmlException, Exception
   {
-    // TODO: Refactor code in this method into smaller logical units!!!
-
     this.init();
 
-    LOGGER.info(String.format("Reading WSDL document from file '%s'.", wsdlFile.getPath()));
-
     // Read WSDL definition from file
+    LOGGER.info(String.format("Reading WSDL document from file '%s'.", wsdlFile.getPath()));
     Definition wsdlDefinition = new WSDLReaderImpl().readWSDL(wsdlFile.getAbsolutePath());
 
-    // Get namespaces from WSDL definition
-    Map<?, ?> wsdlNamespaces = wsdlDefinition.getNamespaces();
+    // Extract parts from WSDL definition
+    this.extractTypes(wsdlDefinition, wsdlFile.toURI());
+    this.extractMessages(wsdlDefinition);
+    this.extractPortTypes(wsdlDefinition);
+    this.extractBindings(wsdlDefinition);
+    this.extractServices(wsdlDefinition);
+  }
 
-    /*****************************************************************
-     * Extract inline XML Schema from WSDL file
-     *****************************************************************/
+  /**
+   * Initialize member variables.
+   */
+  private void init()
+  {
+    this.schema = null;
 
+    this.messages = new HashSet<FMessage>();
+    this.portTypes = new HashSet<FPortType>();
+    this.bindings = new HashSet<FBinding>();
+    this.services = new HashSet<FService>();
+  }
+
+  /**
+   * Extract inline XML Schema code from WSDL file (if any).
+   * Otherwise the internal member variable will be 'null'.
+   *
+   * The code of this method is based on an earlier
+   * implementation by Marco Wegner.
+   *
+   * @param wsdlDefinition WSDL definition read from file
+   * @param schemaLocation URI of XML Schema document
+   * 
+   * @throws XmlException Error getting Schema document
+   * while extracting WSDL types
+   * @throws Exception Error adding Schema document to
+   * FSchema object
+   */
+  private void extractTypes(final Definition wsdlDefinition, final URI schemaLocation) throws XmlException, Exception
+  {
     if (null != wsdlDefinition.getTypes())
     {
+      // Get namespaces from WSDL definition
+      Map<?, ?> wsdlNamespaces = wsdlDefinition.getNamespaces();
+
       for (Object element: wsdlDefinition.getTypes().getExtensibilityElements())
       {
         if (element instanceof Schema)
@@ -126,23 +165,28 @@ public class FWSDL
             rootElement.setAttribute("targetNamespace", wsdlDefinition.getTargetNamespace());
           }
 
-          // Build new schema from root element and its children
+          // Build new Schema document from root element and its children
           org.apache.xmlbeans.impl.xb.xsdschema.SchemaDocument.Schema schemaDocument = SchemaDocument.Factory.parse(rootElement).getSchema();
 
           LOGGER.debug(String.format("Adding inline schema to FSchema object:\n %s", schemaDocument.toString()));
 
           // Create Fabric schema object from XML Schema
           this.schema = new FSchema();
-          this.schema.addSchema(schemaDocument, wsdlFile.toURI());
+          this.schema.addSchema(schemaDocument, schemaLocation);
         }
       }
     }
+  }
 
-    /*****************************************************************
-     * Extract webservice messages from WSDL file
-     *****************************************************************/
-
+  /**
+   * Extract webservice messages from WSDL file.
+   *
+   * @param wsdlDefinition WSDL definition read from file
+   */
+  private void extractMessages(final Definition wsdlDefinition)
+  {
     Map<?, ?> wsdlMessages = wsdlDefinition.getMessages();
+
     if (null != wsdlMessages)
     {
       LOGGER.debug(String.format("Found %d message%s.", wsdlMessages.size(),
@@ -153,7 +197,7 @@ public class FWSDL
       while (messageIterator.hasNext())
       {
         Entry messageObject = (Entry)messageIterator.next();
-        Object messageKey = messageObject.getKey();
+        // Object messageKey = messageObject.getKey();
         Object messageValue = messageObject.getValue();
 
         Message message = (Message)messageValue;
@@ -169,7 +213,7 @@ public class FWSDL
         while (partIterator.hasNext())
         {
           Entry partObject = (Entry)partIterator.next();
-          Object partKey = partObject.getKey();
+          // Object partKey = partObject.getKey();
           Object partValue = partObject.getValue();
 
           Part part = (Part)partValue;
@@ -178,12 +222,18 @@ public class FWSDL
         }
       }
     }
+  }
 
-    /*****************************************************************
-     * Extract webservice operations from WSDL file
-     *****************************************************************/
-
+  /**
+   * Extract port types from WSDL file. Each port type may define
+   * the interface (i.e. signature) of multiple service operations.
+   *
+   * @param wsdlDefinition WSDL definition read from file.
+   */
+  private void extractPortTypes(final Definition wsdlDefinition)
+  {
     Map<?, ?> wsdlPortTypes = wsdlDefinition.getPortTypes();
+
     if (null != wsdlPortTypes)
     {
       LOGGER.debug(String.format("Found %d port type%s.", wsdlPortTypes.size(),
@@ -194,7 +244,7 @@ public class FWSDL
       while (portTypeIterator.hasNext())
       {
         Entry object = (Entry)portTypeIterator.next();
-        Object key = object.getKey();
+        // Object key = object.getKey();
         Object value = object.getValue();
 
         PortType portType = (PortType)value;
@@ -259,11 +309,15 @@ public class FWSDL
         }
       }
     }
+  }
 
-    /*****************************************************************
-     * Extract webservice bindings from WSDL file
-     *****************************************************************/
-
+  /**
+   * Extract bindings from WSDL file.
+   *
+   * @param wsdlDefinition WSDL definition read from file
+   */
+  private void extractBindings(final Definition wsdlDefinition)
+  {
     // javax.wsdl.Definition has two getters for bindings:
     //
     //   getBindings(): Get all bindings from the current
@@ -273,6 +327,7 @@ public class FWSDL
     //                     WSDL definition object as well as
     //                     any imported definitions.
     Map<?, ?> wsdlBindings = wsdlDefinition.getAllBindings();
+
     if (null != wsdlBindings)
     {
       LOGGER.debug(String.format("Found %d binding%s.", wsdlBindings.size(),
@@ -283,7 +338,7 @@ public class FWSDL
       while (bindingIterator.hasNext())
       {
         Entry object = (Entry)bindingIterator.next();
-        Object key = object.getKey();
+        // Object key = object.getKey();
         Object value = object.getValue();
 
         Binding binding = (Binding)value;
@@ -383,7 +438,7 @@ public class FWSDL
               }
             }
 
-            // Create fault messages for binding operation
+            // Create fault messages for binding operation (if any)
             HashSet<FBindingOperationFaultMessage> faultMessages = new HashSet<FBindingOperationFaultMessage>();
             Map<?, ?> faults = operation.getBindingFaults();
             for (Object faultKey: faults.keySet())
@@ -435,12 +490,17 @@ public class FWSDL
         }
       }
     }
+  }
 
-    /*****************************************************************
-     * Extract services with their ports (endpoints) from WSDL file
-     *****************************************************************/
-
+  /**
+   * Extract services with their ports (endpoints) from WSDL file.
+   *
+   * @param wsdlDefinition WSDL definition load from file
+   */
+  private void extractServices(final Definition wsdlDefinition)
+  {
     Map<?, ?> wsdlServices = wsdlDefinition.getServices();
+
     if (null != wsdlServices)
     {
       LOGGER.debug(String.format("Found %d service%s.", wsdlServices.size(),
@@ -480,19 +540,6 @@ public class FWSDL
         }
       }
     }
-  }
-
-  /**
-   * Initialize member variables.
-   */
-  private void init()
-  {
-    this.schema = null;
-
-    this.messages = new HashSet<FMessage>();
-    this.portTypes = new HashSet<FPortType>();
-    this.bindings = new HashSet<FBinding>();
-    this.services = new HashSet<FService>();
   }
 
   /**
