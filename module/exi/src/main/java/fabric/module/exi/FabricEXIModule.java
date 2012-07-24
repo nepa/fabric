@@ -1,4 +1,4 @@
-/** 15.07.2012 15:45 */
+/** 24.07.2012 12:55 */
 package fabric.module.exi;
 
 import java.util.ArrayList;
@@ -101,9 +101,9 @@ public class FabricEXIModule implements FModuleBase
   @Override
   public String getDescription()
   {
-    return String.format("Module to generate EXI serializer and deserializer class. "
-            + "Valid options are '%s', '%s', '%s', '%s', '%s' and '%s'. "
-            + "Alternatively '%s', '%s', '%s' and '%s' can be used.",
+    return String.format("Module to generate EXI serializer and deserializer class. " +
+            "Valid options are '%s', '%s', '%s', '%s', '%s' and '%s'. " +
+            "Alternatively '%s', '%s', '%s' and '%s' can be used.",
             TARGET_LANGUAGE_KEY, MAIN_CLASS_NAME_KEY, XML_FRAMEWORK_KEY,
             PACKAGE_NAME_KEY, EXI_LIBRARY_KEY, EXICODEGEN_NAME_KEY,
             TARGET_LANGUAGE_ALT_KEY, MAIN_CLASS_NAME_ALT_KEY,
@@ -112,7 +112,7 @@ public class FabricEXIModule implements FModuleBase
 
   /**
    * This method returns a Fabric handler object for the EXI generator
-   * module. It is instanziated with the current workspace and module
+   * module. It is instantiated with the current workspace and module
    * options.
    * 
    * @param workspace Workspace object for EXI class output

@@ -1,4 +1,4 @@
-/** 15.07.2012 15:38 */
+/** 24.07.2012 12:54 */
 package fabric.module.typegen;
 
 import java.util.ArrayList;
@@ -84,8 +84,8 @@ public class FabricTypeGenModule implements FModuleBase
   @Override
   public String getDescription()
   {
-    return String.format("TypeGen module for container class generation. "
-            + "Valid options are '%s', '%s', '%s', '%s', '%s' and '%s'.",
+    return String.format("TypeGen module for container class generation. " +
+            "Valid options are '%s', '%s', '%s', '%s', '%s' and '%s'.",
             TARGET_LANGUAGE_KEY, MAIN_CLASS_NAME_KEY,
             XML_FRAMEWORK_KEY, PACKAGE_NAME_KEY,
             CREATE_MAIN_KEY, VECTOR_NAME_KEY,
