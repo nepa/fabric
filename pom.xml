@@ -173,15 +173,46 @@
         <configuration>
           <header>src/etc/license-header.txt</header>
 
+          <properties>
+            <!-- Use Maven property 'currentYear' (defined at EOF) -->
+            <year>${currentYear}</year>
+          </properties>
+
           <strictCheck>true</strictCheck>
 
+          <!--
+            Protection: Create *.licensed files on default;
+            set to 'false' if you want to change real files
+          -->
+          <dryRun>true</dryRun>
+
+          <!-- Only add header to source files -->
+          <includes>
+            <include>**/*.java</include>
+            <include>**/*.xml</include>
+            <include>**/*.xsd</include>
+            <include>**/*.wsdl</include>
+          </includes>
+
+          <!-- Exclude some files and directories -->
           <excludes>
             <exclude>**/resources/wsdls/**</exclude>
             <exclude>.git/**</exclude>
             <exclude>.gitignore</exclude>
             <exclude>README</exclude>
-          </excludes>
 
+            <!-- Some people don't want license headers in their files ;-) -->
+            <exclude>third-party/**</exclude>
+            <exclude>module/typegen/**</exclude>
+            <exclude>module/exi/**</exclude>
+            <exclude>module/midgen4j/**</exclude>
+            <exclude>module/cpp/**</exclude>
+            <exclude>wsdl-schema-parser/src/main/java/fabric/wsdlschemaparser/wsdl/**</exclude>
+            <exclude>wsdl-schema-parser/src/test/java/fabric/wsdlschemaparser/**</exclude>
+
+            <!-- Core unit tests and resources written by 'reichart' -->
+            <exclude>core/src/test/**</exclude>
+          </excludes>
         </configuration>
       </plugin>
 
@@ -269,6 +300,12 @@
   </pluginRepositories>
 
   <properties>
+    <!-- Format build timestamp (default: yyyyMMdd-HHmm) -->
+    <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+
+    <!-- Create property 'currentYear' that points to build timestamp -->
+    <currentYear>${maven.build.timestamp}</currentYear>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
