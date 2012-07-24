@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="AktienTicker"
+  targetNamespace="urn:AktienTicker"
+  xmlns:tns="urn:AktienTicker"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- Nachricht fuer Kursabfrage -->
+  <message name="holeKursRequest">
+    <part name="Symbol" type="xsd:string" />
+  </message>
+
+  <!-- Nachricht fuer Rueckantwort -->
+  <message name="holeKursResponse">
+    <part name="Kurswert" type="xsd:string" />
+  </message>
+
+  <!-- Schnittstelle fuer Datenaustausch -->
+  <portType name="holeKursPortType">
+    <operation name="holeKurs">
+      <input message="tns:holeKursRequest" />
+      <output message="tns:holeKursResponse" />
+    </operation>
+  </portType>
+
+  <!-- Protokoll und Datenformat fuer Kommunikation -->
+  <binding name="holeKursBinding" type="tns:holeKursPortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="holeKurs">
+      <soap:operation soapAction="urn:beispiel#aktienTicker" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+  </binding>
+
+  <!-- Endpunkt fuer den konkreten Dienst -->
+  <service name="AktienTickerService">
+    <port name="holeKursPortType" binding="holeKursBinding">
+      <soap:address location="http://localhost/AktienTickerDienst.php" />
+    </port>
+  </service>
+</definitions>
