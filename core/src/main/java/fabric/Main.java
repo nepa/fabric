@@ -55,6 +55,7 @@ import fabric.module.cpp.test.CppModule;
 import fabric.module.dot.FabricDotGraphModule;
 import fabric.module.typegen.FabricTypeGenModule;
 import fabric.module.exi.FabricEXIModule;
+import fabric.module.midgen4j.MidGen4JModule;
 
 public class Main {
 
@@ -250,6 +251,7 @@ public class Main {
         this.registry.register(new CppModule(this.properties));
         this.registry.register(new FabricEXIModule(this.properties));
         this.registry.register(new FabricTypeGenModule(this.properties));
+        this.registry.register(new MidGen4JModule(this.properties));
     }
 
     /**

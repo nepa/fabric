@@ -21,6 +21,7 @@
     <module>module/api</module>
     <module>module/typegen</module>
     <module>module/exi</module>
+    <module>module/midgen4j</module>
     <module>module/dot</module>
     <module>module/cpp</module>
     <module>module/protobuf</module>
@@ -58,6 +59,11 @@
       <dependency>
         <groupId>de.uniluebeck.itm</groupId>
         <artifactId>fabric.module.exi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.uniluebeck.itm</groupId>
+        <artifactId>fabric.module.midgen4j</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
