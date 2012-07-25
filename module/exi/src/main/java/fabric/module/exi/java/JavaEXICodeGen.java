@@ -1,4 +1,4 @@
-/** 29.03.2012 00:18 */
+/** 25.07.2012 15:24 */
 package fabric.module.exi.java;
 
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import fabric.module.exi.java.FixValueContainer.ListData;
 
 /**
  * EXI code generator for Java.
- * 
+ *
  * @author seidel
  */
 public class JavaEXICodeGen implements EXICodeGen
@@ -40,22 +40,22 @@ public class JavaEXICodeGen implements EXICodeGen
 
   /** Properties object with module configuration */
   private Properties properties;
-  
+
   /** Name for main application */
   private String applicationClassName;
-  
+
   /** Class with main application */
   private JClass applicationClass;
-  
+
   /** Name of the package in which the bean class resides */
   private String packageName;
-  
+
   /** Fully qualified name of the Java bean class (incl. package) */
   private String qualifiedBeanClassName;
 
   /** Name of the XML converter class */
   private String converterClassName;
-  
+
   /** Name of the EXI de-/serializer class */
   private String serializerClassName;
 
@@ -65,34 +65,36 @@ public class JavaEXICodeGen implements EXICodeGen
    *
    * @param workspace Workspace object for source code write-out
    * @param properties Properties object with module options
+   *
+   * @throws Exception Error during code generation
    */
   public JavaEXICodeGen(Workspace workspace, Properties properties) throws Exception
   {
     this.workspace = workspace;
     this.properties = properties;
-    
+
     this.applicationClassName = this.properties.getProperty(FabricEXIModule.APPLICATION_CLASS_NAME_KEY);
     this.applicationClass = JClass.factory.create(JModifier.PUBLIC, this.applicationClassName);
     this.applicationClass.setComment(new JClassCommentImpl("The application's main class."));
-    
+
     this.packageName = this.properties.getProperty(FabricEXIModule.PACKAGE_NAME_KEY);
     if (this.properties.containsKey(FabricEXIModule.PACKAGE_NAME_ALT_KEY))
     {
       this.packageName = this.properties.getProperty(FabricEXIModule.PACKAGE_NAME_ALT_KEY);
     }
-    
+
     this.qualifiedBeanClassName = String.format("%s.%s",
             this.packageName,
             this.properties.getProperty(FabricEXIModule.MAIN_CLASS_NAME_KEY));
 
     this.converterClassName = this.properties.getProperty(FabricEXIModule.MAIN_CLASS_NAME_KEY) + "Converter";
-    
+
     this.serializerClassName = "EXIConverter";
   }
 
   /**
    * Generate code to serialize and deserialize Bean objects with EXI.
-   * 
+   *
    * @param fixElements XML elements, where value-tags need to be fixed
    * @param fixArrays XML arrays, where value-tags need to be fixed
    * @param fixLists XML lists, where value-tags need to be fixed
@@ -107,7 +109,7 @@ public class JavaEXICodeGen implements EXICodeGen
     /*****************************************************************
      * Create main function for application
      *****************************************************************/
-    
+
     JMethod main = this.createMainFunction();
     if (null != main)
     {
@@ -129,7 +131,7 @@ public class JavaEXICodeGen implements EXICodeGen
 
     // Create XML converter class
     beanConverter.generateConverterClass(jsf, fixElements, fixArrays, fixLists);
-    
+
     // Create method for XML serialization
     JMethod xmlSerialize = beanConverter.generateSerializeCall();
     if (null != xmlSerialize)
@@ -147,26 +149,26 @@ public class JavaEXICodeGen implements EXICodeGen
     /*****************************************************************
      * Create class and method calls for EXI converter
      *****************************************************************/
-    
+
     JavaEXIConverter exiConverter = new JavaEXIConverter(this.properties);
-    
+
     // Create source file for the EXI de-/serializer class
     jsf = workspace.getJava().getJSourceFile(
             this.properties.getProperty(FabricEXIModule.PACKAGE_NAME_KEY),
             this.serializerClassName);
-    
+
     LOGGER.debug(String.format("Generated new source file '%s' for EXI de-/serializer.", this.serializerClassName));
-    
+
     // Create EXI de-/serializer class
     exiConverter.generateSerializerClass(jsf);
-    
+
     // Create method for EXI serialization
     JMethod exiSerialize = exiConverter.generateSerializeCall();
     if (null != exiSerialize)
     {
       this.applicationClass.add(exiSerialize);
     }
-    
+
     // Create method for EXI deserialization
     JMethod exiDeserialize = exiConverter.generateDeserializeCall();
     if (null != exiDeserialize)
@@ -187,16 +189,16 @@ public class JavaEXICodeGen implements EXICodeGen
     JSourceFile jsf = workspace.getJava().getJSourceFile(
             this.properties.getProperty(FabricEXIModule.PACKAGE_NAME_KEY),
             this.applicationClassName);
-    
+
     // Add application class
     jsf.add(this.applicationClass);
-    
+
     // Import bean class, if it resides in a different package
     if (!this.properties.getProperty(FabricEXIModule.PACKAGE_NAME_KEY).equals(this.packageName))
     {
       jsf.addImport(this.qualifiedBeanClassName);
     }
-    
+
     LOGGER.debug(String.format("Generated new source file '%s' for main application.", this.applicationClassName));
   }
 
@@ -219,7 +221,7 @@ public class JavaEXICodeGen implements EXICodeGen
    * Handle top level element from XML Schema document. We
    * do not need to build any EXI gramma in the Java code
    * generator, so this method is left empty.
-   * 
+   *
    * @param element Top level element to handle
    */
   @Override
@@ -246,9 +248,9 @@ public class JavaEXICodeGen implements EXICodeGen
    * Private helper method to create a main function for the application.
    * We add some example code here to demonstrate the usage of the XML
    * converter and the EXI de-/serialization class.
-   * 
+   *
    * @return JMethod with main function
-   * 
+   *
    * @throws Exception Error during code generation
    */
   private JMethod createMainFunction() throws Exception
@@ -257,7 +259,7 @@ public class JavaEXICodeGen implements EXICodeGen
     JMethod jm = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC, "void", "main", jms);
 
     String beanClassName = this.properties.getProperty(FabricEXIModule.MAIN_CLASS_NAME_KEY);
-    
+
     // Add code with usage example
     String methodBody = String.format(
             "// Instantiate application\n" +
@@ -277,7 +279,7 @@ public class JavaEXICodeGen implements EXICodeGen
             "}",
             applicationClassName, applicationClassName,
             beanClassName, beanClassName.toLowerCase(), beanClassName, beanClassName.toLowerCase());
-    
+
     jm.getBody().appendSource(methodBody);
     jm.setComment(new JMethodCommentImpl("Main function of the application."));
 
