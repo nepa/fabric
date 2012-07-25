@@ -1,4 +1,4 @@
-/** 19.07.2012 12:15 */
+/** 25.07.2012 15:03 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
  * XML Schema (may it be a simple or a complex type).
  * In this case a message MUST only contain ONE
  * message part.
- * 
+ *
  * @author seidel
  */
 public class FMessagePartImpl extends FWSDLElement implements FMessagePart
@@ -43,7 +43,7 @@ public class FMessagePartImpl extends FWSDLElement implements FMessagePart
 
   /** QName value of the 'element' attribute */
   private QName elementAttribute;
-  
+
   /** QName value of the 'type' attribute */
   private QName typeAttribute;
 
@@ -169,6 +169,38 @@ public class FMessagePartImpl extends FWSDLElement implements FMessagePart
   }
 
   /**
+   * Get QName value of either the 'element' or the 'type'
+   * attribute. This method will return the name of the
+   * none-null attribute or raise an exception, if both
+   * attributes are null.
+   *
+   * @return QName value of the none-null attribute
+   *
+   * @throws IllegalStateException None of the attributes
+   * was set
+   */
+  @Override
+  public QName getNoneNullAttribute()
+  {
+    QName result = null;
+
+    if (this.hasElementAttribute())
+    {
+      result = this.elementAttribute;
+    }
+    else if (this.hasTypeAttribute())
+    {
+      result = this.typeAttribute;
+    }
+    else
+    {
+      throw new IllegalStateException("Message part must either have 'element' or 'type' attribute set.");
+    }
+
+    return result;
+  }
+
+  /**
    * Private helper method to validate the values of two QName
    * objects. The arguments are mutually exclusive, so only one
    * of them may actually have a QName value. The other one must
@@ -230,11 +262,11 @@ public class FMessagePartImpl extends FWSDLElement implements FMessagePart
   {
     return (FAttributeType.TYPE == this.getAttributeType(this.elementAttribute, this.typeAttribute));
   }
-  
+
   /**
    * Create a human-readable form of the message part, that is
    * its name and the value of the 'element' or 'type' attribute.
-   * 
+   *
    * @return String representation of FMessagePartImpl object
    */
   @Override

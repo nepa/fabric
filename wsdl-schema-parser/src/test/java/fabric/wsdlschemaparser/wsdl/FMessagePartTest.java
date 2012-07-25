@@ -1,4 +1,4 @@
-/** 19.07.2012 12:16 */
+/** 25.07.2012 15:17 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.junit.Test;
@@ -84,6 +84,40 @@ public class FMessagePartTest
     part.setTypeName(newQName);
     assertEquals("QName value of 'type' attribute must match new value.",
             "newLocalPart", part.getTypeName().getLocalPart());
+  }
+
+  /**
+   * Test consolidated attribute getter.
+   */
+  @Test(timeout = 1000)
+  public void testConsolidatedGetter()
+  {
+    QName qName = new QName("namespaceURI", "localPart");
+    FMessagePart part = FMessagePart.factory.create("foobar", qName, null);
+
+    // Test getNoneNullAttribute() with 'element' attribute
+    assertEquals("QName value of 'element' attribute must be returned.",
+            part.getElementName(), part.getNoneNullAttribute());
+
+    // Test getNoneNullAttribute() with 'type' attribute
+    part.setElementName(null);
+    part.setTypeName(qName);
+    assertEquals("QName value of 'type' attribute must be returned.",
+            part.getTypeName(), part.getNoneNullAttribute());
+
+    // Test for expected exception (elementName and typeName are both null)
+    Exception exception = null;
+    try
+    {
+      part = new FMessagePartImpl("foobar", null, null);
+      part.getNoneNullAttribute(); // Throws exception
+    }
+    catch (Exception e)
+    {
+      exception = e;
+      System.out.println(String.format("Expected exception was thrown: '%s'", e.getMessage()));
+    }
+    assertTrue("FMessagePart must throw 'IllegalStateException'.", exception instanceof IllegalStateException);
   }
 
   /**

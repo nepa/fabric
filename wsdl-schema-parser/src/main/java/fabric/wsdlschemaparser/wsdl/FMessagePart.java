@@ -1,4 +1,4 @@
-/** 10.07.2012 01:24 */
+/** 25.07.2012 14:48 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -99,6 +99,8 @@ public interface FMessagePart
 
   public void setTypeName(final QName typeName);
   public QName getTypeName();
+
+  public QName getNoneNullAttribute();
 
   public boolean hasElementAttribute();
   public boolean hasTypeAttribute();
