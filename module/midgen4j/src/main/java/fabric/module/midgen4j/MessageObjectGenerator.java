@@ -130,8 +130,7 @@ public class MessageObjectGenerator
    */
   private static String getCorrectTypeName(final String typeName, final String schemaName)
   {
-    // TODO: What if we have no schemaName or no inline schema is defined in WSDl document?
-    String result = typeName;
+    String result = "";
 
     // Mapping from XSD built-in types to Java types:
     //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
@@ -181,9 +180,14 @@ public class MessageObjectGenerator
       result = mapping.get(typeName);
     }
     // Type is a custom type
-    else
+    else if (null != schemaName)
     {
       result = String.format("%s.%sType", schemaName, typeName);
+    }
+    // Type is a custom type, but no inline schema was defined
+    else
+    {
+      result = typeName;
     }
 
     return result;
