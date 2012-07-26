@@ -12,8 +12,6 @@ import fabric.module.api.FDefaultWSDLHandler;
 
 import de.uniluebeck.sourcegen.java.JClass;
 import de.uniluebeck.sourcegen.java.JClassCommentImpl;
-import de.uniluebeck.sourcegen.java.JField;
-import de.uniluebeck.sourcegen.java.JFieldCommentImpl;
 import de.uniluebeck.sourcegen.java.JMethod;
 import de.uniluebeck.sourcegen.java.JMethodCommentImpl;
 import de.uniluebeck.sourcegen.java.JMethodSignature;
@@ -22,7 +20,6 @@ import de.uniluebeck.sourcegen.java.JParameter;
 import de.uniluebeck.sourcegen.java.JSourceFile;
 
 import fabric.wsdlschemaparser.wsdl.FMessage;
-import fabric.wsdlschemaparser.wsdl.FMessagePart;
 import fabric.wsdlschemaparser.wsdl.FOperation;
 import fabric.wsdlschemaparser.wsdl.FPortType;
 
@@ -93,7 +90,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     // Create new container class for each message type
     for (FMessage message: messages)
     {
-      JClass messageClass = this.createMessageClass(message);
+      JClass messageClass = MessageObjectGenerator.createMessageClass(message);
 
       if (null != messageClass)
       {
@@ -184,86 +181,5 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
             "Call the '%s' service operation.", operation.getOperationName())));
 
     return method;
-  }
-
-  /**
-   * Create container class for a single WSDL message. Objects of the
-   * generated class are later used to pass arguments (message parts)
-   * to a service operation.
-   *
-   * @param message FMessage object from WSDL parser
-   *
-   * @return JClass object with message container class
-   *
-   * @throws Exception Error during code generation
-   */
-  private JClass createMessageClass(final FMessage message) throws Exception
-  {
-    // Create class
-    String className = message.getMessageName() + "Message";
-    JClass messageClass = JClass.factory.create(JModifier.PUBLIC, className);
-
-    LOGGER.debug(String.format("Created container class for message '%s'.", message.getMessageName()));
-
-    // Add a comment
-    messageClass.setComment(new JClassCommentImpl(String.format("The '%s' message class.", className)));
-
-    // Process all message parts
-    for (FMessagePart messagePart: message.getParts())
-    {
-      // TODO: Prepend main Schema name
-      // TODO: append "Type" for custom types and map XSD built-in types to Java?
-      String typeName = messagePart.getNoneNullAttribute().getLocalPart() + "Type";
-      String variableName = messagePart.getPartName();
-
-      /*****************************************************************
-       * Create member variable
-       *****************************************************************/
-      JField member = JField.factory.create(JModifier.PRIVATE, typeName, variableName);
-
-      member.setComment(new JFieldCommentImpl(String.format("The '%s' message part.", variableName)));
-
-      messageClass.add(member);
-
-      /*****************************************************************
-       * Create setter method
-       *****************************************************************/
-      JParameter input = JParameter.factory.create(typeName, variableName);
-      JMethodSignature jms = JMethodSignature.factory.create(input);
-
-      JMethod setter = JMethod.factory.create(JModifier.PUBLIC, "void",
-              "set" + this.firstLetterCapital(variableName), jms);
-
-      setter.getBody().appendSource(String.format("this.%s = %s;", variableName, variableName));
-      setter.setComment(new JMethodCommentImpl(String.format("Set the '%s' message part.", variableName)));
-
-      messageClass.add(setter);
-
-      /*****************************************************************
-       * Create getter method
-       *****************************************************************/
-      JMethod getter = JMethod.factory.create(JModifier.PUBLIC, typeName,
-              "get" + this.firstLetterCapital(variableName));
-
-      getter.getBody().appendSource(String.format("return this.%s;", variableName));
-      getter.setComment(new JMethodCommentImpl(String.format("Get the '%s' message part.", variableName)));
-
-      messageClass.add(getter);
-    }
-
-    return messageClass;
-  }
-
-  /**
-   * Private helper method to capitalize the first letter of a string.
-   * Function will return null, if argument was null.
-   *
-   * @param text Text to process
-   *
-   * @return Text with first letter capitalized or null
-   */
-  private String firstLetterCapital(final String text)
-  {
-    return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
 }
