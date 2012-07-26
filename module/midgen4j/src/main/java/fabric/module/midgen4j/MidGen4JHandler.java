@@ -1,4 +1,4 @@
-/** 26.07.2012 14:13 */
+/** 26.07.2012 14:46 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -68,8 +68,17 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     // Extract global properties
     this.packageName = this.properties.getProperty(MidGen4JModule.PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
+  }
 
-    // Create class for central service provider
+  /**
+   * Create class for central service provider before processing
+   * any other element of the WSDl document.
+   *
+   * @throws Exception Error during code generation
+   */
+  @Override
+  public void executeBeforeProcessing() throws Exception
+  {
     this.serviceProviderClass = this.createServiceProviderClass();
 
     // Add class to source file

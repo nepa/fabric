@@ -1,4 +1,4 @@
-/** 15.07.2012 19:27 */
+/** 26.07.2012 15:05 */
 package fabric.module.api;
 
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class FWSDLProcessor
    * the given FWSDLItemHandler instance. That is call
    * the methods processMessages(), processPortTypes(),
    * processBindings() and processServices() subsequently.
-   * 
+   *
    * If the second argument is 'null', an instance of the
    * FDefaultWSDLHandler will be used as handler.
    *
@@ -55,6 +55,10 @@ public class FWSDLProcessor
     {
       wsdlHandler = new FDefaultWSDLHandler();
     }
+
+    // Execute code before processing
+    LOGGER.debug("Executing code before WSDL processing.");
+    wsdlHandler.executeBeforeProcessing();
 
     // Process WSDL messages
     if (null != wsdl.getMessages() && !wsdl.getMessages().isEmpty())
@@ -83,5 +87,9 @@ public class FWSDLProcessor
       LOGGER.debug("Processing services of WSDL document.");
       wsdlHandler.processServices(wsdl.getServices());
     }
+
+    // Execute code after processing
+    LOGGER.debug("Executing code after WSDL processing.");
+    wsdlHandler.executeAfterProcessing();
   }
 }

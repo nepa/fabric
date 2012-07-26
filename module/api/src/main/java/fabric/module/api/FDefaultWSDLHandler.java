@@ -1,4 +1,4 @@
-/** 14.07.2012 20:35 */
+/** 26.07.2012 14:37 */
 package fabric.module.api;
 
 import java.util.HashSet;
@@ -16,6 +16,18 @@ import fabric.wsdlschemaparser.wsdl.FService;
  */
 public class FDefaultWSDLHandler implements FWSDLItemHandler
 {
+  @Override
+  public void executeBeforeProcessing() throws Exception
+  {
+    // Nothing to do
+  }
+
+  @Override
+  public void executeAfterProcessing() throws Exception
+  {
+    // Nothing to do
+  }
+
   @Override
   public void processMessages(final HashSet<FMessage> messages) throws Exception
   {
