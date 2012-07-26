@@ -1,4 +1,4 @@
-/** 25.07.2012 16:00 */
+/** 26.07.2012 14:13 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -90,12 +90,13 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     // Create new container class for each message type
     for (FMessage message: messages)
     {
-      JClass messageClass = MessageObjectGenerator.createMessageClass(message);
+      JClass messageClass = MessageObjectGenerator.createMessageClass(message,
+              this.properties.getProperty("typegen.main_class_name"));
 
       if (null != messageClass)
       {
         JSourceFile jsf = this.workspace.getJava().getJSourceFile(
-                this.serviceProviderClassName, message.getMessageName() + "Message");
+                this.packageName, message.getMessageName() + "Message");
         jsf.add(messageClass);
       }
     }

@@ -1,8 +1,10 @@
-/** 26.07.2012 11:28 */
+/** 26.07.2012 14:16 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 import de.uniluebeck.sourcegen.java.JClass;
 import de.uniluebeck.sourcegen.java.JClassCommentImpl;
@@ -36,12 +38,14 @@ public class MessageObjectGenerator
    * to a service operation.
    *
    * @param message FMessage object from WSDL parser
+   * @param schemaName Name of the container class that was generated
+   * by the TypeGen module to represent the entire XML Schema document
    *
    * @return JClass object with message container class
    *
    * @throws Exception Error during code generation
    */
-  public static JClass createMessageClass(final FMessage message) throws Exception
+  public static JClass createMessageClass(final FMessage message, final String schemaName) throws Exception
   {
     // Create class
     String className = message.getMessageName() + "Message";
@@ -55,9 +59,8 @@ public class MessageObjectGenerator
     // Process all message parts
     for (FMessagePart messagePart: message.getParts())
     {
-      // TODO: Prepend main Schema name
-      // TODO: append "Type" for custom types and map XSD built-in types to Java?
-      String typeName = messagePart.getNoneNullAttribute().getLocalPart() + "Type";
+      String typeName = MessageObjectGenerator.getCorrectTypeName(
+              messagePart.getNoneNullAttribute().getLocalPart(), schemaName);
       String variableName = messagePart.getPartName();
 
       /*****************************************************************
@@ -75,7 +78,7 @@ public class MessageObjectGenerator
       JParameter input = JParameter.factory.create(typeName, variableName);
       JMethodSignature jms = JMethodSignature.factory.create(input);
 
-      JMethod setter = JMethod.factory.create(JModifier.PUBLIC, "void",
+      JMethod setter = JMethod.factory.create(JModifier.PUBLIC | JModifier.FINAL, "void",
               "set" + MessageObjectGenerator.firstLetterCapital(variableName), jms);
 
       setter.getBody().appendSource(String.format("this.%s = %s;", variableName, variableName));
@@ -109,5 +112,80 @@ public class MessageObjectGenerator
   private static String firstLetterCapital(final String text)
   {
     return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
+  }
+
+  /**
+   * Private helper method to find the correct type name for a message
+   * part. In the simple case, the part is of one of the XSD built-in
+   * types and can directly be mapped to the corresponding Java type.
+   * In more complex scenarios, the part can be of a custom type that
+   * is defined in the inline XML Schema of the WSDL document.
+   *
+   * @param typeName Type name from WSDL parser (i.e. local part of
+   * QName that was extracted from WSDL document)
+   * @param schemaName Name of the container class that was generated
+   * by the TypeGen module to represent the entire XML Schema document
+   *
+   * @return Type name that can be used in generated Java code
+   */
+  private static String getCorrectTypeName(final String typeName, final String schemaName)
+  {
+    // TODO: What if we have no schemaName or no inline schema is defined in WSDl document?
+    String result = typeName;
+
+    // Mapping from XSD built-in types to Java types:
+    //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
+    HashMap<String, String> mapping = new HashMap<String, String>();
+    mapping.put("boolean", "boolean");
+    mapping.put("float", "float");
+    mapping.put("double", "double");
+    mapping.put("byte", "byte");
+    mapping.put("unsignedByte", "short");
+    mapping.put("short", "short");
+    mapping.put("unsignedShort", "int");
+    mapping.put("int", "int");
+    mapping.put("integer", "java.math.BigDecimal");
+    mapping.put("positiveInteger", "java.math.BigInteger");
+    mapping.put("unsignedInt", "java.math.BigInteger");
+    mapping.put("long", "java.math.BigInteger");
+    mapping.put("unsignedLong", "java.math.BigDecimal");
+    mapping.put("decimal", "java.math.BigDecimal");
+    mapping.put("string", "String");
+    mapping.put("hexBinary", "byte[]");
+    mapping.put("base64Binary", "byte[]");
+    mapping.put("dateTime", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("time", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("date", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("gMonth", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("gMonthDay", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("gYear", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("gYearMonth", "javax.xml.datatype.XMLGregorianCalendar");
+    mapping.put("duration", "javax.xml.datatype.Duration");
+    mapping.put("NOTATION", "javax.xml.namespace.QName");
+    mapping.put("QName", "javax.xml.namespace.QName");
+    mapping.put("anyURI", "String");
+    mapping.put("Name", "String");
+    mapping.put("NCName", "String");
+    mapping.put("negativeInteger", "java.math.BigDecimal");
+    mapping.put("NMTOKEN", "String");
+    mapping.put("nonNegativeInteger", "java.math.BigDecimal");
+    mapping.put("nonPositiveInteger", "java.math.BigDecimal");
+    mapping.put("normalizedString", "String");
+    mapping.put("token", "String");
+    mapping.put("any", "Object");
+
+    // Type is an XSD built-in type
+    if (mapping.containsKey(typeName))
+    {
+      result = mapping.get(typeName);
+    }
+    // Type is a custom type
+    else
+    {
+      result = String.format("%s.%sType", schemaName, typeName);
+    }
+
+    return result;
   }
 }
