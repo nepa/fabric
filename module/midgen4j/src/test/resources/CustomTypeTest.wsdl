@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="Addierer"
+  targetNamespace="urn:Addierer"
+  xmlns:tns="urn:Addierer"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- Datentypen fuer Nachrichtenteile -->
+  <types>
+    <schema targetNamespace="urn:Addierer" xmlns="http://www.w3.org/2001/XMLSchema">
+      <xsd:simpleType name="Zahl">
+        <xsd:restriction base="xsd:integer">
+          <xsd:minInclusive value="0" />
+          <xsd:maxInclusive value="100" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <xsd:element name="Zahlenpaar">
+      <xsd:complexType>
+        <xsd:sequence>
+          <element name="ErsteZahl" type="xsd:Zahl" />
+          <element name="ZweiteZahl" type="xsd:Zahl" />
+        </xsd:sequence>
+      </xsd:complexType>
+      </xsd:element>
+    </schema>
+  </types>
+
+  <!-- Nachricht fuer Anfrage -->
+  <message name="addiereRequest">
+    <part name="Summanden" type="xsd:Zahlenpaar" />
+  </message>
+
+  <!-- Nachricht fuer Rueckantwort -->
+  <message name="addiereResponse">
+    <part name="Summe" type="xsd:int" />
+  </message>
+
+  <!-- Schnittstelle fuer Datenaustausch -->
+  <portType name="addierePortType">
+    <operation name="addiere">
+      <input message="tns:addiereRequest" />
+      <output message="tns:addiereResponse" />
+    </operation>
+  </portType>
+
+  <!-- Protokoll und Datenformat fuer Kommunikation -->
+  <binding name="addiereBinding" type="tns:addierePortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="addiere">
+      <soap:operation soapAction="urn:beispiel#addierer" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+  </binding>
+
+  <!-- Endpunkt fuer den konkreten Dienst -->
+  <service name="AddiereService">
+    <port name="addierePortType" binding="addiereBinding">
+      <soap:address location="http://localhost/AddiererDienst.php" />
+    </port>
+  </service>
+</definitions>
