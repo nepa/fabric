@@ -1,0 +1,23 @@
+<!--
+  Schema test file for type generator.
+-->
+
+<xsd:schema
+  targetNamespace="http://www.itm.uni-luebeck.de/fabrictest"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+
+  <!--
+    Element with local simple type.
+  -->
+  <xsd:element name="LocalSimpleTypeElement">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="0" />
+        <xsd:maxInclusive value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+
+</xsd:schema>

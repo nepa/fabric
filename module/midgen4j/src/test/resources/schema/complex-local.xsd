@@ -1,0 +1,23 @@
+<!--
+  Schema test file for type generator.
+-->
+
+<xsd:schema
+  targetNamespace="http://www.itm.uni-luebeck.de/fabrictest"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+
+  <!--
+    Element with local complex type.
+  -->
+  <xsd:element name="LocalComplexTypeElement">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="FirstItem" type="xsd:int" minOccurs="5" maxOccurs="10" />
+        <xsd:element name="SecondItem" type="xsd:int" maxOccurs="3" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>
