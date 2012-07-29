@@ -1,4 +1,4 @@
-/** 17.07.2012 14:43 */
+/** 29.07.2012 02:20 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.HashSet;
  *
  * @author seidel
  */
-abstract public class FBindingOperationMessage extends FWSDLElement
+public abstract class FBindingOperationMessage extends FWSDLElement
 {
   /** Name of the binding operation message */
   protected String bindingOperationMessageName;

@@ -53,11 +53,11 @@ public class JSourceFileImpl extends JElemImpl implements JSourceFile {
 	public JSourceFile add(JComplexType... typeObject) throws JDuplicateException {
 		for (JComplexType to : typeObject) {
 			if (to.getSourceFile() == this)
-				throw new JDuplicateException("Complex SimpleType already added to JSourceFile");
+				throw new JDuplicateException("JComplexType is already assigned to this source file.");
 			if (to.getSourceFile() != null)
-				throw new JDuplicateException("Complex SimpleType is already added to some other source file");
+				throw new JDuplicateException("JComplexType is already assigned to a different source file.");
 			if (contains(to))
-				throw new JDuplicateException("Duplicate Java Complex SimpleType " + typeObject);
+				throw new JDuplicateException("Duplicate JComplexType '" + typeObject + "' in source file.");
 			types.add((JComplexTypeImpl) to);
 			((JComplexTypeImpl) to).setSourceFile(this);
 		}

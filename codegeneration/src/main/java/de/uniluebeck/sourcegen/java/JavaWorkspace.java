@@ -22,49 +22,39 @@ public class JavaWorkspace {
     }
 
     public JSourceFile getJSourceFile(String packageName, String fileName) {
-            // check if source file already exists
-            for (SourceFile f : this.sourceFiles) {
-                    if (f instanceof JSourceFile && ((JSourceFile) f).getPackageName().equals(packageName)
-                                    && ((JSourceFile) f).getFileName().equals(fileName)) {
-                            log.error("Sourcefile " + fileName + " gibts schon!! SCHLECHT!");
-                            log.info("Folgende JSourceFiles gibt es:");
-                            for (SourceFile file : this.sourceFiles)
-                                    if (file instanceof JSourceFile) {
-                                            log.info("  " + file.getFileName());
-                                    }
-                            return (JSourceFile) f;
-                    }
+        // check if source file already exists
+        for (SourceFile f : this.sourceFiles) {
+            if (f instanceof JSourceFile && ((JSourceFile) f).getPackageName().equals(packageName) &&
+                    ((JSourceFile) f).getFileName().equals(fileName)) {
+                log.error(String.format("Source file '%s' already exists. Will return existing instance.", fileName));
+                
+                return (JSourceFile) f;
             }
-            JSourceFile f = new JSourceFileImpl(packageName, fileName);
-            this.sourceFiles.add(f);
-            log.info("Sourcefile " + fileName + " added to workspace");
-            return f;
+        }
+        
+        JSourceFile f = new JSourceFileImpl(packageName, fileName);
+        this.sourceFiles.add(f);
+        log.info("Sourcefile " + fileName + " added to workspace");
+
+        return f;
     }
 
     public boolean containsJavaClass(String clazz) {
-            for (SourceFile f : sourceFiles) {
-                    if (f instanceof JSourceFile) {
-                            JSourceFile file = (JSourceFile) f;
-                            JClass jclazz = file.getClassByName(clazz);
-                            if (jclazz != null) {
-                                    return true;
-                            }
-                    }
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof JSourceFile) {
+                JSourceFile file = (JSourceFile) f;
+                JClass jclazz = file.getClassByName(clazz);
+                if (jclazz != null) {
+                    return true;
+                }
             }
-            return false;
+        }
+        
+        return false;
     }
 
-    /**
-     * Stores a new method in the store
-     *
-     * @param domain
-     * @param aspect
-     * @param type
-     * @return
-     */
     public void setGlobalMethod(JMethod method) {
             globalMethodStoreJava.add(method);
     }
 
 }
-

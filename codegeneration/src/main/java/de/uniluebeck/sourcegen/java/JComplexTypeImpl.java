@@ -23,12 +23,38 @@
  */
 package de.uniluebeck.sourcegen.java;
 
-
-
 abstract class JComplexTypeImpl extends JElemImpl implements JComplexType {
 
 	JSourceFile sourceFile = null;
-	
+
+  @Override
+	public boolean isNested() {
+		return getParent() != null;
+	}
+
+  @Override
+	public boolean equals(JComplexType other) {
+		return getFullyQualifiedName().equals(other.getFullyQualifiedName());
+	}
+
+  @Override
+	public boolean equals(Object o) {
+        boolean ret = false;
+
+        if (o instanceof JComplexTypeImpl) {
+            JComplexTypeImpl ct = (JComplexTypeImpl) o;
+            ret = getFullyQualifiedName().equals(ct.getFullyQualifiedName());
+        }
+
+        return ret;
+  }
+
+  @Override
+	public abstract String getName();
+
+  public abstract JComplexType getParent();
+
+  @Override
 	public String getFullyQualifiedName() {
 		if (getParent() != null)
 			return getParent().getFullyQualifiedName() + "." + getName();
@@ -37,14 +63,7 @@ abstract class JComplexTypeImpl extends JElemImpl implements JComplexType {
 		return name + getName();
 	}
 
-	public abstract String getName();
-	
-	abstract JComplexType getParent();
-	
-	public boolean equals(JComplexType other) {
-		return getFullyQualifiedName().equals(other.getFullyQualifiedName());
-	}
-
+  @Override
 	public String getPackageName() {
 		if (getParent() != null)
 			return getParent().getPackageName();
@@ -54,28 +73,15 @@ abstract class JComplexTypeImpl extends JElemImpl implements JComplexType {
 		
 		return "";
 	}
-	
-	public boolean isNested() {
-		return getParent() != null;
-	}
 
-	void setSourceFile(JSourceFile sourceFile) {
+  @Override
+	public void setSourceFile(JSourceFile sourceFile) {
 		this.sourceFile = sourceFile;
 	}
 
+  @Override
 	public JSourceFile getSourceFile() {
 		return sourceFile;
 	}
 	
-	public boolean equals(Object o) {
-        boolean ret = false;
-
-        if(o instanceof JComplexTypeImpl) {
-            JComplexTypeImpl ct = (JComplexTypeImpl) o;
-            ret = getFullyQualifiedName().equals(ct.getFullyQualifiedName());
-        }
-
-        return ret;
-    }
-
 }

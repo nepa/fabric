@@ -1,4 +1,4 @@
-/** 17.07.2012 14:18 */
+/** 29.07.2012 02:22 */
 package fabric.wsdlschemaparser.wsdl;
 
 /**
@@ -9,7 +9,7 @@ package fabric.wsdlschemaparser.wsdl;
  *
  * @author seidel
  */
-abstract public class FWSDLElement
+public abstract class FWSDLElement
 {
   /**
    * Getter that will return the internal name of the

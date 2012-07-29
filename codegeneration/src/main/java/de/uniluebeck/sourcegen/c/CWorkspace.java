@@ -23,63 +23,72 @@ public class CWorkspace {
     }
 
     public CppHeaderFile getCppHeaderFile(String fileName) {
-
         // check if file is already existing and
         // return instance if so
-        for (SourceFile f : sourceFiles)
-            if (f instanceof CppHeaderFile && ((CppSourceFile) f).getFileName().equals(fileName))
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof CppHeaderFile && ((CppSourceFile) f).getFileName().equals(fileName)) {
                 return (CppHeaderFile) f;
+            }
+        }
 
         // create the new instance since it's not yet existing
         CppHeaderFileImpl file = new CppHeaderFileImpl(fileName);
         sourceFiles.add(file);
-        return file;
 
+        return file;
     }
 
     public CppSourceFile getCppSourceFile(String fileName) {
-
         // check if file is already existing and
         // return instance if so
-        for (SourceFile f : sourceFiles)
-            if (f instanceof CppSourceFile && !(f instanceof CppHeaderFile)
-                    && ((CppSourceFile) f).getFileName().equals(fileName))
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof CppSourceFile && !(f instanceof CppHeaderFile) &&
+                    ((CppSourceFile) f).getFileName().equals(fileName)) {
                 return (CppSourceFile) f;
+            }
+        }
 
         // create the new instance since it's not yet existing
         CppSourceFile file = new CppSourceFileImpl(fileName);
         sourceFiles.add(file);
+
         return file;
     }
 
     public CSourceFile getCSourceFile(String fileName) {
-
         // check if source file already existing and
         // return instance if so
-        for (SourceFile f : sourceFiles)
-            if (f instanceof CSourceFile && !(f instanceof CHeaderFile)
-                    && ((CSourceFile) f).getFileName().equals(fileName))
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof CSourceFile && !(f instanceof CHeaderFile) &&
+                    ((CSourceFile) f).getFileName().equals(fileName)) {
                 return (CSourceFile) f;
+            }
+        }
 
         // create new instance since it's not yet existing
         CSourceFile file = new CSourceFileImpl(fileName);
         sourceFiles.add(file);
-        return file;
 
+        return file;
     }
 
     public boolean containsCHeaderFile(String fileName) {
-        for (SourceFile f : sourceFiles)
-            if (f instanceof CHeaderFile && f.getFileName().equals(fileName))
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof CHeaderFile && f.getFileName().equals(fileName)) {
                 return true;
-        return false;
+            }
+        }
 
+        return false;
     }
 
     public boolean containsCSourceFile(String fileName) {
-        for (SourceFile f : sourceFiles)
-            if (f instanceof CSourceFile && !(f instanceof CHeaderFile) && f.getFileName().equals(fileName))
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof CSourceFile && !(f instanceof CHeaderFile) && f.getFileName().equals(fileName)) {
                 return true;
+            }
+        }
+
         return false;
     }
 
@@ -87,16 +96,17 @@ public class CWorkspace {
 
         // check if source file already existing and
         // return instance if so
-        for (SourceFile f : sourceFiles)
-            if (f instanceof CHeaderFile && f.getFileName().equals(filename))
+        for (SourceFile f : sourceFiles) {
+            if (f instanceof CHeaderFile && f.getFileName().equals(filename)) {
                 return (CHeaderFile) f;
+            }
+        }
 
         // create new instance since it's not yet existing
         CHeaderFileImpl header = new CHeaderFileImpl(filename);
         sourceFiles.add(header);
 
         try {
-
             // adding header include guard (part 1)
             String guard = filename.toUpperCase() + "_H";
             header.addBeforeDirective("ifndef " + guard);
@@ -112,14 +122,13 @@ public class CWorkspace {
 
             // belongs to the header include guard
             header.addAfterDirective("endif");
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.error("" + e, e);
             e.printStackTrace();
         }
 
         return header;
-
     }
 
     /**
@@ -132,7 +141,6 @@ public class CWorkspace {
      */
     public void setGlobalMethod(CFun fun) {
         globalMethodStoreC.add(fun);
-
     }
 
 }

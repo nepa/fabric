@@ -85,7 +85,7 @@ class JInterfaceImpl extends JComplexTypeImpl implements JInterface {
 	private LinkedList<JEnumImpl> enums = new LinkedList<JEnumImpl>();
 	
 	@Override
-	JComplexType getParent() {
+	public JComplexType getParent() {
 		return parentClass == null ? (parentInterface == null ? null : parentInterface) : parentClass;
 	}
 	

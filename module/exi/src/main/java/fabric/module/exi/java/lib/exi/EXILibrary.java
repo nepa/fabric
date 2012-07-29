@@ -1,4 +1,4 @@
-/** 11.11.2011 20:57 */
+/** 29.07.2012 02:19 */
 package fabric.module.exi.java.lib.exi;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import de.uniluebeck.sourcegen.java.JModifier;
  * 
  * @author seidel
  */
-abstract public class EXILibrary
+public abstract class EXILibrary
 {
   /** List of required Java imports */
   protected ArrayList<String> requiredImports;

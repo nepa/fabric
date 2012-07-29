@@ -65,12 +65,12 @@ public class JDuplicateException extends JValidationException {
 
 	@SuppressWarnings("nls")
 	public JDuplicateException(JInterfaceMethod method) {
-		super("Duplicate Method: " + method);
+		super("Duplicate method: " + method);
 	}
 
 	@SuppressWarnings("nls")
 	public JDuplicateException(JMethod method) {
-		super("Duplicate Method: " + method);
+		super("Duplicate method: " + method);
 	}
 
 	@SuppressWarnings("nls")

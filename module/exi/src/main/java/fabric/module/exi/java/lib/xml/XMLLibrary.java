@@ -1,4 +1,4 @@
-/** 02.12.2011 12:32 */
+/** 29.07.2012 02:24 */
 package fabric.module.exi.java.lib.xml;
 
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import fabric.module.exi.java.FixValueContainer.ListData;
  *
  * @author reichart, seidel
  */
-abstract public class XMLLibrary
+public abstract class XMLLibrary
 {
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(XMLLibrary.class);

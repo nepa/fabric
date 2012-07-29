@@ -26,9 +26,7 @@ package de.uniluebeck.sourcegen.java;
 import de.uniluebeck.sourcegen.SourceFile;
 import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 
-
-public interface JSourceFile extends SourceFile, JElem {
-	
+public interface JSourceFile extends SourceFile, JElem {	
 	public JSourceFile 	add(JComplexType... typeObjects) throws JDuplicateException;
 	
 	public JSourceFile 	addImport(String... importString) throws JDuplicateException;

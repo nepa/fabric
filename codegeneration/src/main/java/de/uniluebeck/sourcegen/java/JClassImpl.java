@@ -92,7 +92,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 	private JInterfaceImpl parentInterface = null;
 
 	@Override
-	JComplexType getParent() {
+	public JComplexType getParent() {
 		return parentClass == null ? (parentInterface == null ? null : parentInterface) : parentClass;
 	}
 

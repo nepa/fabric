@@ -24,16 +24,17 @@
 package de.uniluebeck.sourcegen.java;
 
 public interface JComplexType extends JElem {
-	
+
 	public boolean isNested();
-	
-	public boolean equals(JComplexType other);
-	
-	public String getName();
 
-	public String getPackageName();
-	public JSourceFile getSourceFile();
+  public boolean equals(JComplexType other);
 
+  public String getName();
 	public String getFullyQualifiedName();
-	
+
+  public String getPackageName();
+
+  public void setSourceFile(JSourceFile sourceFile);
+  public JSourceFile getSourceFile();
+
 }

@@ -41,6 +41,8 @@ import de.uniluebeck.sourcegen.c.CppSourceFile;
 import de.uniluebeck.sourcegen.dot.DotGraphWorkspace;
 import de.uniluebeck.sourcegen.java.JSourceFile;
 import de.uniluebeck.sourcegen.java.JavaWorkspace;
+import de.uniluebeck.sourcegen.js.JSSourceFile;
+import de.uniluebeck.sourcegen.js.JavaScriptWorkspace;
 import de.uniluebeck.sourcegen.protobuf.ProtobufWorkspace;
 
 public class Workspace {
@@ -79,6 +81,16 @@ public class Workspace {
 
     public CWorkspace getC() {
         return c;
+    }
+
+    // ###################################################################
+    // JavaScript workspace
+    // ###################################################################
+
+    private JavaScriptWorkspace javaScript;
+
+    public JavaScriptWorkspace getJavaScript() {
+        return javaScript;
     }
 
     // ###################################################################
@@ -129,6 +141,7 @@ public class Workspace {
         // Set up the workspaces
         this.java = new JavaWorkspace(this);
         this.c = new CWorkspace(this);
+        this.javaScript = new JavaScriptWorkspace(this);
         this.protobuf = new ProtobufWorkspace(this);
         this.dot = new DotGraphWorkspace(this);
     }
@@ -192,15 +205,15 @@ public class Workspace {
     }
 
     private void assureDirExists(File dir) throws Exception {
-        if (!dir.exists())
-            if (!dir.mkdirs())
-                throw new Exception("File output directory could not be created.");
+      if (!dir.exists() && !dir.mkdirs()) {
+        throw new Exception("File output directory could not be created.");
+      }
     }
 
     private void assureFileExists(File file) throws Exception {
-        if (!file.exists())
-            if (!file.createNewFile())
-                throw new Exception("File could not be created.");
+      if (!file.exists() && !file.createNewFile()) {
+        throw new Exception("File could not be created.");
+      }
     }
 
     private String getFileString(SourceFile sourceFile) {
@@ -214,6 +227,8 @@ public class Workspace {
             return sourceFile.getFileName() + ".hpp";
         if (sourceFile instanceof CppSourceFile)
             return sourceFile.getFileName() + ".cpp";
+        if (sourceFile instanceof JSSourceFile)
+            return sourceFile.getFileName() + ".js";
         return sourceFile.getFileName();
     }
 
@@ -238,8 +253,8 @@ public class Workspace {
 
             if (null == jSourceFile.getPackageName())
             {
-            	throw new Exception("PackageName is null for source file '" + jSourceFile.getFileName() + "'. "
-            			+ "Maybe you did not set it correctly in your module?");
+              throw new Exception(String.format("PackageName is null for source file '%s'. " +
+                      "Maybe you did not set it correctly in your module?", jSourceFile.getFileName()));
             }
             else
             {

@@ -1,4 +1,4 @@
-/** 16.12.2011 02:19 */
+/** 29.07.2012 02:23 */
 package fabric.module.typegen.base;
 
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Iterator;
  *
  * @author seidel
  */
-abstract public class Mapper
+public abstract class Mapper
 {
   /** Mapping between Fabric's XSD built-in datatypes and language-specific ones */
   protected HashMap<String, String> types = new HashMap<String, String>();

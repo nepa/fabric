@@ -1,4 +1,4 @@
-/** 17.07.2012 14:56 */
+/** 29.07.2012 02:21 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
  *
  * @author seidel
  */
-abstract public class FOperationMessage extends FWSDLElement
+public abstract class FOperationMessage extends FWSDLElement
 {
   /** Name of the operation message */
   protected String operationMessageName;

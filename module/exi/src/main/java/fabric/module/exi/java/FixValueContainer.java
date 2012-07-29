@@ -1,4 +1,4 @@
-/** 09.11.2011 22:58 */
+/** 29.07.2012 02:20 */
 package fabric.module.exi.java;
 
 /**
@@ -9,7 +9,7 @@ package fabric.module.exi.java;
  * 
  * @author seidel
  */
-abstract public class FixValueContainer
+public abstract class FixValueContainer
 {  
   /*****************************************************************
    * ElementData inner class

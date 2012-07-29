@@ -114,7 +114,7 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 	private List<JEnumAnnotation> annotations = new ArrayList<JEnumAnnotation>( );
 
 	@Override
-	JComplexType getParent() {
+	public JComplexType getParent() {
 		return parentClass == null ? (parentInterface == null ? null : parentInterface) : parentClass;
 	}
 
