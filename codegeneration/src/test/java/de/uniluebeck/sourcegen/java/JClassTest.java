@@ -1,22 +1,16 @@
-package fabric.codegeneration;
+package de.uniluebeck.sourcegen.java;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.List;
 
-import de.uniluebeck.sourcegen.java.JClass;
-import de.uniluebeck.sourcegen.java.JMethod;
-import de.uniluebeck.sourcegen.java.JMethodSignature;
-import de.uniluebeck.sourcegen.java.JModifier;
-import de.uniluebeck.sourcegen.java.JParameter;
-
 /**
  * Unit test for the JClassImpl class.
  *
  * @author seidel
  */
-public class JClassImplTest
+public class JClassTest
 {
   /**
    * Test getJMethodsByName() function.
