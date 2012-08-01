@@ -1,4 +1,4 @@
-/** 17.07.2012 15:08 */
+/** 01.08.2012 02:16 */
 package fabric.wsdlschemaparser.wsdl;
 
 import javax.xml.namespace.QName;
@@ -94,8 +94,8 @@ public class FExtensibilityElement extends FWSDLElement
   }
 
   /**
-   * This method is an alias for getRequired() and solely
-   * provided for convenience.
+   * This method is an alias for getRequired() and is
+   * solely provided for convenience.
    *
    * @return Boolean value of 'required' flag
    */

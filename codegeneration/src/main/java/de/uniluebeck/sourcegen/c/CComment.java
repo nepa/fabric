@@ -24,6 +24,6 @@
 
 package de.uniluebeck.sourcegen.c;
 
-public abstract interface CComment extends CppLangElem {
+public interface CComment extends CppLangElem {
 
 }

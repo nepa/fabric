@@ -21,14 +21,12 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package de.uniluebeck.sourcegen.c;
 
 /**
- * Comment for C/C++ elements
+ * Comment for C/C++ elements.
  *
  * @author Dennis Boldt
- *
  */
 public class CCommentImpl extends CElemImpl implements CComment {
 
