@@ -1,4 +1,4 @@
-/** 02.08.2012 00:02 */
+/** 02.08.2012 20:37 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -42,6 +42,21 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
     this.classes = new LinkedList<JSClass>();
     this.functions = new LinkedList<JSFunction>();
     this.comment = null;
+  }
+
+  /**
+   * Set name of the JavaScript source file.
+   *
+   * @param fileName Desired name for source file
+   *
+   * @return JSSourceFile object
+   */
+  @Override
+  public JSSourceFile setFileName(final String fileName)
+  {
+    this.fileName = fileName;
+
+    return this;
   }
 
   /**
@@ -322,8 +337,20 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
     // Print all global variables
     this.toString(buffer, tabCount, this.fields, "", "\n\n");
 
+    // Separate fields from following items
+    if (!this.fields.isEmpty() && (!this.classes.isEmpty() || !this.functions.isEmpty()))
+    {
+      buffer.append("\n\n");
+    }
+
     // Print all classes
     this.toString(buffer, tabCount, this.classes, "", "\n\n");
+
+    // Separate classes from following items
+    if (!this.classes.isEmpty() && !this.functions.isEmpty())
+    {
+      buffer.append("\n\n");
+    }
 
     // Print all global functions
     this.toString(buffer, tabCount, this.functions, "", "\n\n");

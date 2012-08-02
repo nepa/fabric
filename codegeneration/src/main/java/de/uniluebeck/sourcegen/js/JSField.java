@@ -1,4 +1,4 @@
-/** 01.08.2012 22:28 */
+/** 02.08.2012 20:33 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -72,4 +72,6 @@ public interface JSField extends JSElement
   public String getInitValue();
 
   public JSField setComment(final JSComment comment);
+
+  public void toString(StringBuffer buffer, int tabCount, boolean inClassContext);
 }

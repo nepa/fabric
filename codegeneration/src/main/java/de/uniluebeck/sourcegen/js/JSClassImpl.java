@@ -467,7 +467,7 @@ public class JSClassImpl extends JSComplexTypeImpl implements JSClass
     // Print all fields
     for (JSField field: this.fields)
     {
-      field.toString(buffer, tabCount + 1);
+      field.toString(buffer, tabCount + 1, true);
       buffer.append("\n");
     }
 

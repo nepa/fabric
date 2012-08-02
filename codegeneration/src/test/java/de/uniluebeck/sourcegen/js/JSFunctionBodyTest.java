@@ -1,4 +1,4 @@
-/** 30.07.2012 18:02 */
+/** 02.08.2012 20:19 */
 package de.uniluebeck.sourcegen.js;
 
 import org.junit.Test;
@@ -68,5 +68,24 @@ public class JSFunctionBodyTest
     functionBody.appendCode("Gamma", "Delta");
     assertEquals("Output must equal expected form.", "Alpha\nBeta\nGamma\nDelta", functionBody.toString());
     System.out.println(functionBody);
+  }
+
+  /**
+   * Test object equality.
+   */
+  @Test(timeout = 1000)
+  public void testEquality()
+  {
+    JSFunctionBody firstFunctionBody = JSFunctionBody.factory.create("nop();");
+    JSFunctionBody secondFunctionBody = JSFunctionBody.factory.create("foobar();");
+
+    // Unequality
+    assertFalse("Function bodies with different code must not be equal.", firstFunctionBody.equals(secondFunctionBody));
+
+    // Equality
+    secondFunctionBody.setCode("nop();");
+    assertTrue("Function bodies must be equal.", firstFunctionBody.equals(secondFunctionBody));
+
+    assertTrue("Function body must be equal to itself.", firstFunctionBody.equals(firstFunctionBody));
   }
 }

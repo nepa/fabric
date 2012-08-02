@@ -1,35 +1,35 @@
-/** 02.08.2012 20:21 */
+/** 02.08.2012 15:07 */
 package de.uniluebeck.sourcegen.js;
 
 /**
- * This class represents the body of a JavaScript function.
- * All lines of code will be written to a StringBuffer and
- * cannot be accessed individually afterwards. However, to
- * output the code with pretty indention, lines are later
- * processed one by one.
+ * This class represents a common block of JavaScript code
+ * in a source file. All lines of code will be written to
+ * a StringBuffer and cannot be accessed individually
+ * afterwards. However, to output the code with pretty
+ * indention, lines are later processed one by one.
  *
  * @author seidel
  */
-public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
+public class JSCodeBlockImpl extends JSElementImpl implements JSCodeBlock
 {
-  /** Buffer for code of the function body */
+  /** Buffer for code of the code block */
   private StringBuffer code;
 
   /**
-   * Parameterless constructor will create an empty function body.
+   * Parameterless constructor will create an empty code block.
    */
-  public JSFunctionBodyImpl()
+  public JSCodeBlockImpl()
   {
     this.code = new StringBuffer();
   }
 
   /**
-   * Parameterized constructor will create a function body
+   * Parameterized constructor will create a code block
    * with the given lines of JavaScript source code.
    *
    * @param codeLines Lines of JavaScript source code
    */
-  public JSFunctionBodyImpl(final String... codeLines)
+  public JSCodeBlockImpl(final String... codeLines)
   {
     this.code = new StringBuffer();
 
@@ -40,25 +40,25 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
   }
 
   /**
-   * Set JavaScript source code of the function body.
+   * Set JavaScript source code of the code block.
    *
    * @param code JavaScript source code
    *
-   * @return JSFunctionBody object
+   * @return JSCodeBlock object
    */
   @Override
-  public JSFunctionBody setCode(final String code)
+  public JSCodeBlock setCode(final String code)
   {
     this.clearCode();
     this.appendCode(code);
-    
+
     return this;
   }
 
   /**
-   * Get JavaScript source code of the function body.
+   * Get JavaScript source code of the code block.
    *
-   * @return JSFunctionBody object
+   * @return JSCodeBlock object
    */
   @Override
   public String getCode()
@@ -69,13 +69,13 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
   /**
    * Prepend new lines of code at beginning of existing
    * JavaScript source code.
-   * 
+   *
    * @param codeLines Lines of JavaScript source code
-   * 
-   * @return JSFunctionBody object
+   *
+   * @return JSCodeBlock object
    */
   @Override
-  public JSFunctionBody prependCode(final String... codeLines)
+  public JSCodeBlock prependCode(final String... codeLines)
   {
     for (String line: codeLines)
     {
@@ -91,10 +91,10 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
    *
    * @param codeLines Lines of JavaScript source code
    *
-   * @return JSFunctionBody object
+   * @return JSCodeBlock object
    */
   @Override
-  public JSFunctionBody appendCode(final String... codeLines)
+  public JSCodeBlock appendCode(final String... codeLines)
   {
     for (String line: codeLines)
     {
@@ -106,12 +106,12 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
 
   /**
    * Clear buffer that holds JavaScript source code of
-   * the function body.
+   * the code block.
    *
-   * @return JSFunctionBody object
+   * @return JSCodeBlock object
    */
   @Override
-  public JSFunctionBody clearCode()
+  public JSCodeBlock clearCode()
   {
     if (this.code.length() > 0)
     {
@@ -122,14 +122,13 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
   }
 
   /**
-   * Compare current JavaScript function body with another
-   * object of the same type. Equality comparison is based
-   * on the code in the function body.
+   * Compare current JavaScript code block with another object
+   * of the same type. Equality comparison is based on the code
+   * in the code block.
    *
-   * @param object JSFunctionBody object for comparison
+   * @param object JSCodeBlock object for comparison
    *
-   * @return True if both function bodies are equal, false
-   * otherwise
+   * @return True if both code blocks are equal, false otherwise
    */
   @Override
   public boolean equals(Object object)
@@ -150,9 +149,9 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
     if (this.getClass() == object.getClass())
     {
       // Safe cast to desired type
-      JSFunctionBodyImpl otherFunctionBody = (JSFunctionBodyImpl)object;
+      JSCodeBlockImpl otherCodeBlock = (JSCodeBlockImpl)object;
 
-      if (this.getCode().equals(otherFunctionBody.getCode()))
+      if (this.getCode().equals(otherCodeBlock.getCode()))
       {
         return true;
       }
@@ -170,15 +169,15 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
   @Override
   public int hashCode()
   {
-    int hash = 3;
+    int hash = 5;
 
-    hash = 67 * hash + (this.code != null ? this.code.hashCode() : 0);
+    hash = 89 * hash + (this.code != null ? this.code.hashCode() : 0);
 
     return hash;
   }
 
   /**
-   * Print JavaScript source code of the function body
+   * Print JavaScript source code of the code block
    * with pretty indention.
    *
    * @param buffer Buffer for code write-out

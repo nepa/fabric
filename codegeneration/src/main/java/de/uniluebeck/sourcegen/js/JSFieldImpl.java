@@ -1,4 +1,4 @@
-/** 01.08.2012 22:55 */
+/** 02.08.2012 20:35 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -157,13 +157,34 @@ public class JSFieldImpl extends JSElementImpl implements JSField
   }
 
   /**
-   * Print JavaScript field with its name and initial value.
+   * Print JavaScript field with its name and initial value. This
+   * method will print the field in the global context of a source
+   * file, that is "var name = initialValue;". If you want to print
+   * the field as a class member, use the other toString() method
+   * instead.
    *
    * @param buffer Buffer for code write-out
    * @param tabCount Depth of code indention
    */
   @Override
   public void toString(StringBuffer buffer, int tabCount)
+  {
+    this.toString(buffer, tabCount, false);
+  }
+
+  /**
+   * Print JavaScript field with its name and initial value.
+   * This method will print the field in class context, that
+   * is "this.name = initialValue;". If you want to print the
+   * field in the global context of a source file, use the
+   * other toString() method instead.
+   *
+   * @param buffer Buffer for code write-out
+   * @param tabCount Depth of code indention
+   * @param inClassContext Flag to print field in class context
+   */
+  @Override
+  public void toString(StringBuffer buffer, int tabCount, boolean inClassContext)
   {
     // Write comment if necessary
     if (null != this.comment)
@@ -173,7 +194,14 @@ public class JSFieldImpl extends JSElementImpl implements JSField
 
     this.indent(buffer, tabCount);
 
-    // Print field with initial value    
-    buffer.append(String.format("this.%s = %s;", this.name, this.initValue));
+    // Print field with initial value
+    if (inClassContext)
+    {
+      buffer.append(String.format("this.%s = %s;", this.name, this.initValue));
+    }
+    else
+    {
+      buffer.append(String.format("var %s = %s;", this.name, this.initValue));
+    }
   }
 }

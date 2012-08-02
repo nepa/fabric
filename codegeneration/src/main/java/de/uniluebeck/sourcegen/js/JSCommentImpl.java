@@ -1,4 +1,4 @@
-/** 01.08.2012 22:28 */
+/** 02.08.2012 20:31 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -22,6 +22,19 @@ public class JSCommentImpl extends JSElementImpl implements JSComment
   public JSCommentImpl(final String description)
   {
     this.description = description;
+  }
+
+  /**
+   * Set actual text of the comment.
+   *
+   * @param description Text of the comment
+   */
+  @Override
+  public JSComment setDescription(final String description)
+  {
+    this.description = description;
+
+    return this;
   }
 
   /**
