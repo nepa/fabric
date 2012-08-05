@@ -213,6 +213,8 @@
             <exclude>module/exi/**</exclude>
             <exclude>module/midgen4j/**</exclude>
             <exclude>module/cpp/**</exclude>
+            <exclude>codegeneration/src/main/java/de/uniluebeck/sourcegen/js/**</exclude>
+            <exclude>codegeneration/src/test/java/de/uniluebeck/sourcegen/js/**</exclude>
             <exclude>wsdl-schema-parser/src/main/java/fabric/wsdlschemaparser/wsdl/**</exclude>
             <exclude>wsdl-schema-parser/src/test/java/fabric/wsdlschemaparser/**</exclude>
 

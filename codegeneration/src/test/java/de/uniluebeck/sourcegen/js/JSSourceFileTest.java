@@ -1,4 +1,4 @@
-/** 02.08.2012 20:29 */
+/** 03.08.2012 01:14 */
 package de.uniluebeck.sourcegen.js;
 
 import org.junit.Test;
@@ -114,7 +114,31 @@ public class JSSourceFileTest
   @Test(timeout = 1000)
   public void testCodeBlockHandling()
   {
-    // TODO: Implement test case
+    JSSourceFile sourceFile = new JSSourceFileImpl("foobar");
+
+    // Test before fields
+    String code = "// Code block before fields";
+    sourceFile.getCodeBeforeFields().setCode(code);
+    assertEquals("Code block before fields must match initial value.",
+            code, sourceFile.getCodeBeforeFields().toString());
+
+    // Test before classes
+    code = "// Code block before classes";
+    sourceFile.getCodeBeforeClasses().setCode(code);
+    assertEquals("Code block before classes must match initial value.",
+            code, sourceFile.getCodeBeforeClasses().toString());
+
+    // Test before functions
+    code = "// Code block before functions";
+    sourceFile.getCodeBeforeFunctions().setCode(code);
+    assertEquals("Code block before functions must match initial value.",
+            code, sourceFile.getCodeBeforeFunctions().toString());
+
+    // Test after functions
+    code = "// Code block after functions";
+    sourceFile.getCodeAfterFunctions().setCode(code);
+    assertEquals("Code block after functions must match initial value.",
+            code, sourceFile.getCodeAfterFunctions().toString());
   }
 
   /**
@@ -174,7 +198,7 @@ public class JSSourceFileTest
     sourceFile.add(jsc);
 
     // Create global function
-    JSFunction function = JSFunction.factory.create("foobar", "alpba", "beta", "gamma", "delta");
+    JSFunction function = JSFunction.factory.create("foobar", "alpha", "beta", "gamma", "delta");
     function.setComment(new JSCommentImpl("A test function."));
 
     String functionBody =
@@ -185,8 +209,23 @@ public class JSSourceFileTest
 
     sourceFile.add(function);
 
-    assertTrue("Source file must contain header comment.", sourceFile.toString().contains("A JavaScript test file."));
-    assertTrue("Source file must contain 'foobar' function.", sourceFile.toString().contains("foobar"));
+    // Create code blocks
+    sourceFile.getCodeBeforeFields().setCode("// Code block before fields");
+    sourceFile.getCodeBeforeClasses().setCode("// Code block before classes");
+    sourceFile.getCodeBeforeFunctions().setCode("// Code block before functions");
+    sourceFile.getCodeAfterFunctions().setCode("// Code block after functions");
+
+    String code = sourceFile.toString();
+    assertTrue("Source file must contain header comment.", code.contains("A JavaScript test file."));
+    assertTrue("Source file must contain 'foo' field.", code.contains("var foo"));
+    assertTrue("Source file must contain 'bar' field.", code.contains("var bar"));
+    assertTrue("Source file must contain 'Apple' class.", code.contains("function Apple"));
+    assertTrue("Source file must contain 'foobar' function.", code.contains("foobar"));
+
+    assertTrue("Source file must contain code block before fields.", code.contains("Code block before fields"));
+    assertTrue("Source file must contain code block before classes.", code.contains("Code block before classes"));
+    assertTrue("Source file must contain code block before functions.", code.contains("Code block before functions"));
+    assertTrue("Source file must contain code block after functions.", code.contains("Code block after functions"));
 
     System.out.println(sourceFile);
   }

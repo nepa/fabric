@@ -18,6 +18,4 @@ public class JSDuplicateException extends ValidationException
   {
     super(message);
   }
-
-  // TODO: Add new constructor for each JSComplexType object (like in JDuplicateException)
 }

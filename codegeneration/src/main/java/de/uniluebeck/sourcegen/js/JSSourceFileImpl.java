@@ -1,4 +1,4 @@
-/** 02.08.2012 20:37 */
+/** 03.08.2012 01:14 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -17,14 +17,26 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   /** Name of the JavaScript source file */
   private String fileName;
 
+  /** Code block before fields */
+  private JSCodeBlock codeBeforeFields;
+
   /** List of variables in the global scope */
   private LinkedList<JSField> fields;
+
+  /** Code block before classes */
+  private JSCodeBlock codeBeforeClasses;
 
   /** List of classes in the source file */
   private LinkedList<JSClass> classes;
 
+  /** Code block before functions */
+  private JSCodeBlock codeBeforeFunctions;
+
   /** List of global functions in the source file */
   private LinkedList<JSFunction> functions;
+
+  /** Code block after functions */
+  private JSCodeBlock codeAfterFuntions;
 
   /** Comment to print at beginning of file */
   private JSComment comment;
@@ -38,9 +50,13 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   public JSSourceFileImpl(final String fileName)
   {
     this.fileName = fileName;
+    this.codeBeforeFields = JSCodeBlock.factory.create();
     this.fields = new LinkedList<JSField>();
+    this.codeBeforeClasses = JSCodeBlock.factory.create();
     this.classes = new LinkedList<JSClass>();
+    this.codeBeforeFunctions = JSCodeBlock.factory.create();
     this.functions = new LinkedList<JSFunction>();
+    this.codeAfterFuntions = JSCodeBlock.factory.create();
     this.comment = null;
   }
 
@@ -238,6 +254,82 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   }
 
   /**
+   * Get block of JavaScript code before global variables
+   * (i.e. fields) of the source file.
+   *
+   * @return Code block before fields
+   */
+  @Override
+  public JSCodeBlock getCodeBeforeFields()
+  {
+    return this.codeBeforeFields;
+  }
+
+  /**
+   * Get block of JavaScript code after global variables
+   * (i.e. fields) of the source file. This method is an
+   * alias for getCodeBeforeClasses() and is simply provided
+   * for convenience.
+   *
+   * @return Code block after fields
+   */
+  @Override
+  public JSCodeBlock getCodeAfterFields()
+  {
+    return this.getCodeBeforeClasses();
+  }
+
+  /**
+   * Get block of JavaScript code before classes of
+   * the source file.
+   *
+   * @return Code block before classes
+   */
+  @Override
+  public JSCodeBlock getCodeBeforeClasses()
+  {
+    return this.codeBeforeClasses;
+  }
+
+  /**
+   * Get block of JavaScript code after classes of
+   * the source file. This method is an alias for
+   * getCodeBeforeFunctions() and is simply provided
+   * for convenience.
+   *
+   * @return Code block after classes
+   */
+  @Override
+  public JSCodeBlock getCodeAfterClasses()
+  {
+    return this.getCodeBeforeFunctions();
+  }
+
+  /**
+   * Get block of JavaScript code before global functions
+   * of the source file.
+   *
+   * @return Code block before functions
+   */
+  @Override
+  public JSCodeBlock getCodeBeforeFunctions()
+  {
+    return this.codeBeforeFunctions;
+  }
+
+  /**
+   * Get block of JavaScript code after global functions
+   * of the source file.
+   *
+   * @return Code block after functions
+   */
+  @Override
+  public JSCodeBlock getCodeAfterFunctions()
+  {
+    return this.codeAfterFuntions;
+  }
+
+  /**
    * Set a comment that will be printed right at the
    * beginning of the JavaScript source file.
    *
@@ -257,7 +349,8 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
    * Compare current JavaScript source file with another object
    * of the same type. Equality comparison is based on the file
    * name as well as all fields, classes and functions that are
-   * contained in the file.
+   * contained in the file. Code blocks before and after fields,
+   * classes and functions are also used in equality test.
    *
    * @param object JSSourceFile object for comparison
    *
@@ -285,6 +378,10 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
       JSSourceFileImpl otherSourceFile = (JSSourceFileImpl)object;
 
       if (this.fileName.equals(otherSourceFile.getFileName()) &&
+          this.codeBeforeFields.equals(otherSourceFile.getCodeBeforeFields()) &&
+          this.codeBeforeClasses.equals(otherSourceFile.getCodeBeforeClasses()) &&
+          this.codeBeforeFunctions.equals(otherSourceFile.getCodeBeforeFunctions()) &&
+          this.codeAfterFuntions.equals(otherSourceFile.getCodeAfterFunctions()) &&
           this.fields.size() == otherSourceFile.getFields().size() && // Early exit for better performance
           this.fields.equals(otherSourceFile.getFields()) &&
           this.classes.size() == otherSourceFile.getClasses().size() && // Early exit for better performance
@@ -310,10 +407,14 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   {
     int hash = 7;
 
-    hash = 41 * hash + (this.fileName != null ? this.fileName.hashCode() : 0);
-    hash = 41 * hash + (this.fields != null ? this.fields.hashCode() : 0);
-    hash = 41 * hash + (this.classes != null ? this.classes.hashCode() : 0);
-    hash = 41 * hash + (this.functions != null ? this.functions.hashCode() : 0);
+    hash = 23 * hash + (this.fileName != null ? this.fileName.hashCode() : 0);
+    hash = 23 * hash + (this.codeBeforeFields != null ? this.codeBeforeFields.hashCode() : 0);
+    hash = 23 * hash + (this.fields != null ? this.fields.hashCode() : 0);
+    hash = 23 * hash + (this.codeBeforeClasses != null ? this.codeBeforeClasses.hashCode() : 0);
+    hash = 23 * hash + (this.classes != null ? this.classes.hashCode() : 0);
+    hash = 23 * hash + (this.codeBeforeFunctions != null ? this.codeBeforeFunctions.hashCode() : 0);
+    hash = 23 * hash + (this.functions != null ? this.functions.hashCode() : 0);
+    hash = 23 * hash + (this.codeAfterFuntions != null ? this.codeAfterFuntions.hashCode() : 0);
 
     return hash;
   }
@@ -334,25 +435,62 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
       buffer.append("\n");
     }
 
-    // Print all global variables
-    this.toString(buffer, tabCount, this.fields, "", "\n\n");
-
-    // Separate fields from following items
-    if (!this.fields.isEmpty() && (!this.classes.isEmpty() || !this.functions.isEmpty()))
+    // Print code block before fields
+    if (!this.codeBeforeFields.getCode().isEmpty())
     {
+      this.codeBeforeFields.toString(buffer, tabCount);
+      buffer.append("\n\n");
+    }
+
+    // Print all global variables
+    if (!this.fields.isEmpty())
+    {
+      this.toString(buffer, tabCount, this.fields, "", "\n\n");
+      buffer.append("\n\n");
+    }
+
+    // Print code block before classes
+    if (!this.codeBeforeClasses.getCode().isEmpty())
+    {
+      this.codeBeforeClasses.toString(buffer, tabCount);
       buffer.append("\n\n");
     }
 
     // Print all classes
-    this.toString(buffer, tabCount, this.classes, "", "\n\n");
-
-    // Separate classes from following items
-    if (!this.classes.isEmpty() && !this.functions.isEmpty())
+    if (!this.classes.isEmpty())
     {
+      this.toString(buffer, tabCount, this.classes, "", "\n\n");
+      buffer.append("\n\n");
+    }
+
+    // Print code block before functions
+    if (!this.codeBeforeFunctions.getCode().isEmpty())
+    {
+      this.codeBeforeFunctions.toString(buffer, tabCount);
       buffer.append("\n\n");
     }
 
     // Print all global functions
-    this.toString(buffer, tabCount, this.functions, "", "\n\n");
+    if (!this.functions.isEmpty())
+    {
+      this.toString(buffer, tabCount, this.functions, "", "\n\n");
+      buffer.append("\n\n");
+    }
+
+    // Print code block after functions
+    if (!this.codeAfterFuntions.getCode().isEmpty())
+    {
+      this.codeAfterFuntions.toString(buffer, tabCount);
+    }
+
+    // Remove trailing line breaks (if any)
+    String code = buffer.toString();
+    String trimmedCode = code.trim();
+    if (buffer.length() > 0 && !code.equals(trimmedCode))
+    {
+      // Clear buffer and use trimmed code instead
+      buffer.delete(0, buffer.length());
+      buffer.append(trimmedCode);
+    }
   }
 }
