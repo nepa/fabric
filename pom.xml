@@ -192,7 +192,7 @@
           -->
           <dryRun>true</dryRun>
 
-          <!-- Only add header to source files -->
+          <!-- Only add license header to source files -->
           <includes>
             <include>**/*.java</include>
             <include>**/*.xml</include>
