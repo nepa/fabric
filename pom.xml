@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -171,6 +170,15 @@
         </configuration>
       </plugin>
 
+      <!--
+        The maven-license-plugin does not handle includes/excludes
+        correctly in version 1.9.0. Use update_license_headers.sh
+        from the Fabric wiki to update license headers instead!
+        
+        The problem is issued, but the project seems to be dead:
+          http://code.google.com/p/maven-license-plugin/issues/detail?id=110
+      -->
+
       <!-- mvn license:check / mvn license:format -->
       <plugin>
         <groupId>com.mycila.maven-license-plugin</groupId>
@@ -207,7 +215,7 @@
             <exclude>.gitignore</exclude>
             <exclude>README</exclude>
 
-            <!-- Some people don't want license headers in their files ;-) -->
+            <!-- Some people do not like license headers in their files :-) -->
             <exclude>third-party/**</exclude>
             <exclude>module/typegen/**</exclude>
             <exclude>module/exi/**</exclude>
