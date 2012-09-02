@@ -120,6 +120,13 @@ public final class FSchemaTreeWalker {
             for (final FElement e : tlo.getTopLevelElements( )) {
                 handleElement(e, null);
             }
+
+            // seidel: Added loop to process unreferenced types as well.
+            // Otherwise Fabric would only process global types if they
+            // are used in at least one top-level element.
+            for (final FSchemaType t : tlo.getTopLevelTypes( )) {
+                handleSchemaType(t, null);
+            }
         }
 
         handler.endSchema(schema);

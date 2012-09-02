@@ -1,4 +1,4 @@
-/** 26.07.2012 14:16 */
+/** 31.08.2012 16:52 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -38,17 +38,15 @@ public class MessageObjectGenerator
    * to a service operation.
    *
    * @param message FMessage object from WSDL parser
-   * @param schemaName Name of the container class that was generated
-   * by the TypeGen module to represent the entire XML Schema document
    *
    * @return JClass object with message container class
    *
    * @throws Exception Error during code generation
    */
-  public static JClass createMessageClass(final FMessage message, final String schemaName) throws Exception
+  public static JClass createMessageClass(final FMessage message) throws Exception
   {
     // Create class
-    String className = message.getMessageName() + "Message";
+    String className = MessageObjectGenerator.firstLetterCapital(message.getMessageName()) + "Message";
     JClass messageClass = JClass.factory.create(JModifier.PUBLIC, className);
 
     LOGGER.debug(String.format("Created container class for message '%s'.", message.getMessageName()));
@@ -59,8 +57,7 @@ public class MessageObjectGenerator
     // Process all message parts
     for (FMessagePart messagePart: message.getParts())
     {
-      String typeName = MessageObjectGenerator.getCorrectTypeName(
-              messagePart.getNoneNullAttribute().getLocalPart(), schemaName);
+      String typeName = MessageObjectGenerator.getCorrectTypeName(messagePart.getNoneNullAttribute().getLocalPart());
       String variableName = messagePart.getPartName();
 
       /*****************************************************************
@@ -75,10 +72,10 @@ public class MessageObjectGenerator
       /*****************************************************************
        * Create setter method
        *****************************************************************/
-      JParameter input = JParameter.factory.create(typeName, variableName);
+      JParameter input = JParameter.factory.create(JModifier.FINAL, typeName, variableName);
       JMethodSignature jms = JMethodSignature.factory.create(input);
 
-      JMethod setter = JMethod.factory.create(JModifier.PUBLIC | JModifier.FINAL, "void",
+      JMethod setter = JMethod.factory.create(JModifier.PUBLIC, "void",
               "set" + MessageObjectGenerator.firstLetterCapital(variableName), jms);
 
       setter.getBody().appendSource(String.format("this.%s = %s;", variableName, variableName));
@@ -123,12 +120,10 @@ public class MessageObjectGenerator
    *
    * @param typeName Type name from WSDL parser (i.e. local part of
    * QName that was extracted from WSDL document)
-   * @param schemaName Name of the container class that was generated
-   * by the TypeGen module to represent the entire XML Schema document
    *
    * @return Type name that can be used in generated Java code
    */
-  private static String getCorrectTypeName(final String typeName, final String schemaName)
+  private static String getCorrectTypeName(final String typeName)
   {
     String result = "";
 
@@ -180,11 +175,6 @@ public class MessageObjectGenerator
       result = mapping.get(typeName);
     }
     // Type is a custom type
-    else if (null != schemaName)
-    {
-      result = String.format("%s.%sType", schemaName, typeName);
-    }
-    // Type is a custom type, but no inline schema was defined
     else
     {
       result = typeName;

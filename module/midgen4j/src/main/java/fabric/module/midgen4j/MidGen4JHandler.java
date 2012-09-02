@@ -1,4 +1,4 @@
-/** 26.07.2012 14:46 */
+/** 02.09.2012 19:50 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -99,13 +99,12 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     // Create new container class for each message type
     for (FMessage message: messages)
     {
-      JClass messageClass = MessageObjectGenerator.createMessageClass(message,
-              this.properties.getProperty("typegen.main_class_name"));
+      JClass messageClass = MessageObjectGenerator.createMessageClass(message);
 
       if (null != messageClass)
       {
-        JSourceFile jsf = this.workspace.getJava().getJSourceFile(
-                this.packageName, message.getMessageName() + "Message");
+        JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName,
+                MidGen4JHandler.firstLetterCapital(message.getMessageName()) + "Message");
         jsf.add(messageClass);
       }
     }
@@ -169,7 +168,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   {
     // Create input argument
     JParameter methodInput = JParameter.factory.create(
-            operation.getInputMessage().getMessageAttribute().getLocalPart() + "Message",
+            MidGen4JHandler.firstLetterCapital(operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message",
             "inputMessage");
 
     // Create method signature
@@ -177,7 +176,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
 
     // Create method stub
     JMethod method = JMethod.factory.create(JModifier.PUBLIC,
-            operation.getOutputMessage().getMessageAttribute().getLocalPart() + "Message",
+            MidGen4JHandler.firstLetterCapital(operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message",
             operation.getOperationName(),
             jms);
 
@@ -191,5 +190,18 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
             "Call the '%s' service operation.", operation.getOperationName())));
 
     return method;
+  }
+
+  /**
+   * Private helper method to capitalize the first letter of a string.
+   * Function will return null, if argument was null.
+   *
+   * @param text Text to process
+   *
+   * @return Text with first letter capitalized or null
+   */
+  private static String firstLetterCapital(final String text)
+  {
+    return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
 }

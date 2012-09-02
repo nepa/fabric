@@ -19,14 +19,12 @@
         </xsd:restriction>
       </xsd:simpleType>
 
-      <xsd:element name="Zahlenpaar">
-      <xsd:complexType>
+      <xsd:complexType name="Zahlenpaar">
         <xsd:sequence>
           <element name="ErsteZahl" type="xsd:Zahl" />
           <element name="ZweiteZahl" type="xsd:Zahl" />
         </xsd:sequence>
       </xsd:complexType>
-      </xsd:element>
     </schema>
   </types>
 
