@@ -51,6 +51,8 @@ public class FOperationImpl extends FWSDLElement implements FOperation
   public FOperationImpl(final String operationName, final FOperationType operationType,
           final FOperationInputMessage inputMessage, final FOperationOutputMessage outputMessage) throws IllegalArgumentException
   {
+    // TODO: Do not access inputMessage/outputMessage unless we know it is not null!
+
     this.operationName = operationName;
     this.operationType = operationType;
     this.faultMessages = new HashSet<FOperationFaultMessage>();

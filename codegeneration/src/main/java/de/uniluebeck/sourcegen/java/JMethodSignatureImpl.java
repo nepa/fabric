@@ -51,8 +51,11 @@ class JMethodSignatureImpl extends JElemImpl implements JMethodSignature {
 	}
 	
 	public JMethodSignature add(JParameter... params) throws JDuplicateException {
-		for(JParameter p : params)
-			addInternal(p);
+		for(JParameter p : params) {
+			if(p != null) {
+				addInternal(p);
+			}
+		}
 		return this;
 	}
 	

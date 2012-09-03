@@ -1,4 +1,4 @@
-/** 23.07.2012 15:07 */
+/** 03.09.2012 16:30 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.slf4j.Logger;
@@ -263,7 +263,8 @@ public class FWSDL
             Operation operation = (Operation)o;
 
             // Operation must either have input or output message (or both)
-            if (null != operation.getInput().getMessage() || null != operation.getOutput().getMessage())
+            if ((null != operation.getInput() && null != operation.getInput().getMessage()) ||
+                (null != operation.getOutput() && null != operation.getOutput().getMessage()))
             {
               // Determine operation type
               FOperationType methodType = FOperationType.INVALID;
@@ -297,10 +298,21 @@ public class FWSDL
                 faultMessages.add(new FOperationFaultMessage(faultName, faultMessage));
               }
 
-              FOperationImpl method = FOperation.factory.create(operation.getName(), methodType,
-                      new FOperationInputMessage(operation.getInput().getName(), operation.getInput().getMessage().getQName()),
-                      new FOperationOutputMessage(operation.getOutput().getName(), operation.getOutput().getMessage().getQName()),
-                      faultMessages);
+              // Create operation input message
+              FOperationInputMessage inputMessage = null;
+              if (null != operation.getInput() && null != operation.getInput().getMessage())
+              {
+                inputMessage = new FOperationInputMessage(operation.getInput().getName(), operation.getInput().getMessage().getQName());
+              }
+
+              // Create operation output message
+              FOperationOutputMessage outputMessage = null;
+              if (null != operation.getOutput() && null != operation.getOutput().getMessage())
+              {
+                outputMessage = new FOperationOutputMessage(operation.getOutput().getName(), operation.getOutput().getMessage().getQName());
+              }
+
+              FOperationImpl method = FOperation.factory.create(operation.getName(), methodType, inputMessage, outputMessage, faultMessages);
 
               // Add operation to webservice interface
               serviceInterface.addOperation(method);

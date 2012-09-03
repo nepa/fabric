@@ -44,6 +44,14 @@
       <input message="tns:addiereRequest" />
       <output message="tns:addiereResponse" />
     </operation>
+
+    <operation name="addiereOhneAntwort">
+      <input message="tns:addiereRequest" />
+    </operation>
+
+    <operation name="addiereOhneEingabe">
+      <output message="tns:addiereResponse" />
+    </operation>
   </portType>
 
   <!-- Protokoll und Datenformat fuer Kommunikation -->

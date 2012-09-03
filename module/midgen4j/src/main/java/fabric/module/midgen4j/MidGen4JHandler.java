@@ -1,4 +1,4 @@
-/** 02.09.2012 19:50 */
+/** 03.09.2012 15:45 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -167,23 +167,49 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   private JMethod createServiceMethod(final FOperation operation) throws Exception
   {
     // Create input argument
-    JParameter methodInput = JParameter.factory.create(
-            MidGen4JHandler.firstLetterCapital(operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message",
-            "inputMessage");
+    JParameter methodInput = null;
+
+    // Operation has an input value
+    if (null != operation.getInputMessage())
+    {
+      methodInput = JParameter.factory.create(
+              JModifier.FINAL,
+              MidGen4JHandler.firstLetterCapital(operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message",
+              "inputMessage");
+    }
 
     // Create method signature
     JMethodSignature jms = JMethodSignature.factory.create(methodInput);
 
+    // Create output argument
+    String methodOutput = "void";
+    if (null != operation.getOutputMessage())
+    {
+      methodOutput = MidGen4JHandler.firstLetterCapital(
+              operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
+    }
+
     // Create method stub
     JMethod method = JMethod.factory.create(JModifier.PUBLIC,
-            MidGen4JHandler.firstLetterCapital(operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message",
+            methodOutput,
             operation.getOperationName(),
             jms);
 
     LOGGER.debug(String.format("Created method stub for service operation '%s'.", operation.getOperationName()));
 
     // Set method body
-    method.getBody().appendSource("// TODO: Add your custom business logic here");
+    String methodBody = "// TODO: Add your custom business logic here";
+
+    // Operation has a return value
+    if (null != operation.getOutputMessage())
+    {
+      methodBody = String.format(
+              "%s result = new %s();\n\n" +
+              "%s\n\n" +
+              "return result;",
+              methodOutput, methodOutput, methodBody);
+    }
+    method.getBody().appendSource(methodBody);
 
     // Add a comment
     method.setComment(new JMethodCommentImpl(String.format(
