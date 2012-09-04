@@ -1,4 +1,4 @@
-/** 03.09.2012 15:45 */
+/** 04.09.2012 14:59 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -44,6 +44,9 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   /** Properties object for module configuration */
   private Properties properties;
 
+  /** Java package name for bean classes */
+  private String beanPackageName;
+
   /** Java package name for generated classes */
   private String packageName;
 
@@ -66,6 +69,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     this.properties = properties;
 
     // Extract global properties
+    this.beanPackageName = this.properties.getProperty(MidGen4JModule.BEAN_PACKAGE_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JModule.PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
   }
@@ -99,16 +103,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     // Create new container class for each message type
     for (FMessage message: messages)
     {
-      JClass messageClass = MessageObjectGenerator.createMessageClass(message);
-
-      if (null != messageClass)
-      {
-        JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName,
-                MidGen4JHandler.firstLetterCapital(message.getMessageName()) + "Message");
-        jsf.add(messageClass);
-
-        // TODO: Add required imports (with no duplicats)
-      }
+      MessageObjectGenerator.createMessageClass(this.workspace, this.packageName, this.beanPackageName, message);
     }
   }
 

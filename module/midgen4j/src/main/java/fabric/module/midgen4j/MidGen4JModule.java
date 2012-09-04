@@ -1,4 +1,4 @@
-/** 24.07.2012 16:15 */
+/** 04.09.2012 15:26 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -35,6 +35,12 @@ public class MidGen4JModule implements FModuleBase
   /** Key for package name in properties object */
   public static final String PACKAGE_NAME_KEY = "midgen4j.package_name";
 
+  /** Key for bean package name in properties object */
+  public static final String BEAN_PACKAGE_NAME_KEY = "midgen4j.bean_package_name";
+
+  /** Alternative key for bean package name */
+  public static final String BEAN_PACKAGE_NAME_ALT_KEY = "typegen.java.package_name";
+
   /** Properties object for module configuration */
   private Properties properties;
 
@@ -68,8 +74,10 @@ public class MidGen4JModule implements FModuleBase
   public String getDescription()
   {
     return String.format("Base module of the Java Middleware Generator. " +
-            "Valid options are '%s' and '%s'.",
-            SERVICE_PROVIDER_CLASS_NAME_KEY, PACKAGE_NAME_KEY);
+            "Valid options are '%s', '%s' and '%s'. " +
+            "Alternatively '%s' can be used.",
+            SERVICE_PROVIDER_CLASS_NAME_KEY, PACKAGE_NAME_KEY,
+            BEAN_PACKAGE_NAME_KEY, BEAN_PACKAGE_NAME_ALT_KEY);
   }
 
   /**
@@ -114,9 +122,13 @@ public class MidGen4JModule implements FModuleBase
       throw new IllegalStateException("Properties object is null. Maybe it was not initialized properly?");
     }
 
+    // Check if alternative keys have been used and copy values
+    this.copyAlternativeProperties();
+
     // Check properties
     this.checkServiceProviderClassName();
     this.checkPackageName();
+    this.checkBeanPackageName();
 
     // Print MidGen4J module properties for debug purposes
     for (String key: this.properties.stringPropertyNames())
@@ -126,6 +138,44 @@ public class MidGen4JModule implements FModuleBase
         LOGGER.debug(String.format("Property '%s' has value '%s'.", key, this.properties.getProperty(key)));
       }
     }
+  }
+
+  /**
+   * Private helper method to determine which properties should be
+   * used. The MidGen4J module can copy properties from TypeGen module,
+   * if appropriate values are set.
+   */
+  private void copyAlternativeProperties()
+  {
+    if (!isSet(BEAN_PACKAGE_NAME_KEY) && isSet(BEAN_PACKAGE_NAME_ALT_KEY))
+    {
+      copyProperty(BEAN_PACKAGE_NAME_ALT_KEY, BEAN_PACKAGE_NAME_KEY);
+    }
+  }
+
+  /**
+   * Private helper method to check, whether a value is set for
+   * a certain key in the properties object.
+   *
+   * @param key Key of property to check
+   *
+   * @return True if property is set, false otherwise
+   */
+  private boolean isSet(final String key)
+  {
+    return (this.properties.containsKey(key) && !("").equals(this.properties.getProperty(key)));
+  }
+
+  /**
+   * Private helper method to copy property from field with key
+   * 'from' to another field with key 'to'.
+   *
+   * @param from Key of source property
+   * @param to Key of target property
+   */
+  private void copyProperty(final String from, final String to)
+  {
+    this.properties.setProperty(to, this.properties.getProperty(from));
   }
 
   /**
@@ -158,6 +208,22 @@ public class MidGen4JModule implements FModuleBase
     if (null != packageName)
     {
       this.properties.setProperty(PACKAGE_NAME_KEY, packageName.toLowerCase());
+    }
+  }
+
+  /**
+   * Check parameter for the package name of custom type classes (JavaBeans).
+   * This property is optional. However, it is strongly recommended to provide
+   * a value, because otherwise "fabric.package.default" is used as default.
+   */
+  private void checkBeanPackageName()
+  {
+    String beanPackageName = this.properties.getProperty(BEAN_PACKAGE_NAME_KEY, "fabric.package.default");
+
+    // Convert package name to lower case
+    if (null != beanPackageName)
+    {
+      this.properties.setProperty(BEAN_PACKAGE_NAME_KEY, beanPackageName.toLowerCase());
     }
   }
 }

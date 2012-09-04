@@ -1,10 +1,9 @@
-/** 31.08.2012 16:52 */
+/** 04.09.2012 15:45 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.uniluebeck.sourcegen.java.JClass;
@@ -16,6 +15,8 @@ import de.uniluebeck.sourcegen.java.JMethodCommentImpl;
 import de.uniluebeck.sourcegen.java.JMethodSignature;
 import de.uniluebeck.sourcegen.java.JModifier;
 import de.uniluebeck.sourcegen.java.JParameter;
+import de.uniluebeck.sourcegen.java.JSourceFile;
+import de.uniluebeck.sourcegen.Workspace;
 
 import fabric.wsdlschemaparser.wsdl.FMessage;
 import fabric.wsdlschemaparser.wsdl.FMessagePart;
@@ -30,33 +31,10 @@ import fabric.wsdlschemaparser.wsdl.FMessagePart;
  */
 public class MessageObjectGenerator
 {
-  // TODO: Check class modifiers and add comments
-  public class JClassWithImports
-  {
-    private JClass classObject;
-    private ArrayList<String> requiredImports;
-
-    public JClassWithImports(final JClass classObject, final ArrayList<String> requiredImports)
-    {
-      this.classObject = classObject;
-      this.requiredImports = requiredImports;
-    }
-
-    public JClass getClassObject()
-    {
-      return this.classObject;
-    }
-
-    public ArrayList<String> getRequiredImports()
-    {
-      return this.requiredImports;
-    }
-  }
-
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(MessageObjectGenerator.class);
 
-  // TODO: Add comment
+  /** Mapping from XSD built-in types to Java types */
   private static HashMap<String, String> mapping = initMapping();
 
   /**
@@ -64,13 +42,15 @@ public class MessageObjectGenerator
    * generated class are later used to pass arguments (message parts)
    * to a service operation.
    *
+   * @param workspace Workspace for code write-out
+   * @param packageName Java package name for the message class
+   * @param beanPackageName Java package name for type classes
+   * (JavaBeans) that the message class may import
    * @param message FMessage object from WSDL parser
-   *
-   * @return JClassWithImports object with message container class
    *
    * @throws Exception Error during code generation
    */
-  public static JClassWithImports createMessageClass(final FMessage message) throws Exception
+  public static void createMessageClass(final Workspace workspace, final String packageName, final String beanPackageName, final FMessage message) throws Exception
   {
     // Create class
     String className = MessageObjectGenerator.firstLetterCapital(message.getMessageName()) + "Message";
@@ -81,6 +61,10 @@ public class MessageObjectGenerator
     // Add a comment
     messageClass.setComment(new JClassCommentImpl(String.format("The '%s' message class.", className)));
 
+    // Get source file and add class
+    JSourceFile jsf = workspace.getJava().getJSourceFile(packageName, className);
+    jsf.add(messageClass);
+
     // Process all message parts
     for (FMessagePart messagePart: message.getParts())
     {
@@ -88,11 +72,18 @@ public class MessageObjectGenerator
       String variableName = messagePart.getPartName();
 
       /*****************************************************************
-       * TODO: Add required imports
+       * Add required imports
        *****************************************************************/
-      if (!mapping.containsKey(typeName))
+      if (!packageName.equals(beanPackageName) && !mapping.containsKey(typeName)) // Custom type class in different package
       {
-        // TODO: Collect required imports
+        // Import custom types only
+        String requiredImport = String.format("%s.%s", beanPackageName, typeName);
+
+        // No duplicates!
+        if (!jsf.containsImport(requiredImport))
+        {
+          jsf.addImport(requiredImport);
+        }
       }
 
       /*****************************************************************
@@ -129,29 +120,20 @@ public class MessageObjectGenerator
 
       messageClass.add(getter);
     }
-
-    return messageClass;
   }
 
   /**
-   * Private helper method to capitalize the first letter of a string.
-   * Function will return null, if argument was null.
+   * Private helper method to initialize the datatype mapping
+   * from XSD built-in types to Java types:
    *
-   * @param text Text to process
+   *   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
    *
-   * @return Text with first letter capitalized or null
+   * @return Type mapping from XSD built-in types to Java types
    */
-  private static String firstLetterCapital(final String text)
-  {
-    return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
-  }
-
-  // TODO: Add comment and move method to correct place
   private static HashMap<String, String> initMapping()
   {
-    // Mapping from XSD built-in types to Java types:
-    //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
     HashMap<String, String> typeMapping = new HashMap<String, String>();
+
     typeMapping.put("boolean", "boolean");
     typeMapping.put("float", "float");
     typeMapping.put("double", "double");
@@ -210,49 +192,6 @@ public class MessageObjectGenerator
   {
     String result = "";
 
-// TODO: Remove block
-//    // Mapping from XSD built-in types to Java types:
-//    //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
-//    HashMap<String, String> mapping = new HashMap<String, String>();
-//    mapping.put("boolean", "boolean");
-//    mapping.put("float", "float");
-//    mapping.put("double", "double");
-//    mapping.put("byte", "byte");
-//    mapping.put("unsignedByte", "short");
-//    mapping.put("short", "short");
-//    mapping.put("unsignedShort", "int");
-//    mapping.put("int", "int");
-//    mapping.put("integer", "java.math.BigDecimal");
-//    mapping.put("positiveInteger", "java.math.BigInteger");
-//    mapping.put("unsignedInt", "java.math.BigInteger");
-//    mapping.put("long", "java.math.BigInteger");
-//    mapping.put("unsignedLong", "java.math.BigDecimal");
-//    mapping.put("decimal", "java.math.BigDecimal");
-//    mapping.put("string", "String");
-//    mapping.put("hexBinary", "byte[]");
-//    mapping.put("base64Binary", "byte[]");
-//    mapping.put("dateTime", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("time", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("date", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("gMonth", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("gMonthDay", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("gYear", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("gYearMonth", "javax.xml.datatype.XMLGregorianCalendar");
-//    mapping.put("duration", "javax.xml.datatype.Duration");
-//    mapping.put("NOTATION", "javax.xml.namespace.QName");
-//    mapping.put("QName", "javax.xml.namespace.QName");
-//    mapping.put("anyURI", "String");
-//    mapping.put("Name", "String");
-//    mapping.put("NCName", "String");
-//    mapping.put("negativeInteger", "java.math.BigDecimal");
-//    mapping.put("NMTOKEN", "String");
-//    mapping.put("nonNegativeInteger", "java.math.BigDecimal");
-//    mapping.put("nonPositiveInteger", "java.math.BigDecimal");
-//    mapping.put("normalizedString", "String");
-//    mapping.put("token", "String");
-//    mapping.put("any", "Object");
-
     // Type is an XSD built-in type
     if (mapping.containsKey(typeName))
     {
@@ -265,5 +204,18 @@ public class MessageObjectGenerator
     }
 
     return result;
+  }
+
+  /**
+   * Private helper method to capitalize the first letter of a string.
+   * Function will return null, if argument was null.
+   *
+   * @param text Text to process
+   *
+   * @return Text with first letter capitalized or null
+   */
+  private static String firstLetterCapital(final String text)
+  {
+    return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
 }
