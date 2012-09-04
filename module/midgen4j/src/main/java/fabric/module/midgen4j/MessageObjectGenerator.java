@@ -4,6 +4,7 @@ package fabric.module.midgen4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.uniluebeck.sourcegen.java.JClass;
@@ -29,8 +30,34 @@ import fabric.wsdlschemaparser.wsdl.FMessagePart;
  */
 public class MessageObjectGenerator
 {
+  // TODO: Check class modifiers and add comments
+  public class JClassWithImports
+  {
+    private JClass classObject;
+    private ArrayList<String> requiredImports;
+
+    public JClassWithImports(final JClass classObject, final ArrayList<String> requiredImports)
+    {
+      this.classObject = classObject;
+      this.requiredImports = requiredImports;
+    }
+
+    public JClass getClassObject()
+    {
+      return this.classObject;
+    }
+
+    public ArrayList<String> getRequiredImports()
+    {
+      return this.requiredImports;
+    }
+  }
+
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(MessageObjectGenerator.class);
+
+  // TODO: Add comment
+  private static HashMap<String, String> mapping = initMapping();
 
   /**
    * Create container class for a single WSDL message. Objects of the
@@ -39,11 +66,11 @@ public class MessageObjectGenerator
    *
    * @param message FMessage object from WSDL parser
    *
-   * @return JClass object with message container class
+   * @return JClassWithImports object with message container class
    *
    * @throws Exception Error during code generation
    */
-  public static JClass createMessageClass(final FMessage message) throws Exception
+  public static JClassWithImports createMessageClass(final FMessage message) throws Exception
   {
     // Create class
     String className = MessageObjectGenerator.firstLetterCapital(message.getMessageName()) + "Message";
@@ -59,6 +86,14 @@ public class MessageObjectGenerator
     {
       String typeName = MessageObjectGenerator.getCorrectTypeName(messagePart.getNoneNullAttribute().getLocalPart());
       String variableName = messagePart.getPartName();
+
+      /*****************************************************************
+       * TODO: Add required imports
+       *****************************************************************/
+      if (!mapping.containsKey(typeName))
+      {
+        // TODO: Collect required imports
+      }
 
       /*****************************************************************
        * Create member variable
@@ -111,6 +146,54 @@ public class MessageObjectGenerator
     return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
 
+  // TODO: Add comment and move method to correct place
+  private static HashMap<String, String> initMapping()
+  {
+    // Mapping from XSD built-in types to Java types:
+    //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
+    HashMap<String, String> typeMapping = new HashMap<String, String>();
+    typeMapping.put("boolean", "boolean");
+    typeMapping.put("float", "float");
+    typeMapping.put("double", "double");
+    typeMapping.put("byte", "byte");
+    typeMapping.put("unsignedByte", "short");
+    typeMapping.put("short", "short");
+    typeMapping.put("unsignedShort", "int");
+    typeMapping.put("int", "int");
+    typeMapping.put("integer", "java.math.BigDecimal");
+    typeMapping.put("positiveInteger", "java.math.BigInteger");
+    typeMapping.put("unsignedInt", "java.math.BigInteger");
+    typeMapping.put("long", "java.math.BigInteger");
+    typeMapping.put("unsignedLong", "java.math.BigDecimal");
+    typeMapping.put("decimal", "java.math.BigDecimal");
+    typeMapping.put("string", "String");
+    typeMapping.put("hexBinary", "byte[]");
+    typeMapping.put("base64Binary", "byte[]");
+    typeMapping.put("dateTime", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("time", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("date", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("gMonth", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("gMonthDay", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("gYear", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("gYearMonth", "javax.xml.datatype.XMLGregorianCalendar");
+    typeMapping.put("duration", "javax.xml.datatype.Duration");
+    typeMapping.put("NOTATION", "javax.xml.namespace.QName");
+    typeMapping.put("QName", "javax.xml.namespace.QName");
+    typeMapping.put("anyURI", "String");
+    typeMapping.put("Name", "String");
+    typeMapping.put("NCName", "String");
+    typeMapping.put("negativeInteger", "java.math.BigDecimal");
+    typeMapping.put("NMTOKEN", "String");
+    typeMapping.put("nonNegativeInteger", "java.math.BigDecimal");
+    typeMapping.put("nonPositiveInteger", "java.math.BigDecimal");
+    typeMapping.put("normalizedString", "String");
+    typeMapping.put("token", "String");
+    typeMapping.put("any", "Object");
+
+    return typeMapping;
+  }
+
   /**
    * Private helper method to find the correct type name for a message
    * part. In the simple case, the part is of one of the XSD built-in
@@ -127,47 +210,48 @@ public class MessageObjectGenerator
   {
     String result = "";
 
-    // Mapping from XSD built-in types to Java types:
-    //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
-    HashMap<String, String> mapping = new HashMap<String, String>();
-    mapping.put("boolean", "boolean");
-    mapping.put("float", "float");
-    mapping.put("double", "double");
-    mapping.put("byte", "byte");
-    mapping.put("unsignedByte", "short");
-    mapping.put("short", "short");
-    mapping.put("unsignedShort", "int");
-    mapping.put("int", "int");
-    mapping.put("integer", "java.math.BigDecimal");
-    mapping.put("positiveInteger", "java.math.BigInteger");
-    mapping.put("unsignedInt", "java.math.BigInteger");
-    mapping.put("long", "java.math.BigInteger");
-    mapping.put("unsignedLong", "java.math.BigDecimal");
-    mapping.put("decimal", "java.math.BigDecimal");
-    mapping.put("string", "String");
-    mapping.put("hexBinary", "byte[]");
-    mapping.put("base64Binary", "byte[]");
-    mapping.put("dateTime", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("time", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("date", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("gMonth", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("gMonthDay", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("gYear", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("gYearMonth", "javax.xml.datatype.XMLGregorianCalendar");
-    mapping.put("duration", "javax.xml.datatype.Duration");
-    mapping.put("NOTATION", "javax.xml.namespace.QName");
-    mapping.put("QName", "javax.xml.namespace.QName");
-    mapping.put("anyURI", "String");
-    mapping.put("Name", "String");
-    mapping.put("NCName", "String");
-    mapping.put("negativeInteger", "java.math.BigDecimal");
-    mapping.put("NMTOKEN", "String");
-    mapping.put("nonNegativeInteger", "java.math.BigDecimal");
-    mapping.put("nonPositiveInteger", "java.math.BigDecimal");
-    mapping.put("normalizedString", "String");
-    mapping.put("token", "String");
-    mapping.put("any", "Object");
+// TODO: Remove block
+//    // Mapping from XSD built-in types to Java types:
+//    //   http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
+//    HashMap<String, String> mapping = new HashMap<String, String>();
+//    mapping.put("boolean", "boolean");
+//    mapping.put("float", "float");
+//    mapping.put("double", "double");
+//    mapping.put("byte", "byte");
+//    mapping.put("unsignedByte", "short");
+//    mapping.put("short", "short");
+//    mapping.put("unsignedShort", "int");
+//    mapping.put("int", "int");
+//    mapping.put("integer", "java.math.BigDecimal");
+//    mapping.put("positiveInteger", "java.math.BigInteger");
+//    mapping.put("unsignedInt", "java.math.BigInteger");
+//    mapping.put("long", "java.math.BigInteger");
+//    mapping.put("unsignedLong", "java.math.BigDecimal");
+//    mapping.put("decimal", "java.math.BigDecimal");
+//    mapping.put("string", "String");
+//    mapping.put("hexBinary", "byte[]");
+//    mapping.put("base64Binary", "byte[]");
+//    mapping.put("dateTime", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("time", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("date", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("gMonth", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("gMonthDay", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("gYear", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("gYearMonth", "javax.xml.datatype.XMLGregorianCalendar");
+//    mapping.put("duration", "javax.xml.datatype.Duration");
+//    mapping.put("NOTATION", "javax.xml.namespace.QName");
+//    mapping.put("QName", "javax.xml.namespace.QName");
+//    mapping.put("anyURI", "String");
+//    mapping.put("Name", "String");
+//    mapping.put("NCName", "String");
+//    mapping.put("negativeInteger", "java.math.BigDecimal");
+//    mapping.put("NMTOKEN", "String");
+//    mapping.put("nonNegativeInteger", "java.math.BigDecimal");
+//    mapping.put("nonPositiveInteger", "java.math.BigDecimal");
+//    mapping.put("normalizedString", "String");
+//    mapping.put("token", "String");
+//    mapping.put("any", "Object");
 
     // Type is an XSD built-in type
     if (mapping.containsKey(typeName))

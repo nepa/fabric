@@ -106,6 +106,8 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
         JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName,
                 MidGen4JHandler.firstLetterCapital(message.getMessageName()) + "Message");
         jsf.add(messageClass);
+
+        // TODO: Add required imports (with no duplicats)
       }
     }
   }
