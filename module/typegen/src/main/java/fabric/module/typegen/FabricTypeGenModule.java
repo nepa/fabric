@@ -1,4 +1,4 @@
-/** 24.07.2012 12:54 */
+/** 04.09.2012 15:50 */
 package fabric.module.typegen;
 
 import java.util.ArrayList;
@@ -225,11 +225,11 @@ public class FabricTypeGenModule implements FModuleBase
   /**
    * Check parameter for the package name. This property is optional.
    * However, it is strongly recommended to provide a value, because
-   * otherwise "fabric.package.default" is used as default.
+   * otherwise "de.nptech.fabric" is used as default.
    */
   private void checkPackageName()
   {
-    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "fabric.package.default");
+    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "de.nptech.fabric");
 
     // Convert package name to lower case
     if (null != packageName)
@@ -243,7 +243,7 @@ public class FabricTypeGenModule implements FModuleBase
    * should be created or not. This property is optional.
    * However, it is strongly recommended to provide a value,
    * because otherwise "true" is used as default.
-   * 
+   *
    * @throws Exception Invalid value passed for property
    */
   private void checkCreateMain() throws Exception

@@ -1,4 +1,4 @@
-/** 24.07.2012 12:55 */
+/** 04.09.2012 15:51 */
 package fabric.module.exi;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import fabric.module.typegen.FabricTypeGenModule;
  * properties file and the name of the XML schema document to create
  * a class, that allows the serialization and deserialization of the
  * corresponding type objects.
- * 
+ *
  * @author seidel
  */
 public class FabricEXIModule implements FModuleBase
@@ -29,28 +29,28 @@ public class FabricEXIModule implements FModuleBase
 
   /** Key for target language in properties object */
   public static final String TARGET_LANGUAGE_KEY = "exi.target_language";
-  
-  /** Alternative key for target language */  
+
+  /** Alternative key for target language */
   public static final String TARGET_LANGUAGE_ALT_KEY = "typegen.target_language";
 
   /** Key for main class name in properties object */
   public static final String MAIN_CLASS_NAME_KEY = "exi.main_class_name";
-  
+
   /** Alternative key for main class name */
   public static final String MAIN_CLASS_NAME_ALT_KEY = "typegen.main_class_name";
-  
+
   /** Key for application class name in properties object */
   public static final String APPLICATION_CLASS_NAME_KEY = "exi.application_class_name";
-  
+
   /** Key for XML framework name in properties object */
   public static final String XML_FRAMEWORK_KEY = "exi.java.xml_framework";
-  
+
   /** Alternative key for XML framework name */
   public static final String XML_FRAMEWORK_ALT_KEY = "typegen.java.xml_framework";
 
   /** Key for main package name in properties object */
   public static final String PACKAGE_NAME_KEY = "exi.java.package_name";
-  
+
   /** Alternative key for main package name */
   public static final String PACKAGE_NAME_ALT_KEY = "typegen.java.package_name";
 
@@ -74,7 +74,7 @@ public class FabricEXIModule implements FModuleBase
 
   /**
    * Constructor initializes the internal properties object.
-   * 
+   *
    * @param properties Properties object with module options
    */
   public FabricEXIModule(Properties properties)
@@ -84,7 +84,7 @@ public class FabricEXIModule implements FModuleBase
 
   /**
    * Helper method to return module name.
-   * 
+   *
    * @return Module name
    */
   @Override
@@ -95,7 +95,7 @@ public class FabricEXIModule implements FModuleBase
 
   /**
    * Helper method to return module description.
-   * 
+   *
    * @return Module description
    */
   @Override
@@ -114,12 +114,12 @@ public class FabricEXIModule implements FModuleBase
    * This method returns a Fabric handler object for the EXI generator
    * module. It is instantiated with the current workspace and module
    * options.
-   * 
+   *
    * @param workspace Workspace object for EXI class output
-   * 
+   *
    * @return List with one FabricEXIHandler object
    *
-   * @throws Exception Error during handler instantiation 
+   * @throws Exception Error during handler instantiation
    */
   @Override
   public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
@@ -149,7 +149,7 @@ public class FabricEXIModule implements FModuleBase
     {
       throw new IllegalStateException("Properties object is null. Maybe it was not initialized properly?");
     }
-    
+
     // Check if alternative keys have been used and copy values
     this.copyAlternativeProperties();
 
@@ -170,7 +170,7 @@ public class FabricEXIModule implements FModuleBase
       }
     }
   }
-  
+
   /**
    * Private helper method to determine which properties should be
    * used. The EXI module can copy properties from TypeGen module,
@@ -198,13 +198,13 @@ public class FabricEXIModule implements FModuleBase
       copyProperty(PACKAGE_NAME_ALT_KEY, PACKAGE_NAME_KEY);
     }
   }
-  
+
   /**
    * Private helper method to check, whether a value is set for
    * a certain key in the properties object.
-   * 
+   *
    * @param key Key of property to check
-   * 
+   *
    * @return True if property is set, false otherwise
    */
   private boolean isSet(final String key)
@@ -215,7 +215,7 @@ public class FabricEXIModule implements FModuleBase
   /**
    * Private helper method to copy property from field with key
    * 'from' to another field with key 'to'.
-   * 
+   *
    * @param from Key of source property
    * @param to Key of target property
    */
@@ -276,7 +276,7 @@ public class FabricEXIModule implements FModuleBase
               className.substring(0, 1).toUpperCase() + className.substring(1, className.length()));
     }
   }
-  
+
   /**
    * Check parameter for the application class name. This property is
    * optional. However, it is strongly recommended to provide a value,
@@ -285,7 +285,7 @@ public class FabricEXIModule implements FModuleBase
   private void checkApplicationClassName()
   {
     String applicationName = this.properties.getProperty(APPLICATION_CLASS_NAME_KEY, "Application");
-    
+
     // Capitalize first letter of class name
     if (null != applicationName)
     {
@@ -330,11 +330,11 @@ public class FabricEXIModule implements FModuleBase
   /**
    * Check parameter for the package name. This property is optional.
    * However, it is strongly recommended to provide a value, because
-   * otherwise "fabric.package.default" is used as default.
+   * otherwise "de.nptech.fabric" is used as default.
    */
   private void checkPackageName()
   {
-    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "fabric.package.default");
+    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "de.nptech.fabric");
 
     // Convert package name to lower case
     if (null != packageName)

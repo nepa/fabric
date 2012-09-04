@@ -1,4 +1,4 @@
-/** 04.09.2012 15:26 */
+/** 04.09.2012 15:50 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -198,11 +198,11 @@ public class MidGen4JModule implements FModuleBase
   /**
    * Check parameter for the package name. This property is optional.
    * However, it is strongly recommended to provide a value, because
-   * otherwise "fabric.package.default" is used as default.
+   * otherwise "de.nptech.fabric" is used as default.
    */
   private void checkPackageName()
   {
-    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "fabric.package.default");
+    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "de.nptech.fabric");
 
     // Convert package name to lower case
     if (null != packageName)
@@ -214,11 +214,11 @@ public class MidGen4JModule implements FModuleBase
   /**
    * Check parameter for the package name of custom type classes (JavaBeans).
    * This property is optional. However, it is strongly recommended to provide
-   * a value, because otherwise "fabric.package.default" is used as default.
+   * a value, because otherwise "de.nptech.fabric" is used as default.
    */
   private void checkBeanPackageName()
   {
-    String beanPackageName = this.properties.getProperty(BEAN_PACKAGE_NAME_KEY, "fabric.package.default");
+    String beanPackageName = this.properties.getProperty(BEAN_PACKAGE_NAME_KEY, "de.nptech.fabric");
 
     // Convert package name to lower case
     if (null != beanPackageName)
