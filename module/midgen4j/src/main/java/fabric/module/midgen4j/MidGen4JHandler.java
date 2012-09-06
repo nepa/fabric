@@ -1,10 +1,12 @@
-/** 04.09.2012 14:59 */
+/** 06.09.2012 12:54 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
@@ -21,6 +23,7 @@ import de.uniluebeck.sourcegen.java.JSourceFile;
 
 import fabric.wsdlschemaparser.wsdl.FMessage;
 import fabric.wsdlschemaparser.wsdl.FOperation;
+import fabric.wsdlschemaparser.wsdl.FOperationMessage;
 import fabric.wsdlschemaparser.wsdl.FPortType;
 
 /**
@@ -56,6 +59,9 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   /** Class with central service provider */
   private JClass serviceProviderClass;
 
+  /** Message definitions from WSDL file */
+  private Set<FMessage> messages;
+
   /**
    * Constructor initializes the MidGen4J handler, which generates
    * the central service provider class.
@@ -72,6 +78,8 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     this.beanPackageName = this.properties.getProperty(MidGen4JModule.BEAN_PACKAGE_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JModule.PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
+    
+    this.messages = new HashSet<FMessage>();
   }
 
   /**
@@ -100,11 +108,8 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   @Override
   public void processMessages(final HashSet<FMessage> messages) throws Exception
   {
-    // Create new container class for each message type
-    for (FMessage message: messages)
-    {
-      MessageObjectGenerator.createMessageClass(this.workspace, this.packageName, this.beanPackageName, message);
-    }
+    // Copy message definitions to use them in processPortTypes()
+    this.messages = messages;
   }
 
   /**
@@ -122,10 +127,64 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     {
       for (FOperation operation: portType.getOperations())
       {
+        // Create service method and add it to class
         if (null != this.serviceProviderClass)
         {
           this.serviceProviderClass.add(this.createServiceMethod(operation));
         }
+
+        // Create container class for input message (if any)
+        if (null != operation.getInputMessage())
+        {
+          this.createMessageClass(operation.getInputMessage());
+        }
+
+        // Create container class for output message (if any)
+        if (null != operation.getOutputMessage())
+        {
+          this.createMessageClass(operation.getOutputMessage());
+        }
+
+        // Do NOT create container classes for fault messages
+      }
+    }
+  }
+
+  /**
+   * This method will iterate over all message elements that are
+   * defined in the WSDL file and search for the name of the
+   * current operation message.
+   *
+   * We need this workaround, because message elements do not know
+   * whether they are used as input, output or fault message. On
+   * the other hand, operation messages know whether they are an
+   * input, output or fault message, but they do not know their
+   * own message parts.
+   *
+   * So we can now pass an input or output operation message to
+   * this method and it will find the corresponding message element
+   * with its message parts. This way we can skip fault messages
+   * as desired in processPortTypes().
+   *
+   * @param operationMessage Operation message object (either an
+   * input, output or fault message)
+   *
+   * @throws Exception Error during creation of message class
+   */
+  private void createMessageClass(final FOperationMessage operationMessage) throws Exception
+  {
+    String messageName = operationMessage.getMessageAttribute().getLocalPart();
+
+    // Iterate all WSDL message elements
+    Iterator iterator = this.messages.iterator();
+    while (iterator.hasNext())
+    {
+      FMessage message = (FMessage)iterator.next();
+
+      // Create message class, if operation message was found
+      if (messageName.equals(message.getMessageName()))
+      {
+        MessageObjectGenerator.createMessageClass(this.workspace, this.packageName, this.beanPackageName, message);
       }
     }
   }
