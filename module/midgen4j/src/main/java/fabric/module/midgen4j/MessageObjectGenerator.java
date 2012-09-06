@@ -1,4 +1,4 @@
-/** 04.09.2012 15:45 */
+/** 06.09.2012 14:40 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -61,64 +61,69 @@ public class MessageObjectGenerator
     // Add a comment
     messageClass.setComment(new JClassCommentImpl(String.format("The '%s' message class.", className)));
 
-    // Get source file and add class
+    // Get source file from workspace
     JSourceFile jsf = workspace.getJava().getJSourceFile(packageName, className);
-    jsf.add(messageClass);
 
-    // Process all message parts
-    for (FMessagePart messagePart: message.getParts())
+    // No duplicate classes!
+    if (null == jsf.getClassByName(className))
     {
-      String typeName = MessageObjectGenerator.getCorrectTypeName(messagePart.getNoneNullAttribute().getLocalPart());
-      String variableName = messagePart.getPartName();
+      jsf.add(messageClass);
 
-      /*****************************************************************
-       * Add required imports
-       *****************************************************************/
-      if (!packageName.equals(beanPackageName) && !mapping.containsKey(typeName)) // Custom type class in different package
+      // Process all message parts
+      for (FMessagePart messagePart: message.getParts())
       {
-        // Import custom types only
-        String requiredImport = String.format("%s.%s", beanPackageName, typeName);
+        String typeName = MessageObjectGenerator.getCorrectTypeName(messagePart.getNoneNullAttribute().getLocalPart());
+        String variableName = messagePart.getPartName();
 
-        // No duplicates!
-        if (!jsf.containsImport(requiredImport))
+        /*****************************************************************
+         * Add required imports
+         *****************************************************************/
+        if (!packageName.equals(beanPackageName) && !mapping.containsValue(typeName)) // Custom type class in different package
         {
-          jsf.addImport(requiredImport);
+          // Import custom types only
+          String requiredImport = String.format("%s.%s", beanPackageName, typeName);
+
+          // No duplicate imports!
+          if (!jsf.containsImport(requiredImport))
+          {
+            jsf.addImport(requiredImport);
+          }
         }
+
+        /*****************************************************************
+         * Create member variable
+         *****************************************************************/
+        JField member = JField.factory.create(JModifier.PRIVATE, typeName, variableName);
+
+        member.setComment(new JFieldCommentImpl(String.format("The '%s' message part.", variableName)));
+
+        messageClass.add(member);
+
+        /*****************************************************************
+         * Create setter method
+         *****************************************************************/
+        JParameter input = JParameter.factory.create(JModifier.FINAL, typeName, variableName);
+        JMethodSignature jms = JMethodSignature.factory.create(input);
+
+        JMethod setter = JMethod.factory.create(JModifier.PUBLIC, "void",
+                "set" + MessageObjectGenerator.firstLetterCapital(variableName), jms);
+
+        setter.getBody().appendSource(String.format("this.%s = %s;", variableName, variableName));
+        setter.setComment(new JMethodCommentImpl(String.format("Set the '%s' message part.", variableName)));
+
+        messageClass.add(setter);
+
+        /*****************************************************************
+         * Create getter method
+         *****************************************************************/
+        JMethod getter = JMethod.factory.create(JModifier.PUBLIC, typeName,
+                "get" + MessageObjectGenerator.firstLetterCapital(variableName));
+
+        getter.getBody().appendSource(String.format("return this.%s;", variableName));
+        getter.setComment(new JMethodCommentImpl(String.format("Get the '%s' message part.", variableName)));
+
+        messageClass.add(getter);
       }
-
-      /*****************************************************************
-       * Create member variable
-       *****************************************************************/
-      JField member = JField.factory.create(JModifier.PRIVATE, typeName, variableName);
-
-      member.setComment(new JFieldCommentImpl(String.format("The '%s' message part.", variableName)));
-
-      messageClass.add(member);
-
-      /*****************************************************************
-       * Create setter method
-       *****************************************************************/
-      JParameter input = JParameter.factory.create(JModifier.FINAL, typeName, variableName);
-      JMethodSignature jms = JMethodSignature.factory.create(input);
-
-      JMethod setter = JMethod.factory.create(JModifier.PUBLIC, "void",
-              "set" + MessageObjectGenerator.firstLetterCapital(variableName), jms);
-
-      setter.getBody().appendSource(String.format("this.%s = %s;", variableName, variableName));
-      setter.setComment(new JMethodCommentImpl(String.format("Set the '%s' message part.", variableName)));
-
-      messageClass.add(setter);
-
-      /*****************************************************************
-       * Create getter method
-       *****************************************************************/
-      JMethod getter = JMethod.factory.create(JModifier.PUBLIC, typeName,
-              "get" + MessageObjectGenerator.firstLetterCapital(variableName));
-
-      getter.getBody().appendSource(String.format("return this.%s;", variableName));
-      getter.setComment(new JMethodCommentImpl(String.format("Get the '%s' message part.", variableName)));
-
-      messageClass.add(getter);
     }
   }
 

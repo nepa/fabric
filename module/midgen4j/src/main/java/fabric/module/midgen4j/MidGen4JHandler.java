@@ -1,4 +1,4 @@
-/** 06.09.2012 12:54 */
+/** 06.09.2012 15:09 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
@@ -22,6 +21,7 @@ import de.uniluebeck.sourcegen.java.JParameter;
 import de.uniluebeck.sourcegen.java.JSourceFile;
 
 import fabric.wsdlschemaparser.wsdl.FMessage;
+import fabric.wsdlschemaparser.wsdl.FMessagePart;
 import fabric.wsdlschemaparser.wsdl.FOperation;
 import fabric.wsdlschemaparser.wsdl.FOperationMessage;
 import fabric.wsdlschemaparser.wsdl.FPortType;
@@ -78,7 +78,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     this.beanPackageName = this.properties.getProperty(MidGen4JModule.BEAN_PACKAGE_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JModule.PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
-    
+
     this.messages = new HashSet<FMessage>();
   }
 
@@ -108,6 +108,22 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   @Override
   public void processMessages(final HashSet<FMessage> messages) throws Exception
   {
+    // MidGen4J does not support message parts with element-attribute
+    for (FMessage message: messages)
+    {
+      for (FMessagePart part: message.getParts())
+      {
+        if (part.hasElementAttribute())
+        {
+          throw new Exception(String.format(
+                  "Message '%s' has a part '%s' with element-attribute. This is not supported. " +
+                  "Either provide a WSDL document with no embedded XML Schema and only XSD built-in types or " +
+                  "use embedded XSD code, define all types globally and reference them using the type-attribute.",
+                  message.getMessageName(), part.getPartName()));
+        }
+      }
+    }
+
     // Copy message definitions to use them in processPortTypes()
     this.messages = messages;
   }
@@ -176,11 +192,8 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     String messageName = operationMessage.getMessageAttribute().getLocalPart();
 
     // Iterate all WSDL message elements
-    Iterator iterator = this.messages.iterator();
-    while (iterator.hasNext())
+    for (FMessage message: this.messages)
     {
-      FMessage message = (FMessage)iterator.next();
-
       // Create message class, if operation message was found
       if (messageName.equals(message.getMessageName()))
       {
