@@ -1,4 +1,4 @@
-/** 06.09.2012 14:40 */
+/** 17.09.2012 19:35 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 
 import de.uniluebeck.sourcegen.java.JClass;
+import de.uniluebeck.sourcegen.java.JClassAnnotationImpl;
 import de.uniluebeck.sourcegen.java.JClassCommentImpl;
 import de.uniluebeck.sourcegen.java.JField;
+import de.uniluebeck.sourcegen.java.JFieldAnnotationImpl;
 import de.uniluebeck.sourcegen.java.JFieldCommentImpl;
 import de.uniluebeck.sourcegen.java.JMethod;
 import de.uniluebeck.sourcegen.java.JMethodCommentImpl;
@@ -61,6 +63,10 @@ public class MessageObjectGenerator
     // Add a comment
     messageClass.setComment(new JClassCommentImpl(String.format("The '%s' message class.", className)));
 
+    // Add JAXB annotations
+    messageClass.addAnnotation(new JClassAnnotationImpl(String.format("XmlRootElement(name = \"%s\")", className)));
+    messageClass.addAnnotation(new JClassAnnotationImpl("XmlAccessorType(XmlAccessType.NONE)"));
+
     // Get source file from workspace
     JSourceFile jsf = workspace.getJava().getJSourceFile(packageName, className);
 
@@ -78,7 +84,9 @@ public class MessageObjectGenerator
         /*****************************************************************
          * Add required imports
          *****************************************************************/
-        if (!packageName.equals(beanPackageName) && !mapping.containsValue(typeName)) // Custom type class in different package
+
+        // Add import for custom type class in different package
+        if (!packageName.equals(beanPackageName) && !mapping.containsValue(typeName))
         {
           // Import custom types only
           String requiredImport = String.format("%s.%s", beanPackageName, typeName);
@@ -90,12 +98,21 @@ public class MessageObjectGenerator
           }
         }
 
+        // Add imports for JAXB annotations
+        jsf.addImport("javax.xml.bind.annotation.XmlRootElement");
+        jsf.addImport("javax.xml.bind.annotation.XmlAccessorType");
+        jsf.addImport("javax.xml.bind.annotation.XmlAccessType");
+        jsf.addImport("javax.xml.bind.annotation.XmlElement");
+
         /*****************************************************************
          * Create member variable
          *****************************************************************/
         JField member = JField.factory.create(JModifier.PRIVATE, typeName, variableName);
 
         member.setComment(new JFieldCommentImpl(String.format("The '%s' message part.", variableName)));
+
+        // Add JAXB annotation
+        member.addAnnotation(new JFieldAnnotationImpl("XmlElement"));
 
         messageClass.add(member);
 
