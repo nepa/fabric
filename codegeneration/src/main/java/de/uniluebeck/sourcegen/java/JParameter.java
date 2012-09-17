@@ -47,11 +47,11 @@ public interface JParameter extends JLangElem {
 		public JParameter create(JComplexType type, String name) throws JInvalidModifierException {
 			return new JParameterImpl(JModifier.NONE, type.getName(), name);
 		}
-		
+
 		public JParameter create(int modifiers, String type, String name) throws JInvalidModifierException {
 			return new JParameterImpl(modifiers, type, name);
 		}
-		
+
 		public JParameter create(int modifiers, JComplexType type, String name) throws JInvalidModifierException {
 			return new JParameterImpl(modifiers, type.getName(), name);
 		}
@@ -59,13 +59,11 @@ public interface JParameter extends JLangElem {
 	}
 
 	public static final JavaParameterFactory factory = JavaParameterFactory.getInstance();
-	
+
 	/**
 	 * Please use typeEquals() or nameEquals() instead.
 	 * 
-	 * @param other
-	 * @return
-	 * @deprecated use typeEquals() or nameEquals() instead
+	 * @deprecated Use typeEquals() or nameEquals() instead.
 	 */
 	@Deprecated
 	public boolean equals(JParameter other);
@@ -74,4 +72,12 @@ public interface JParameter extends JLangElem {
 	public boolean typeEquals(JParameter other);
 	public boolean typeEquals(String type);
 
+	/**
+   * Add Java annotations to the method parameter.
+	 *
+	 * @param annotations List of annotations for the parameter
+   *
+	 * @return Reference to this object
+	 */
+	public JParameter addAnnotation(JParameterAnnotation... annotations);
 }

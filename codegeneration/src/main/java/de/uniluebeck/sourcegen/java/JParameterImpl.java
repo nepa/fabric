@@ -24,6 +24,9 @@
  */
 package de.uniluebeck.sourcegen.java;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import java.lang.reflect.Modifier;
 import java.util.ResourceBundle;
 
@@ -43,6 +46,9 @@ class JParameterImpl extends JElemImpl implements JParameter {
 
 	private String type;
 
+  /** List of Java annotations for the method parameter */
+  private List<JParameterAnnotation> annotations = new ArrayList<JParameterAnnotation>();
+
 	/**
 	 * Test: {@link JavaParameterTest#testJavaParameter()}
 	 * 
@@ -59,7 +65,8 @@ class JParameterImpl extends JElemImpl implements JParameter {
 		validateModifiers();
 	}
 
-	@Deprecated
+  @Override
+  @Deprecated
 	public boolean equals(JParameter other) {
 		try {
 			throw new Exception(res.getString("exception.equals")); //$NON-NLS-1$
@@ -77,6 +84,7 @@ class JParameterImpl extends JElemImpl implements JParameter {
 		return type;
 	}
 
+  @Override
 	public boolean nameEquals(JParameter other) {
 		return name.equals(((JParameterImpl) other).name);
 	}
@@ -86,6 +94,7 @@ class JParameterImpl extends JElemImpl implements JParameter {
     return this.name.equals(name);
   }
 
+  @Override
 	public boolean typeEquals(JParameter other) {
 		return type.equals(((JParameterImpl) other).type);
 	}
@@ -110,13 +119,35 @@ class JParameterImpl extends JElemImpl implements JParameter {
 
 	}
 
+	/**
+	 * @see de.uniluebeck.sourcegen.java.JParameter#addAnnotation(de.uniluebeck.sourcegen.java.JParameterAnnotation[])
+	 */
+	@Override
+	public JParameter addAnnotation(JParameterAnnotation... annotations)
+	{
+		for (JParameterAnnotation annotation: annotations)
+		{
+			this.annotations.add(annotation);
+		}
+
+		return this;
+	}
+
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 		indent(buffer, tabCount);
+
+		// Write annotations (if any)
+		for (JParameterAnnotation annotation: this.annotations) {
+			annotation.toString(buffer, tabCount);
+		}
+
+		// Write modifiers (if any)
 		if (modifiers != JModifier.NONE) {
 			buffer.append(Modifier.toString(modifiers));
 			buffer.append(" ");
 		}
+
 		buffer.append(type);
 		buffer.append(" ");
 		buffer.append(name);
