@@ -1,4 +1,4 @@
-/** 25.09.2012 19:03 */
+/** 25.09.2012 22:14 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -203,7 +203,10 @@ public class MidGen4JRESTHandler extends FDefaultWSDLHandler
               "inputMessage");
 
       // Add required import for input message
-      this.addRequiredImport(this.serviceProviderPackageName + "." + inputMessageClassName);
+      if (!this.packageName.equals(this.serviceProviderPackageName))
+      {
+        this.addRequiredImport(this.serviceProviderPackageName + "." + inputMessageClassName);
+      }
     }
 
     // Create method signature
@@ -217,7 +220,10 @@ public class MidGen4JRESTHandler extends FDefaultWSDLHandler
               operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
 
       // Add required import for output message
-      this.addRequiredImport(this.serviceProviderPackageName + "." + methodOutput);
+      if (!this.packageName.equals(this.serviceProviderPackageName))
+      {
+        this.addRequiredImport(this.serviceProviderPackageName + "." + methodOutput);
+      }
     }
 
     // Create request handler
@@ -264,7 +270,10 @@ public class MidGen4JRESTHandler extends FDefaultWSDLHandler
     String serviceProviderClassName = this.properties.getProperty(MidGen4JRESTModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
 
     // Add import for service provider class
-    this.addRequiredImport(this.serviceProviderPackageName + "." + serviceProviderClassName);
+    if (!this.packageName.equals(this.serviceProviderPackageName))
+    {
+      this.addRequiredImport(this.serviceProviderPackageName + "." + serviceProviderClassName);
+    }
 
     // Create member variable
     JField member = JField.factory.create(JModifier.PRIVATE, serviceProviderClassName, "serviceProvider");
