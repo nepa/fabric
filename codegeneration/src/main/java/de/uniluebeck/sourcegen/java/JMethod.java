@@ -76,10 +76,10 @@ public interface JMethod extends JInterfaceMethod {
 	
 	public static final JavaMethodFactory factory = JavaMethodFactory.getInstance();
 	
-	public boolean 		equals	(JMethod other);
-	public JMethodBody 	getBody	();
-	public String 		getName();
-	public JClass		getClazz();
-	public void			setClazz(JClass clazz);
+	public boolean equals(JMethod other);
+	public JMethodBody getBody();
+	public String getName();
+	public JClass getClazz();
+	public void setClazz(JClass clazz);
 
 }

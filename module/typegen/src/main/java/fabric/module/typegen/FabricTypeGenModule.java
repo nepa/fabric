@@ -1,4 +1,4 @@
-/** 04.09.2012 15:50 */
+/** 18.09.2012 01:36 */
 package fabric.module.typegen;
 
 import java.util.ArrayList;
@@ -121,7 +121,7 @@ public class FabricTypeGenModule implements FModuleBase
    * constructor of this class is called during Fabric setup. At that
    * time, however, the Java properties file from the command line is
    * not yet processed. This is why this method must not be called in
-   * the module's constructor, but in the getHandler() method.
+   * the module's constructor, but in the getHandlers() method.
    *
    * @throws Exception Error during validation
    */

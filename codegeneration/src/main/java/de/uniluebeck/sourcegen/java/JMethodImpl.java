@@ -106,8 +106,7 @@ class JMethodImpl extends JInterfaceMethodImpl implements JMethod {
 
 	public void setClazz(JClass clazz)
 	{
-		this.parentClass = clazz;
-		
+		this.parentClass = clazz;		
 	}
 
 }

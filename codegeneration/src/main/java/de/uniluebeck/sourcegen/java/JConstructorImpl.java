@@ -37,13 +37,13 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
 
     private static final ResourceBundle res = ResourceBundle.getBundle(JConstructorImpl.class.getCanonicalName());
 
-    private JMethodBodyImpl body;
-
-    private JComplexType parent;
-
     private int modifiers;
 
+    private String className;
+
     private JMethodSignatureImpl signature;
+
+    private JMethodBodyImpl body;
 
     private JConstructorComment comment = null;
 
@@ -52,12 +52,11 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
      */
     private List<JConstructorAnnotation> annotations = new ArrayList<JConstructorAnnotation>();
 
-    public JConstructorImpl(JComplexType parent, int modifiers,
-                            JMethodSignature signature, String... source)
+    public JConstructorImpl(int modifiers, String className, JMethodSignature signature, String... source)
             throws JConflictingModifierException, JInvalidModifierException {
 
         this.modifiers = modifiers;
-        this.parent = parent;
+        this.className = className;
         this.signature = (signature != null) ? (JMethodSignatureImpl) signature :
                 JMethodSignature.factory.createEmptySignature();
         this.body = (source != null) ? new JMethodBodyImpl(source) : JMethodBody.factory.createEmpty();
@@ -67,20 +66,23 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
     }
 
     public boolean equals(JConstructorImpl other) {
-        return parent.equals(other.parent)
+        return className.equals(other.className)
                 && signature.equals(other.signature);
     }
 
-    public JMethodBody getBody() {
-        return body;
+    @Override
+    public String getClassName() {
+        return className;
     }
 
-    public JComplexType getParent() {
-        return parent;
-    }
-
+    @Override
     public JMethodSignature getSignature() {
         return signature;
+    }
+
+    @Override
+    public JMethodBody getBody() {
+        return body;
     }
 
     private void validateModifiers() throws JInvalidModifierException, JConflictingModifierException {
@@ -114,7 +116,27 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
                     res.getString("exception.modifier.conflict") //$NON-NLS-1$
             );
 
+    }
 
+    /**
+     * @see de.uniluebeck.sourcegen.JConstructor#setComment(de.uniluebeck.sourcegen.JConstructorComment)
+     */
+    @Override
+    public JConstructor setComment(JConstructorComment comment)
+    {
+        this.comment = comment;
+        return this;
+    }
+    
+    /**
+     * @see de.uniluebeck.sourcegen.java.JConstructor#addAnnotation(de.uniluebeck.sourcegen.java.JConstructorAnnotation[])
+     */
+    @Override
+    public JConstructor addAnnotation(JConstructorAnnotation... annotations) {
+        for (JConstructorAnnotation ann : annotations) {
+            this.annotations.add(ann);
+        }
+        return this;
     }
 
     @Override
@@ -132,7 +154,7 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
 
         if (toStringModifiers(buffer, tabCount, modifiers))
             buffer.append(" ");
-        buffer.append(parent.getName());
+        buffer.append(className);
         signature.toString(buffer, 0);
         buffer.append(" {\n");
         body.toString(buffer, tabCount + 1);
@@ -142,37 +164,15 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
     }
 
     public static void main(String[] args) throws Exception {
-        JClass clazz = JClass.factory.create(
-                "TheConstructorTestClass"
-        );
         JConstructor constructor = JConstructor.factory.create(
-                clazz,
                 Modifier.PRIVATE,
+                "FooClass",
                 JMethodSignature.factory.create(
-                        JParameter.factory.create(JModifier.NONE, "String", "theTestString")
-                ),
-                "hello world\n",
-                "my darling"
+                    JParameter.factory.create(JModifier.NONE, "String", "barParam")),
+                "System.out.println(\"Hello World!\");\n" +
+                "System.out.println(barParam);"
         );
-        System.out.print(constructor.toString(1));
-    }
-
-    /* (non-Javadoc)
-         * @see de.uniluebeck.sourcegen.JConstructor#setComment(de.uniluebeck.sourcegen.JConstructorComment)
-         */
-    public JConstructor setComment(JConstructorComment comment) {
-        this.comment = comment;
-        return this;
-    }
-
-    /**
-     * @see de.uniluebeck.sourcegen.java.JConstructor#addAnnotation(de.uniluebeck.sourcegen.java.JConstructorAnnotation[])
-     */
-    public JConstructor addAnnotation(JConstructorAnnotation... annotations) {
-        for (JConstructorAnnotation ann : annotations) {
-            this.annotations.add(ann);
-        }
-        return this;
+        System.out.println(constructor.toString(1));
     }
 
 }

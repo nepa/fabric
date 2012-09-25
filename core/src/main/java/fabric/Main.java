@@ -57,6 +57,7 @@ import fabric.module.dot.FabricDotGraphModule;
 import fabric.module.typegen.FabricTypeGenModule;
 import fabric.module.exi.FabricEXIModule;
 import fabric.module.midgen4j.MidGen4JModule;
+import fabric.module.midgen4j.rest.MidGen4JRESTModule;
 
 public class Main {
 
@@ -64,7 +65,7 @@ public class Main {
         Logging.setLoggingDefaults();
     }
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Main.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private File wsdlFile = null;
     private File schemaFile = null;
@@ -96,7 +97,7 @@ public class Main {
         try {
             registerModules();
         } catch (Exception e) {
-            Main.log.error("", e);
+            LOGGER.error("", e);
             System.exit(1);
         }
 
@@ -120,7 +121,7 @@ public class Main {
             // Load properties from file
             if (line.hasOption('p')) {
                 String propertiesFile = line.getOptionValue('p');
-                Main.log.debug("Loading properties from '" + propertiesFile + "'.");
+                LOGGER.debug("Loading properties from '" + propertiesFile + "'.");
                 properties.load(new FileReader(new File(propertiesFile)));
             }
             
@@ -136,13 +137,13 @@ public class Main {
             	File fileOutput = new File(oValue);
 
             	if (!fileOutput.exists()) {
-            		Main.log.error("The desired output directory '" + oValue + "' does not exist.");
+            		LOGGER.error("The desired output directory '" + oValue + "' does not exist.");
             		System.exit(0);
             	} else if (!fileOutput.isDirectory()) {
-            		Main.log.error("The desired output directory '" + oValue + "' is a file.");
+            		LOGGER.error("The desired output directory '" + oValue + "' is a file.");
             		System.exit(0);
             	} else {
-                Main.log.debug("Setting output directory to '" + oValue + "'.");
+                LOGGER.debug("Setting output directory to '" + oValue + "'.");
                 properties.setProperty("fabric.output_directory", oValue); // Add code output directory to properties
               }
             }
@@ -153,7 +154,7 @@ public class Main {
             if (line.hasOption('m')) {
                 for (String moduleName : line.getOptionValue('m').split(",")) {
                     moduleName = moduleName.trim();
-                    Main.log.debug("Creating instance of module {}", moduleName);
+                    LOGGER.debug("Creating instance of module {}", moduleName);
 
                     ArrayList<FItemHandlerBase> handlers = this.registry.get(moduleName).getHandlers(this.workspace);
                     for (FItemHandlerBase handler: handlers) {
@@ -189,7 +190,7 @@ public class Main {
             }
 
         } catch (Exception e) {
-            Main.log.error("Invalid command line: " + e, e);
+            LOGGER.error("Invalid command line: " + e, e);
             usage(options, registry);
             System.exit(1);
         }
@@ -215,7 +216,7 @@ public class Main {
 
             // Process WSDL elements (if any)
             if (null != wsdl) {
-                Main.log.debug("Handling WSDL elements.");
+                LOGGER.debug("Handling WSDL elements.");
                 System.out.println(wsdl.toString());
 
                 FWSDLProcessor processor = new FWSDLProcessor();
@@ -226,7 +227,7 @@ public class Main {
 
             // Walk XML Schema tree (if any)
             if (null != schema) {
-                Main.log.debug("Walking XML Schema tree.");
+                LOGGER.debug("Walking XML Schema tree.");
                 System.out.println(schema.toString());
 
                 FSchemaTreeWalker treeWalker = new FSchemaTreeWalker();
@@ -253,6 +254,7 @@ public class Main {
         this.registry.register(new FabricEXIModule(this.properties));
         this.registry.register(new FabricTypeGenModule(this.properties));
         this.registry.register(new MidGen4JModule(this.properties));
+        this.registry.register(new MidGen4JRESTModule(this.properties));
     }
 
     /**

@@ -41,12 +41,19 @@ public interface JConstructor extends JLangElem {
 
         private JavaConstructorFactory() { /* not to be invoked */ }
 
-        public JConstructor create(JComplexType parent, int modifiers,
-                                   JMethodSignature signature, String... source)
-                throws JConflictingModifierException,
-                JInvalidModifierException {
+        public JConstructor create(int modifiers, String className, JMethodSignature signature,
+                String... source) throws JConflictingModifierException, JInvalidModifierException {
+            return new JConstructorImpl(modifiers, className, signature, source);
+        }
 
-            return new JConstructorImpl(parent, modifiers, signature, source);
+        public JConstructor create(int modifiers, String className, JMethodSignature signature)
+                throws JConflictingModifierException, JInvalidModifierException {
+            return new JConstructorImpl(modifiers, className, signature);
+        }
+
+        public JConstructor create(int modifiers, String className)
+                throws JConflictingModifierException, JInvalidModifierException {
+            return new JConstructorImpl(modifiers, className, null);
         }
 
     }
@@ -54,6 +61,10 @@ public interface JConstructor extends JLangElem {
     public static final JavaConstructorFactory factory = JavaConstructorFactory.getInstance();
 
     public boolean equals(JConstructorImpl other);
+    
+    public String getClassName();
+    public JMethodSignature getSignature();
+    public JMethodBody getBody();
 
     JConstructor setComment(JConstructorComment comment);
 

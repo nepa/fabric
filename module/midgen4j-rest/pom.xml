@@ -12,8 +12,8 @@
     <relativePath>../../</relativePath>
   </parent>
 
-  <artifactId>fabric.module.midgen4j</artifactId>
-  <name>Fabric :: Module MidGen4J</name>
+  <artifactId>fabric.module.midgen4j-rest</artifactId>
+  <name>Fabric :: Module MidGen4J-REST</name>
   <packaging>jar</packaging>
 
   <dependencies>

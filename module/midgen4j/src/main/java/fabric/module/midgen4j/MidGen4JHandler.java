@@ -1,4 +1,4 @@
-/** 06.09.2012 15:09 */
+/** 24.09.2012 00:01 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -84,7 +84,7 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
 
   /**
    * Create class for central service provider before processing
-   * any other element of the WSDl document.
+   * any other element of the WSDL document.
    *
    * @throws Exception Error during code generation
    */
@@ -243,7 +243,8 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     {
       methodInput = JParameter.factory.create(
               JModifier.FINAL,
-              MidGen4JHandler.firstLetterCapital(operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message",
+              MidGen4JHandler.firstLetterCapital(
+                operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message",
               "inputMessage");
     }
 
@@ -259,7 +260,8 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     }
 
     // Create method stub
-    JMethod method = JMethod.factory.create(JModifier.PUBLIC,
+    JMethod method = JMethod.factory.create(
+            JModifier.PUBLIC,
             methodOutput,
             operation.getOperationName(),
             jms);

@@ -21,6 +21,7 @@
     <module>module/typegen</module>
     <module>module/exi</module>
     <module>module/midgen4j</module>
+    <module>module/midgen4j-rest</module>
     <module>module/dot</module>
     <module>module/cpp</module>
     <module>module/protobuf</module>
@@ -63,6 +64,11 @@
       <dependency>
         <groupId>de.uniluebeck.itm</groupId>
         <artifactId>fabric.module.midgen4j</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.uniluebeck.itm</groupId>
+        <artifactId>fabric.module.midgen4j-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -220,6 +226,7 @@
             <exclude>module/typegen/**</exclude>
             <exclude>module/exi/**</exclude>
             <exclude>module/midgen4j/**</exclude>
+            <exclude>module/midgen4j-rest/**</exclude>
             <exclude>module/cpp/**</exclude>
             <exclude>codegeneration/src/main/java/de/uniluebeck/sourcegen/js/**</exclude>
             <exclude>codegeneration/src/test/java/de/uniluebeck/sourcegen/js/**</exclude>

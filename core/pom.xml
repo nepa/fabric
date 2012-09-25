@@ -106,6 +106,10 @@
     </dependency>
     <dependency>
       <groupId>de.uniluebeck.itm</groupId>
+      <artifactId>fabric.module.midgen4j-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.uniluebeck.itm</groupId>
       <artifactId>fabric.module.dot</artifactId>
     </dependency>
     <dependency>

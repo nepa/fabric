@@ -156,12 +156,15 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 	}
 
 	private void addInternal(JConstructor constructor) throws JCodeValidationException, JDuplicateException {
-		if (((JConstructorImpl)constructor).getParent() != this)
-			throw new JCodeValidationException(
-					res.getString("exception.wrong_constructor_class")); //$NON-NLS-1$
+    String constructorClassName = ((JConstructorImpl)constructor).getClassName();
 
-		if(contains(constructor))
-			throw new JDuplicateException(constructor);
+		if (!constructorClassName.equals(this.className)) {
+        throw new JCodeValidationException(res.getString("exception.wrong_constructor_class")); //$NON-NLS-1$
+    }
+
+		if (contains(constructor)) {
+        throw new JDuplicateException(constructor);
+    }
 
 		constructors.add((JConstructorImpl)constructor);
 	}
