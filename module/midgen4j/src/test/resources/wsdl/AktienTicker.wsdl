@@ -16,7 +16,7 @@
 
   <!-- Nachricht fuer Rueckantwort -->
   <message name="holeKursResponse">
-    <part name="Kurswert" type="xsd:string" />
+    <part name="Kurswert" type="xsd:float" />
   </message>
 
   <!-- Schnittstelle fuer Datenaustausch -->

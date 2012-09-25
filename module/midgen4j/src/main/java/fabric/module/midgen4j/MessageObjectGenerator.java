@@ -1,4 +1,4 @@
-/** 17.09.2012 19:35 */
+/** 25.09.2012 19:42 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -88,21 +88,16 @@ public class MessageObjectGenerator
         // Add import for custom type class in different package
         if (!packageName.equals(beanPackageName) && !mapping.containsValue(typeName))
         {
-          // Import custom types only
+          // Import custom types only (no default Java types)
           String requiredImport = String.format("%s.%s", beanPackageName, typeName);
-
-          // No duplicate imports!
-          if (!jsf.containsImport(requiredImport))
-          {
-            jsf.addImport(requiredImport);
-          }
+          MessageObjectGenerator.addRequiredImport(jsf, requiredImport);
         }
 
         // Add imports for JAXB annotations
-        jsf.addImport("javax.xml.bind.annotation.XmlRootElement");
-        jsf.addImport("javax.xml.bind.annotation.XmlAccessorType");
-        jsf.addImport("javax.xml.bind.annotation.XmlAccessType");
-        jsf.addImport("javax.xml.bind.annotation.XmlElement");
+        MessageObjectGenerator.addRequiredImport(jsf, "javax.xml.bind.annotation.XmlRootElement");
+        MessageObjectGenerator.addRequiredImport(jsf, "javax.xml.bind.annotation.XmlAccessorType");
+        MessageObjectGenerator.addRequiredImport(jsf, "javax.xml.bind.annotation.XmlAccessType");
+        MessageObjectGenerator.addRequiredImport(jsf, "javax.xml.bind.annotation.XmlElement");
 
         /*****************************************************************
          * Create member variable
@@ -141,6 +136,25 @@ public class MessageObjectGenerator
 
         messageClass.add(getter);
       }
+    }
+  }
+
+  /**
+   * Private helper method to add a required import to a source file.
+   * The method will check for duplicates automatically and only add
+   * an import, if it is not yet part of the source file.
+   *
+   * @param sourceFile Source file to add required import
+   * @param requiredImport Name of required import
+   *
+   * @throws Exception Error while adding a required import
+   */
+  private static void addRequiredImport(final JSourceFile sourceFile, final String requiredImport) throws Exception
+  {
+    // No duplicate imports!
+    if (!sourceFile.containsImport(requiredImport))
+    {
+      sourceFile.addImport(requiredImport);
     }
   }
 

@@ -1,4 +1,4 @@
-/** 25.09.2012 02:22 */
+/** 25.09.2012 19:03 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -313,8 +313,8 @@ public class MidGen4JRESTHandler extends FDefaultWSDLHandler
     String methodBody = String.format(
             "HttpServer server = HttpServerFactory.create(\"%s\");\n\n" +
             "server.start();\n" +
-            "JOptionPane.showMessageDialog(null, \"Click 'OK' to stop server.\",\n" +
-            "\t\"REST Interface Control\", JOptionPane.WARNING_MESSAGE);\n" +
+            "JOptionPane.showMessageDialog(null, \"Click 'OK' to stop server.\", " +
+            "\"REST Interface Control\", JOptionPane.WARNING_MESSAGE);\n" +
             "server.stop(0);",
             this.properties.getProperty(MidGen4JRESTModule.BASE_URL_KEY));
     mainMethod.getBody().setSource(methodBody);

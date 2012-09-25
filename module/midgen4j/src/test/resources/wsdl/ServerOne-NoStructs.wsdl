@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Webservice description for media upload service.
+-->
+
+<definitions name="MediaService"
+  targetNamespace="urn:MediaService"
+  xmlns:tns="urn:MediaService"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- Message for data upload request -->
+  <message name="uploadRequest">
+    <part name="Latitude" type="xsd:decimal" />
+    <part name="Longitude" type="xsd:decimal" />
+    <part name="Title" type="xsd:string" />
+    <part name="Timestamp" type="xsd:string" />
+    <part name="Description" type="xsd:string" />
+    <part name="PayloadType" type="xsd:string" />
+    <part name="Payload" type="xsd:string" />
+  </message>
+
+  <!-- Message for data upload response -->
+  <message name="uploadResponse">
+    <part name="Statuscode" type="xsd:string" />
+    <part name="Message" type="xsd:string" />
+    <part name="SampleID" type="xsd:string" />
+  </message>
+
+  <!-- Message for report noise level request -->
+  <message name="reportNoiseLevelRequest">
+    <part name="Latitude" type="xsd:decimal" />
+    <part name="Longitude" type="xsd:decimal" />
+    <part name="Timestamp" type="xsd:string" />
+    <part name="ZipCode" type="xsd:string" />
+    <part name="NoiseLevel" type="xsd:int" />
+  </message>
+
+  <!-- Message for report noise level response -->
+  <message name="reportNoiseLevelResponse">
+    <part name="Statuscode" type="xsd:string" />
+    <part name="Message" type="xsd:string" />
+  </message>
+
+  <!-- Message for sound sample querying request -->
+  <message name="getSamplesRequest">
+    <part name="Latitude" type="xsd:decimal" />
+    <part name="Longitude" type="xsd:decimal" />
+    <part name="Range" type="xsd:decimal" />
+  </message>
+
+  <!-- Message for sound sample querying response -->
+  <message name="getSamplesResponse">
+    <part name="Statuscode" type="xsd:string" />
+    <part name="Message" type="xsd:string" />
+    <part name="SampleData" type="xsd:string" />
+    <part name="ResultCount" type="xsd:int" />
+  </message>
+
+  <!-- Message for noise levels querying request -->
+  <message name="getNoiseLevelsRequest">
+    <part name="Latitude" type="xsd:decimal" />
+    <part name="Longitude" type="xsd:decimal" />
+    <part name="Range" type="xsd:decimal" />
+  </message>
+
+  <!-- Message for noise levels querying response -->
+  <message name="getNoiseLevelsResponse">
+    <part name="Statuscode" type="xsd:string" />
+    <part name="Message" type="xsd:string" />
+    <part name="NoiseLevels" type="xsd:string" />
+    <part name="ResultCount" type="xsd:int" />
+  </message>
+
+  <!-- Message for average noise level querying request -->
+  <message name="getAverageNoiseLevelRequest">
+    <part name="Latitude" type="xsd:decimal" />
+    <part name="Longitude" type="xsd:decimal" />
+    <part name="Range" type="xsd:decimal" />
+  </message>
+
+  <!-- Message for average noise level querying response -->
+  <message name="getAverageNoiseLevelResponse">
+    <part name="Statuscode" type="xsd:string" />
+    <part name="Message" type="xsd:string" />
+    <part name="AverageNoiseLevel" type="xsd:int" />
+  </message>
+
+  <!-- Message for average noise level by zip code querying request -->
+  <message name="getAverageNoiseLevelByZipCodeRequest">
+    <part name="ZipCode" type="xsd:string" />
+  </message>
+
+  <!-- Message for average noise level by zip code querying response -->
+  <message name="getAverageNoiseLevelByZipCodeResponse">
+    <part name="Statuscode" type="xsd:string" />
+    <part name="Message" type="xsd:string" />
+    <part name="AverageNoiseLevel" type="xsd:int" />
+  </message>
+
+  <!-- Operations provided by webservice -->
+  <portType name="MediaServicePortType">
+
+    <!-- Upload of sound samples -->
+    <operation name="uploadSample">
+      <input message="tns:uploadRequest" />
+      <output message="tns:uploadResponse" />
+    </operation>
+
+    <!-- Noise level reporting -->
+    <operation name="reportNoiseLevel">
+      <input message="tns:reportNoiseLevelRequest" />
+      <output message="tns:reportNoiseLevelResponse" />
+    </operation>
+
+    <!-- Querying sound samples in neighbourhood -->
+    <operation name="getSamples">
+      <input message="tns:getSamplesRequest" />
+      <output message="tns:getSamplesResponse" />
+    </operation>
+
+    <!-- Querying noise levels in neighbourhood -->
+    <operation name="getNoiseLevels">
+      <input message="tns:getNoiseLevelsRequest" />
+      <output message="tns:getNoiseLevelsResponse" />
+    </operation>
+
+    <!-- Querying average noise level in neighbourhood -->
+    <operation name="getAverageNoiseLevel">
+      <input message="tns:getAverageNoiseLevelRequest" />
+      <output message="tns:getAverageNoiseLevelResponse" />
+    </operation>
+
+    <!-- Querying average noise level by zip code -->
+    <operation name="getAverageNoiseLevelByZipCode">
+      <input message="tns:getAverageNoiseLevelByZipCodeRequest" />
+      <output message="tns:getAverageNoiseLevelByZipCodeResponse" />
+    </operation>
+
+  </portType>
+
+  <!-- Protocol and data format for communication -->
+  <binding name="MediaServiceBinding" type="tns:MediaServicePortType">
+
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <operation name="uploadSample">
+      <soap:operation soapAction="urn:s1#uploadSample" />
+      <input>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <operation name="reportNoiseLevel">
+      <soap:operation soapAction="urn:s1#reportNoiseLevel" />
+      <input>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <operation name="getSamples">
+      <soap:operation soapAction="urn:s1#getSamples" />
+      <input>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <operation name="getNoiseLevels">
+      <soap:operation soapAction="urn:s1#getNoiseLevels" />
+      <input>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <operation name="getAverageNoiseLevel">
+      <soap:operation soapAction="urn:s1#getAverageNoiseLevel" />
+      <input>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <operation name="getAverageNoiseLevelByZipCode">
+      <soap:operation soapAction="urn:s1#getAverageNoiseLevelByZipCode" />
+      <input>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:s1"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+  </binding>
+
+  <!-- Service endpoint -->
+  <service name="MediaService">
+    <port name="MediaServicePortType" binding="MediaServiceBinding">
+      <soap:address location="http://localhost/s1/s1.php" />
+    </port>
+  </service>
+
+</definitions>
