@@ -58,6 +58,7 @@ import fabric.module.typegen.FabricTypeGenModule;
 import fabric.module.exi.FabricEXIModule;
 import fabric.module.midgen4j.MidGen4JModule;
 import fabric.module.midgen4j.rest.MidGen4JRESTModule;
+import fabric.module.midgen4j.rest.MidGen4JWebSocketsModule;
 
 public class Main {
 
@@ -255,6 +256,7 @@ public class Main {
         this.registry.register(new FabricTypeGenModule(this.properties));
         this.registry.register(new MidGen4JModule(this.properties));
         this.registry.register(new MidGen4JRESTModule(this.properties));
+        this.registry.register(new MidGen4JWebSocketsModule(this.properties));
     }
 
     /**
