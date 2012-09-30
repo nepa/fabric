@@ -1,4 +1,4 @@
-/** 25.09.2012 01:59 */
+/** 30.09.2012 06:17 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -30,14 +30,14 @@ public class MidGen4JRESTModule implements FModuleBase
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(MidGen4JRESTModule.class);
 
+  /** Key for interface class name in properties object */
+  public static final String INTERFACE_CLASS_NAME_KEY = "midgen4j.rest.interface_class_name";
+
   /** Key for package name in properties object */
   public static final String PACKAGE_NAME_KEY = "midgen4j.rest.package_name";
 
   /** Alternative key for package name */
   public static final String PACKAGE_NAME_ALT_KEY = "midgen4j.package_name";
-
-  /** Key for interface class name in properties object */
-  public static final String INTERFACE_CLASS_NAME_KEY = "midgen4j.rest.interface_class_name";
 
   /** Key for base URL of REST service in properties object */
   public static final String BASE_URL_KEY = "midgen4j.rest.base_url";
@@ -57,17 +57,17 @@ public class MidGen4JRESTModule implements FModuleBase
   /** Key for produced MIME types used in properties object */
   public static final String PRODUCED_MIME_TYPES_KEY = "midgen4j.rest.produced_mime_types";
 
-  /** Key for service provider package name in properties object */
-  public static final String SERVICE_PROVIDER_PACKAGE_NAME_KEY = "midgen4j.rest.service_provider_package_name";
-
-  /** Alternative key for service provider package name */
-  public static final String SERVICE_PROVIDER_PACKAGE_NAME_ALT_KEY = "midgen4j.package_name";
-
   /** Key for service provider class name in properties object */
   public static final String SERVICE_PROVIDER_CLASS_NAME_KEY = "midgen4j.rest.service_provider_class_name";
 
   /** Alternative key for service provider class name */
   public static final String SERVICE_PROVIDER_CLASS_NAME_ALT_KEY = "midgen4j.service_provider_class_name";
+
+  /** Key for service provider package name in properties object */
+  public static final String SERVICE_PROVIDER_PACKAGE_NAME_KEY = "midgen4j.rest.service_provider_package_name";
+
+  /** Alternative key for service provider package name */
+  public static final String SERVICE_PROVIDER_PACKAGE_NAME_ALT_KEY = "midgen4j.package_name";
 
   /** Properties object for module configuration */
   private Properties properties;
@@ -104,11 +104,11 @@ public class MidGen4JRESTModule implements FModuleBase
     return String.format("MidGen4J extension module to create RESTful service interfaces. " +
             "Valid options are '%s', '%s', '%s', '%s', '%s', '%s', '%s' and '%s'. " +
             "Alternatively '%s', '%s' and '%s' can be used.",
-            PACKAGE_NAME_KEY, INTERFACE_CLASS_NAME_KEY, BASE_URL_KEY,
+            INTERFACE_CLASS_NAME_KEY, PACKAGE_NAME_KEY, BASE_URL_KEY,
             BASE_PATH_KEY, CONSUMED_FORMAT_KEY, PRODUCED_FORMAT_KEY,
-            SERVICE_PROVIDER_PACKAGE_NAME_KEY, SERVICE_PROVIDER_CLASS_NAME_KEY,
-            PACKAGE_NAME_ALT_KEY, SERVICE_PROVIDER_PACKAGE_NAME_ALT_KEY,
-            SERVICE_PROVIDER_CLASS_NAME_ALT_KEY);
+            SERVICE_PROVIDER_CLASS_NAME_KEY, SERVICE_PROVIDER_PACKAGE_NAME_KEY,
+            PACKAGE_NAME_ALT_KEY, SERVICE_PROVIDER_CLASS_NAME_ALT_KEY,
+            SERVICE_PROVIDER_PACKAGE_NAME_ALT_KEY);
   }
 
   /**
@@ -157,14 +157,14 @@ public class MidGen4JRESTModule implements FModuleBase
     this.copyAlternativeProperties();
 
     // Check properties
-    this.checkPackageName();
     this.checkInterfaceClassName();
+    this.checkPackageName();
     this.checkBaseURL();
     this.checkBasePath();
     this.checkConsumedFormat();
     this.checkProducedFormat();
-    this.checkServiceProviderPackageName();
     this.checkServiceProviderClassName();
+    this.checkServiceProviderPackageName();
 
     // Print MidGen4J-REST module properties for debug purposes
     for (String key: this.properties.stringPropertyNames())
@@ -225,22 +225,6 @@ public class MidGen4JRESTModule implements FModuleBase
   }
 
   /**
-   * Check parameter for the package name. This property is optional.
-   * However, it is strongly recommended to provide a value, because
-   * otherwise "de.nptech.fabric" is used as default.
-   */
-  private void checkPackageName()
-  {
-    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "de.nptech.fabric");
-
-    // Convert package name to lower case
-    if (null != packageName)
-    {
-      this.properties.setProperty(PACKAGE_NAME_KEY, packageName.toLowerCase());
-    }
-  }
-
-  /**
    * Check parameter for the REST interface class name. This property
    * is optional. However, it is strongly recommended to provide a value,
    * because otherwise "RESTInterface" is used as default.
@@ -254,6 +238,22 @@ public class MidGen4JRESTModule implements FModuleBase
     {
       this.properties.setProperty(INTERFACE_CLASS_NAME_KEY,
               className.substring(0, 1).toUpperCase() + className.substring(1, className.length()));
+    }
+  }
+
+  /**
+   * Check parameter for the package name. This property is optional.
+   * However, it is strongly recommended to provide a value, because
+   * otherwise "de.nptech.fabric" is used as default.
+   */
+  private void checkPackageName()
+  {
+    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "de.nptech.fabric");
+
+    // Convert package name to lower case
+    if (null != packageName)
+    {
+      this.properties.setProperty(PACKAGE_NAME_KEY, packageName.toLowerCase());
     }
   }
 
@@ -370,22 +370,6 @@ public class MidGen4JRESTModule implements FModuleBase
   }
 
   /**
-   * Check parameter for package name of the service provider class. This
-   * property is optional. However, it is strongly recommended to provide
-   * a value, because otherwise "de.nptech.fabric" is used as default.
-   */
-  private void checkServiceProviderPackageName()
-  {
-    String packageName = this.properties.getProperty(SERVICE_PROVIDER_PACKAGE_NAME_KEY, "de.nptech.fabric");
-
-    // Convert package name to lower case
-    if (null != packageName)
-    {
-      this.properties.setProperty(SERVICE_PROVIDER_PACKAGE_NAME_KEY, packageName.toLowerCase());
-    }
-  }
-
-  /**
    * Check parameter for the service provider class name. This property
    * is optional. However, it is strongly recommended to provide a value,
    * because otherwise "ServiceProvider" is used as default.
@@ -399,6 +383,22 @@ public class MidGen4JRESTModule implements FModuleBase
     {
       this.properties.setProperty(SERVICE_PROVIDER_CLASS_NAME_KEY,
               className.substring(0, 1).toUpperCase() + className.substring(1, className.length()));
+    }
+  }
+
+  /**
+   * Check parameter for package name of the service provider class. This
+   * property is optional. However, it is strongly recommended to provide
+   * a value, because otherwise "de.nptech.fabric" is used as default.
+   */
+  private void checkServiceProviderPackageName()
+  {
+    String packageName = this.properties.getProperty(SERVICE_PROVIDER_PACKAGE_NAME_KEY, "de.nptech.fabric");
+
+    // Convert package name to lower case
+    if (null != packageName)
+    {
+      this.properties.setProperty(SERVICE_PROVIDER_PACKAGE_NAME_KEY, packageName.toLowerCase());
     }
   }
 }
