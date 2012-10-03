@@ -101,7 +101,7 @@ public class MidGen4JRESTModule implements FModuleBase
   @Override
   public String getDescription()
   {
-    return String.format("MidGen4J extension module to create RESTful service interfaces. " +
+    return String.format("MidGen4J extension to create RESTful service interface. " +
             "Valid options are '%s', '%s', '%s', '%s', '%s', '%s', '%s' and '%s'. " +
             "Alternatively '%s', '%s' and '%s' can be used.",
             INTERFACE_CLASS_NAME_KEY, PACKAGE_NAME_KEY, BASE_URL_KEY,

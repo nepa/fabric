@@ -58,7 +58,7 @@ import fabric.module.typegen.FabricTypeGenModule;
 import fabric.module.exi.FabricEXIModule;
 import fabric.module.midgen4j.MidGen4JModule;
 import fabric.module.midgen4j.rest.MidGen4JRESTModule;
-import fabric.module.midgen4j.rest.MidGen4JWebSocketsModule;
+import fabric.module.midgen4j.websockets.MidGen4JWebSocketsModule;
 
 public class Main {
 
