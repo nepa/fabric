@@ -198,31 +198,20 @@ public class Main {
 
         // Handle the different file types
         try {
-            FWSDL wsdl = null;
             FSchema schema = null;
+            FWSDL wsdl = null;
 
+            // Create FSchema object
+            if (null != this.schemaFile) {
+                schema = new FSchema(this.schemaFile);
+            }
             // Create FWSDL object
-            if (null != this.wsdlFile) {
+            else if (null != this.wsdlFile) {
                 wsdl = new FWSDL(this.wsdlFile);
 
                 // Extract inline XML Schema (if any)
                 if (null != wsdl.getSchema()) {
                     schema = wsdl.getSchema();
-                }
-            }
-            // Create FSchema object
-            else if (null != this.schemaFile) {
-                schema = new FSchema(this.schemaFile);
-            }
-
-            // Process WSDL elements (if any)
-            if (null != wsdl) {
-                LOGGER.debug("Handling WSDL elements.");
-                System.out.println(wsdl.toString());
-
-                FWSDLProcessor processor = new FWSDLProcessor();
-                for (FWSDLItemHandler wsdlHandler: this.wsdlHandlers) {
-                    processor.process(wsdl, wsdlHandler);
                 }
             }
 
@@ -234,6 +223,17 @@ public class Main {
                 FSchemaTreeWalker treeWalker = new FSchemaTreeWalker();
                 for (FSchemaTreeItemHandler schemaHandler: this.schemaHandlers) {
                     treeWalker.walk(schema, schemaHandler);
+                }
+            }
+
+            // Process WSDL elements (if any)
+            if (null != wsdl) {
+                LOGGER.debug("Handling WSDL elements.");
+                System.out.println(wsdl.toString());
+
+                FWSDLProcessor processor = new FWSDLProcessor();
+                for (FWSDLItemHandler wsdlHandler: this.wsdlHandlers) {
+                    processor.process(wsdl, wsdlHandler);
                 }
             }
 
