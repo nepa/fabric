@@ -1,10 +1,11 @@
-/** 28.07.2012 22:17 */
+/** 04.10.2012 00:33 */
 package de.uniluebeck.sourcegen.js;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Iterator;
 
 import de.uniluebeck.sourcegen.SourceFile;
 import de.uniluebeck.sourcegen.Workspace;
@@ -77,5 +78,50 @@ public class JavaScriptWorkspace
     }
 
     return result;
+  }
+
+  /**
+   * Delete a source file from the JavaScript workspace. The method
+   * will return 'true' on success or 'false' if no file with the
+   * given name was found.
+   * 
+   * @param fileName File name of JavaScript source file
+   * 
+   * @return True if file was deleted successfully, false otherwise
+   */
+  public boolean deleteJSSourceFile(final String fileName)
+  {
+    boolean success = false;
+
+    // Iterate all source files
+    SourceFile sourceFile = null;
+    Iterator<SourceFile> iterator = this.sourceFiles.iterator();
+    while (iterator.hasNext())
+    {
+      sourceFile = iterator.next();
+
+      // Search JavaScript source files
+      if (sourceFile instanceof JSSourceFile)
+      {
+        JSSourceFile jssf = (JSSourceFile)sourceFile;
+
+        if (fileName.equals(jssf.getFileName()))
+        {
+          iterator.remove();
+          success = true;
+
+          LOGGER.info(String.format("Removed JavaScript source file '%s' from workspace.",
+                  jssf.getFileName()));
+        }
+      }
+    }
+
+    if (!success)
+    {
+      LOGGER.info(String.format("Could not remove source file '%s' from workspace. " +
+              "File does not exist.", fileName));
+    }
+
+    return success;
   }
 }

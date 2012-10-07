@@ -24,10 +24,12 @@
  */
 package de.uniluebeck.sourcegen.java;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.uniluebeck.sourcegen.SourceFile;
@@ -35,10 +37,12 @@ import de.uniluebeck.sourcegen.Workspace;
 
 public class JavaWorkspace {
 
+  /** Logger object */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaWorkspace.class);
+
     // TODO Make sure that JMethod has a working Comparator
     private Set<JMethod> globalMethodStoreJava = new HashSet<JMethod>();
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(JavaWorkspace.class);
     private final List<SourceFile> sourceFiles;
 
     public JavaWorkspace(Workspace w) {
@@ -46,21 +50,60 @@ public class JavaWorkspace {
     }
 
     public JSourceFile getJSourceFile(String packageName, String fileName) {
-        // check if source file already exists
+        // Check if source file exists already
         for (SourceFile f : this.sourceFiles) {
             if (f instanceof JSourceFile && ((JSourceFile) f).getPackageName().equals(packageName) &&
                     ((JSourceFile) f).getFileName().equals(fileName)) {
-                log.error(String.format("Source file '%s' already exists. Will return existing instance.", fileName));
-                
+                LOGGER.error(String.format("Source file '%s' exists already. Will return existing instance.", fileName));
+
                 return (JSourceFile) f;
             }
         }
-        
+
         JSourceFile f = new JSourceFileImpl(packageName, fileName);
         this.sourceFiles.add(f);
-        log.info("Sourcefile " + fileName + " added to workspace");
+        LOGGER.info(String.format("Added new source file '%s' to workspace.", fileName));
 
         return f;
+    }
+
+    /**
+     * Search a source file in the Java workspace and delete it. No file
+     * will be removed, unless package name AND file name do match. The
+     * method will return 'true' on success or 'false' on failure.
+     *
+     * @param packageName Package name of Java source file
+     * @param fileName Name of Java source file
+     *
+     * @return True if file was deleted successfully, false otherwise
+     */
+    public boolean deleteJSourceFile(final String packageName, final String fileName) {
+        boolean success = false;
+
+        // Iterate all source files
+        SourceFile sourceFile = null;
+        Iterator<SourceFile> iterator = this.sourceFiles.iterator();
+        while (iterator.hasNext()) {
+            sourceFile = iterator.next();
+
+            // Search Java source files
+            if (sourceFile instanceof JSourceFile) {
+                JSourceFile jsf = (JSourceFile)sourceFile;
+
+                if (packageName.equals(jsf.getPackageName()) && fileName.equals(jsf.getFileName())) {
+                    iterator.remove();
+                    success = true;
+
+                    LOGGER.info(String.format("Removed source file '%s' from workspace.", jsf.getFileName()));
+                }
+            }
+        }
+
+        if (!success) {
+            LOGGER.info(String.format("Could not remove source file '%s' from workspace. File does not exist.", fileName));
+        }
+
+        return success;
     }
 
     public boolean containsJavaClass(String clazz) {
@@ -73,12 +116,12 @@ public class JavaWorkspace {
                 }
             }
         }
-        
+
         return false;
     }
 
     public void setGlobalMethod(JMethod method) {
-            globalMethodStoreJava.add(method);
+        globalMethodStoreJava.add(method);
     }
 
 }
