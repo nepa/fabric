@@ -1,4 +1,4 @@
-/** 30.09.2012 06:17 */
+/** 12.10.2012 03:02 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -327,8 +327,8 @@ public class MidGen4JRESTModule implements FModuleBase
    *
    * If the format identifier is correct, a string with the corresponding
    * MIME types is written to another field in the properties object
-   * (e.g. "text/xml" for option "xml" and "application/json" for option
-   * "json").
+   * (e.g. "application/xml" for option "xml" and "application/json"
+   * for option "json").
    *
    * @param formatKey Key for option in properties object, to read
    * desired serialization format from
@@ -350,7 +350,7 @@ public class MidGen4JRESTModule implements FModuleBase
     // Use XML serialization
     else if (format.toLowerCase().equals("xml"))
     {
-      this.properties.setProperty(mimeTypesKey, "\"text/xml\"");
+      this.properties.setProperty(mimeTypesKey, "\"application/xml\"");
     }
     // Use JSON serialization
     else if (format.toLowerCase().equals("json"))
@@ -360,7 +360,7 @@ public class MidGen4JRESTModule implements FModuleBase
     // Use XML/JSON serialization
     else if (format.toLowerCase().equals("xml/json"))
     {
-      this.properties.setProperty(mimeTypesKey, " { \"text/xml\", \"application/json\" } ");
+      this.properties.setProperty(mimeTypesKey, " { \"application/xml\", \"application/json\" } ");
     }
     // Invalid serialization format provided
     else
