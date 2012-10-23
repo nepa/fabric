@@ -1,4 +1,4 @@
-/** 01.08.2012 23:00 */
+/** 23.10.2012 17:29 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -333,7 +333,7 @@ public class JSMethodImpl extends JSComplexTypeImpl implements JSMethod
     this.indent(buffer, tabCount);
 
     // Output function header
-    buffer.append(String.format("this%s.%s = function ",
+    buffer.append(String.format("this%s.%s = function",
             (this.isPrototypeFunction ? ".prototype" : ""), this.name));
 
     // Prepare argument list

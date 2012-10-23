@@ -1,4 +1,4 @@
-/** 01.08.2012 15:23 */
+/** 23.10.2012 17:47 */
 package de.uniluebeck.sourcegen.js;
 
 import org.junit.Test;
@@ -244,7 +244,7 @@ public class JSClassTest
             jsc.toString().contains("this.taste = \"sweet\";") &&
             jsc.toString().contains("this.price = price;"));
     assertTrue("Class output must contain method header and body.",
-            jsc.toString().contains("this.prototype.setPrice = function (price)") && // Method header
+            jsc.toString().contains("this.prototype.setPrice = function(price)") && // Method header
             jsc.toString().contains("this.price = price;")); // Method body
 
     System.out.println(jsc);

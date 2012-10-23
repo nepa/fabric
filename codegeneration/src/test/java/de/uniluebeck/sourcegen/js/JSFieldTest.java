@@ -1,4 +1,4 @@
-/** 30.07.2012 23:37 */
+/** 23.10.2012 18:38 */
 package de.uniluebeck.sourcegen.js;
 
 import org.junit.Test;
@@ -82,12 +82,19 @@ public class JSFieldTest
     secondField.setName("foo");
     assertFalse("Fields with different initial values must not be equal.", firstField.equals(secondField));
 
+    secondField.setInitValue(null);
+    assertFalse("Fields with different initial values must not be equal.", firstField.equals(secondField));
+
     firstField.setName("foobar");
     secondField.setInitValue("alpha");
     assertFalse("Fields with different names must not be equal.", firstField.equals(secondField));
 
     // Equality
     secondField.setName("foobar");
+    assertTrue("Fields must be equal.", firstField.equals(secondField));
+
+    firstField.setInitValue(null);
+    secondField.setInitValue(null);
     assertTrue("Fields must be equal.", firstField.equals(secondField));
 
     assertTrue("Field must be equal to itself.", firstField.equals(secondField));

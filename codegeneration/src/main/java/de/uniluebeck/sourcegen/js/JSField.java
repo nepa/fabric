@@ -1,4 +1,4 @@
-/** 02.08.2012 20:33 */
+/** 23.10.2012 17:32 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -41,6 +41,21 @@ public interface JSField extends JSElement
       }
 
       return JSFieldFactory.instance;
+    }
+
+    /**
+     * Create a new JSField object with the given name and
+     * NO initial value. Usually this only makes sense in
+     * the global context of a JSSourceFile, not within a
+     * class.
+     *
+     * @param name Name of the JavaScript field
+     *
+     * @return JSFieldImpl object
+     */
+    public JSFieldImpl create(final String name)
+    {
+      return new JSFieldImpl(name, null);
     }
 
     /**

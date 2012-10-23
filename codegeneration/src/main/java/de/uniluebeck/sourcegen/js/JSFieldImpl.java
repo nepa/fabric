@@ -1,4 +1,4 @@
-/** 02.08.2012 20:35 */
+/** 23.10.2012 18:34 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -129,8 +129,13 @@ public class JSFieldImpl extends JSElementImpl implements JSField
       // Safe cast to desired type
       JSFieldImpl otherField = (JSFieldImpl)object;
 
+      // Initial values may be 'null'
+      boolean equalInitValues =
+              (null == this.initValue && null == otherField.getInitValue()) ||
+              (null != this.initValue && null != otherField.getInitValue() && this.initValue.equals(otherField.getInitValue()));
+
       if (this.name.equals(otherField.getName()) &&
-          this.initValue.equals(otherField.getInitValue()))
+          equalInitValues)
       {
         return true;
       }
@@ -197,11 +202,11 @@ public class JSFieldImpl extends JSElementImpl implements JSField
     // Print field with initial value
     if (inClassContext)
     {
-      buffer.append(String.format("this.%s = %s;", this.name, this.initValue));
+      buffer.append(String.format("this.%s = %s;", this.name, (null == this.initValue ? "null" : this.initValue)));
     }
     else
     {
-      buffer.append(String.format("var %s = %s;", this.name, this.initValue));
+      buffer.append(String.format("var %s = %s;", this.name, (null == this.initValue ? "null" : this.initValue)));
     }
   }
 }
