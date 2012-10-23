@@ -1,4 +1,4 @@
-/** 18.09.2012 01:36 */
+/** 08.10.2012 23:29 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import de.uniluebeck.sourcegen.Workspace;
 import fabric.module.api.FItemHandlerBase;
 import fabric.module.api.FModuleBase;
-
-import de.uniluebeck.sourcegen.Workspace;
+import fabric.module.midgen4j.exceptions.MidGen4JException;
 
 /**
  * Fabric base module for the Java Middleware Generator. This class is
@@ -35,11 +35,20 @@ public class MidGen4JModule implements FModuleBase
   /** Key for package name in properties object */
   public static final String PACKAGE_NAME_KEY = "midgen4j.package_name";
 
+  /** Key for name of main bean class in properties object */
+  public static final String BEAN_MAIN_CLASS_NAME_KEY = "midgen4j.bean_main_class_name";
+
+  /** Alternative key for name of main bean class */
+  public static final String BEAN_MAIN_CLASS_NAME_ALT_KEY = "typegen.main_class_name";
+
   /** Key for bean package name in properties object */
   public static final String BEAN_PACKAGE_NAME_KEY = "midgen4j.bean_package_name";
 
   /** Alternative key for bean package name */
   public static final String BEAN_PACKAGE_NAME_ALT_KEY = "typegen.java.package_name";
+
+  /** Key for flag to skip creation of main bean class in properties object */
+  public static final String SKIP_BEAN_MAIN_CLASS_KEY = "midgen4j.skip_bean_main_class";
 
   /** Properties object for module configuration */
   private Properties properties;
@@ -74,10 +83,11 @@ public class MidGen4JModule implements FModuleBase
   public String getDescription()
   {
     return String.format("Base module of the Java Middleware Generator. " +
-            "Valid options are '%s', '%s' and '%s'. " +
-            "Alternatively '%s' can be used.",
-            SERVICE_PROVIDER_CLASS_NAME_KEY, PACKAGE_NAME_KEY,
-            BEAN_PACKAGE_NAME_KEY, BEAN_PACKAGE_NAME_ALT_KEY);
+            "Valid options are '%s', '%s', '%s', '%s' and '%s'. " +
+            "Alternatively '%s' and '%s' can be used.",
+            SERVICE_PROVIDER_CLASS_NAME_KEY, PACKAGE_NAME_KEY, BEAN_MAIN_CLASS_NAME_KEY,
+            BEAN_PACKAGE_NAME_KEY, SKIP_BEAN_MAIN_CLASS_KEY,
+            BEAN_MAIN_CLASS_NAME_ALT_KEY, BEAN_PACKAGE_NAME_ALT_KEY);
   }
 
   /**
@@ -128,7 +138,9 @@ public class MidGen4JModule implements FModuleBase
     // Check properties
     this.checkServiceProviderClassName();
     this.checkPackageName();
+    this.checkBeanMainClassName();
     this.checkBeanPackageName();
+    this.checkSkipBeanMainClass();
 
     // Print MidGen4J module properties for debug purposes
     for (String key: this.properties.stringPropertyNames())
@@ -147,6 +159,11 @@ public class MidGen4JModule implements FModuleBase
    */
   private void copyAlternativeProperties()
   {
+    if (!isSet(BEAN_MAIN_CLASS_NAME_KEY) && isSet(BEAN_MAIN_CLASS_NAME_ALT_KEY))
+    {
+      copyProperty(BEAN_MAIN_CLASS_NAME_ALT_KEY, BEAN_MAIN_CLASS_NAME_KEY);
+    }
+
     if (!isSet(BEAN_PACKAGE_NAME_KEY) && isSet(BEAN_PACKAGE_NAME_ALT_KEY))
     {
       copyProperty(BEAN_PACKAGE_NAME_ALT_KEY, BEAN_PACKAGE_NAME_KEY);
@@ -212,6 +229,23 @@ public class MidGen4JModule implements FModuleBase
   }
 
   /**
+   * Check parameter for the name of the main bean class. This property
+   * is optional. However, it is strongly recommended to provide a value,
+   * because otherwise "Main" is used as default.
+   */
+  private void checkBeanMainClassName()
+  {
+    String className = this.properties.getProperty(BEAN_MAIN_CLASS_NAME_KEY, "Main");
+
+    // Capitalize first letter of class name
+    if (null != className)
+    {
+      this.properties.setProperty(BEAN_MAIN_CLASS_NAME_KEY,
+              className.substring(0, 1).toUpperCase() + className.substring(1, className.length()));
+    }
+  }
+
+  /**
    * Check parameter for the package name of custom type classes (JavaBeans).
    * This property is optional. However, it is strongly recommended to provide
    * a value, because otherwise "de.nptech.fabric" is used as default.
@@ -224,6 +258,37 @@ public class MidGen4JModule implements FModuleBase
     if (null != beanPackageName)
     {
       this.properties.setProperty(BEAN_PACKAGE_NAME_KEY, beanPackageName.toLowerCase());
+    }
+  }
+
+  /**
+   * Check parameter that determines, whether the main bean class
+   * that was created by the TypeGen module should be removed from
+   * the Java workspace before write-out or not. This property is
+   * optional. However, it is strongly recommended to provide a
+   * value, because otherwise "false" is used as default.
+   *
+   * @throws Exception Invalid value passed for property
+   */
+  private void checkSkipBeanMainClass() throws Exception
+  {
+    String skipMain = this.properties.getProperty(SKIP_BEAN_MAIN_CLASS_KEY);
+
+    // Keep main bean class on default or if desired
+    if (null == skipMain || skipMain.toLowerCase().equals("false"))
+    {
+      this.properties.setProperty(SKIP_BEAN_MAIN_CLASS_KEY, "false");
+    }
+    // Remove file from workspace otherwise
+    else if (skipMain.toLowerCase().equals("true"))
+    {
+      this.properties.setProperty(SKIP_BEAN_MAIN_CLASS_KEY, "true");
+    }
+    // Invalid value provided
+    else
+    {
+      throw new MidGen4JException(String.format("Invalid value '%s' for flag to skip " +
+              "creation of the main bean class. Use one of [true, false].", skipMain));
     }
   }
 }

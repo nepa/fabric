@@ -1,4 +1,4 @@
-/** 24.09.2012 00:01 */
+/** 08.10.2012 23:30 */
 package fabric.module.midgen4j;
 
 import org.slf4j.Logger;
@@ -50,6 +50,12 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
   /** Java package name for bean classes */
   private String beanPackageName;
 
+  /** Name of main bean class */
+  private String beanMainClassName;
+
+  /** Flag to skip creation of bean main class */
+  private boolean skipBeanMainClass;
+
   /** Java package name for generated classes */
   private String packageName;
 
@@ -76,6 +82,9 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
 
     // Extract global properties
     this.beanPackageName = this.properties.getProperty(MidGen4JModule.BEAN_PACKAGE_NAME_KEY);
+    this.beanMainClassName = this.properties.getProperty(MidGen4JModule.BEAN_MAIN_CLASS_NAME_KEY);
+    this.skipBeanMainClass = ("true").equals(this.properties.getProperty(MidGen4JModule.SKIP_BEAN_MAIN_CLASS_KEY).toLowerCase());
+
     this.packageName = this.properties.getProperty(MidGen4JModule.PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
 
@@ -96,6 +105,26 @@ public class MidGen4JHandler extends FDefaultWSDLHandler
     // Add class to source file
     JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName, this.serviceProviderClassName);
     jsf.add(this.serviceProviderClass);
+  }
+
+  /**
+   * Delete source file that contains the main bean class. The Fabric
+   * TypeGen module always creates this file, but it is not needed by
+   * the MidGen4J module. Developers can set a flag in the properties
+   * file, such that the MidGen4J base module will remove the file
+   * from the Java workspace, before it will actually be serialized
+   * to disk.
+   *
+   * @throws Exception Error during source file deletion
+   */
+  @Override
+  public void executeAfterProcessing() throws Exception
+  {
+    // Delete main bean class (if desired)
+    if (this.skipBeanMainClass)
+    {
+      this.workspace.getJava().deleteJSourceFile(this.beanPackageName, this.beanMainClassName);
+    }
   }
 
   /**
