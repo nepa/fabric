@@ -1,4 +1,4 @@
-/** 02.08.2012 20:31 */
+/** 25.10.2012 22:57 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -112,8 +112,13 @@ public class JSCommentImpl extends JSElementImpl implements JSComment
   @Override
   public void toString(StringBuffer buffer, int tabCount)
   {
+    this.indent(buffer, tabCount);
     buffer.append("/**\n");
+
+    this.indent(buffer, tabCount);
     buffer.append(" * ").append(this.description).append("\n");
+
+    this.indent(buffer, tabCount);
     buffer.append(" */\n");
   }
 }

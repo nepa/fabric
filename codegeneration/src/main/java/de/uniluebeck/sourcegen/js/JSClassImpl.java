@@ -1,4 +1,4 @@
-/** 01.08.2012 23:40 */
+/** 25.10.2012 22:56 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -468,7 +468,15 @@ public class JSClassImpl extends JSComplexTypeImpl implements JSClass
     for (JSField field: this.fields)
     {
       field.toString(buffer, tabCount + 1, true);
-      buffer.append("\n");
+
+      if (field != this.fields.getLast())
+      {
+        buffer.append("\n\n");
+      }
+      else
+      {
+        buffer.append("\n");
+      }
     }
 
     // Separate fields and methods
@@ -481,7 +489,15 @@ public class JSClassImpl extends JSComplexTypeImpl implements JSClass
     for (JSMethod method: this.methods)
     {
       method.toString(buffer, tabCount + 1);
-      buffer.append("\n");
+
+      if (method != this.methods.getLast())
+      {
+        buffer.append("\n\n");
+      }
+      else
+      {
+        buffer.append("\n");
+      }
     }
 
     buffer.append("}");
