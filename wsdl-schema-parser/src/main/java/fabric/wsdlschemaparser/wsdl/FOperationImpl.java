@@ -1,4 +1,4 @@
-/** 19.07.2012 11:29 */
+/** 27.10.2012 02:58 */
 package fabric.wsdlschemaparser.wsdl;
 
 import java.util.Set;
@@ -51,8 +51,6 @@ public class FOperationImpl extends FWSDLElement implements FOperation
   public FOperationImpl(final String operationName, final FOperationType operationType,
           final FOperationInputMessage inputMessage, final FOperationOutputMessage outputMessage) throws IllegalArgumentException
   {
-    // TODO: Do not access inputMessage/outputMessage unless we know it is not null!
-
     this.operationName = operationName;
     this.operationType = operationType;
     this.faultMessages = new HashSet<FOperationFaultMessage>();
@@ -61,7 +59,7 @@ public class FOperationImpl extends FWSDLElement implements FOperation
     if (FOperationType.ONE_WAY == operationType)
     {
       // Set name to 'operation name', if none is set
-      if (null == inputMessage.getOperationMessageName())
+      if (null != inputMessage && null == inputMessage.getOperationMessageName())
       {
         inputMessage.setOperationMessageName(operationName);
       }
@@ -72,12 +70,12 @@ public class FOperationImpl extends FWSDLElement implements FOperation
     else if (FOperationType.REQUEST_RESPONSE == operationType)
     {
       // Set name to 'Request', if none is set
-      if (null == inputMessage.getOperationMessageName())
+      if (null != inputMessage && null == inputMessage.getOperationMessageName())
       {
         inputMessage.setOperationMessageName("Request");
       }
       // Set name to 'Response', if none is set
-      if (null == outputMessage.getOperationMessageName())
+      if (null != outputMessage && null == outputMessage.getOperationMessageName())
       {
         outputMessage.setOperationMessageName("Response");
       }
@@ -89,12 +87,12 @@ public class FOperationImpl extends FWSDLElement implements FOperation
     else if (FOperationType.SOLICIT_RESPONSE == operationType)
     {
       // Set name to 'Solicit', if none is set
-      if (null == outputMessage.getOperationMessageName())
+      if (null != outputMessage && null == outputMessage.getOperationMessageName())
       {
         outputMessage.setOperationMessageName("Solicit");
       }
       // Set name to 'Response', if none is set
-      if (null == inputMessage.getOperationMessageName())
+      if (null != inputMessage && null == inputMessage.getOperationMessageName())
       {
         inputMessage.setOperationMessageName("Response");
       }
@@ -106,7 +104,7 @@ public class FOperationImpl extends FWSDLElement implements FOperation
     else if (FOperationType.NOTIFICATION == operationType)
     {
       // Set name to 'operation name', if none is set
-      if (null == outputMessage.getOperationMessageName())
+      if (null != outputMessage && null == outputMessage.getOperationMessageName())
       {
         outputMessage.setOperationMessageName(operationName);
       }
