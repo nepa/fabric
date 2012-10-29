@@ -1,4 +1,4 @@
-/** 30.09.2012 06:50 */
+/** 29.10.2012 16:41 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -15,12 +15,17 @@ import de.uniluebeck.sourcegen.Workspace;
 /**
  * TODO: Implement class and add comment
  *
+ * TODO: Add validation of properties
+ *
  * @author seidel
  */
 public class MidGen4JWebSocketsModule implements FModuleBase
 {
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(MidGen4JWebSocketsModule.class);
+
+  /** Key for package name in properties object */
+  public static final String PACKAGE_NAME_KEY = "midgen4j.websockets.package_name";
 
   /** Properties object for module configuration */
   private Properties properties;
@@ -58,26 +63,76 @@ public class MidGen4JWebSocketsModule implements FModuleBase
   }
 
   /**
-   * This method returns a Fabric handler object for the MidGen4J
-   * WebSockets extension. The handler on its part will generate
-   * a WebSockets interface to access the central service provider
-   * class that is created by the MidGen4J base module. The item
-   * handler is instantiated with the current workspace and module
-   * options.
+   * This method returns a list with all Fabric handler objects of
+   * the MidGen4J WebSockets extension. The handlers on their part
+   * will generate a WebSockets interface to access the central
+   * service provider class that is created by the MidGen4J base
+   * module. The item handlers are instantiated with the current
+   * workspace and module options.
    *
    * @param workspace Workspace object for generation of WebSockets
    * interface
    *
-   * @return List with one MidGen4JWebSocketsHandler object
+   * @return List with all Fabric handler objects
    *
    * @throws Exception Error during handler instantiation
    */
   @Override
   public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
   {
+    this.validateProperties();
+
     ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
-    handlers.add(new MidGen4JWebSocketsHandler(workspace, this.properties));
+    handlers.add(new AtmosphereJQueryGenerator(workspace, this.properties));
+    handlers.add(new JSONMarshallerGenerator(workspace, this.properties));
 
     return handlers;
+  }
+
+  /**
+   * This method validates all module-specific options and translates
+   * them where needed. The constructor of this class is called during
+   * Fabric setup. At that time, however, the Java properties file from
+   * the command line is not yet processed. This is why this method must
+   * not be called in the module's constructor, but in the getHandlers()
+   * method.
+   *
+   * @throws Exception Error during validation
+   */
+  private void validateProperties() throws Exception
+  {
+    // Early exit, if properties object is null
+    if (null == this.properties)
+    {
+      throw new IllegalStateException("Properties object is null. Maybe it was not initialized properly?");
+    }
+
+    // Check properties
+    this.checkPackageName();
+
+    // Print MidGen4J-WebSockets module properties for debug purposes
+    for (String key: this.properties.stringPropertyNames())
+    {
+      if (key.startsWith("midgen4j.websockets."))
+      {
+        LOGGER.debug(String.format("Property '%s' has value '%s'.", key, this.properties.getProperty(key)));
+      }
+    }
+  }
+
+  /**
+   * Check parameter for the package name. This property is optional.
+   * However, it is strongly recommended to provide a value, because
+   * otherwise "de.nptech.fabric" is used as default.
+   */
+  private void checkPackageName()
+  {
+    String packageName = this.properties.getProperty(PACKAGE_NAME_KEY, "de.nptech.fabric");
+
+    // Convert package name to lower case
+    if (null != packageName)
+    {
+      this.properties.setProperty(PACKAGE_NAME_KEY, packageName.toLowerCase());
+    }
   }
 }
