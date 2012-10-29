@@ -1,4 +1,4 @@
-/** 25.09.2012 22:14 */
+/** 29.10.2012 02:40 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -321,11 +321,17 @@ public class MidGen4JRESTHandler extends FDefaultWSDLHandler
     // Set method body
     String methodBody = String.format(
             "HttpServer server = HttpServerFactory.create(\"%s\");\n\n" +
+            "String message =\n" +
+            "\t\"Click 'OK' to stop server.\\n\\n\" +\n" +
+            "\t\"REST interface published at:\\n\\n\" +\n" +
+            "\t\"%s%s/\";\n\n" +
             "server.start();\n" +
-            "JOptionPane.showMessageDialog(null, \"Click 'OK' to stop server.\", " +
+            "JOptionPane.showMessageDialog(null, message, " +
             "\"REST Interface Control\", JOptionPane.WARNING_MESSAGE);\n" +
             "server.stop(0);",
-            this.properties.getProperty(MidGen4JRESTModule.BASE_URL_KEY));
+            this.properties.getProperty(MidGen4JRESTModule.BASE_URL_KEY),
+            this.properties.getProperty(MidGen4JRESTModule.BASE_URL_KEY),
+            this.properties.getProperty(MidGen4JRESTModule.BASE_PATH_KEY));
     mainMethod.getBody().setSource(methodBody);
 
     // Add required imports to class
