@@ -1,4 +1,4 @@
-/** 29.10.2012 18:30 */
+/** 31.10.2012 01:18 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -135,33 +135,28 @@ public class JSONMarshallerGenerator extends FDefaultWSDLHandler
   private JMethod createSerializeMethod() throws Exception
   {
     // Create marshaller function
-    JParameter beanClass = JParameter.factory.create(JModifier.FINAL, "Class<T>", "beanClass");
     JParameter beanObject = JParameter.factory.create(JModifier.FINAL, "T", "beanObject");
-    JMethodSignature jms = JMethodSignature.factory.create(beanClass, beanObject);
+    JMethodSignature jms = JMethodSignature.factory.create(beanObject);
 
-    JMethod instanceToJSON = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC, "String", "instanceToJSON", jms);
+    JMethod instanceToJSON = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC,
+            "String", "instanceToJSON", jms, new String[] { "Exception" });
     instanceToJSON.setComment(new JMethodCommentImpl("Serialize bean object to JSON document."));
 
     // Set method body
     String methodBody =
-            "JAXBContext context = JAXBContext.newInstance(beanClass);\n" +
-            "Marshaller marshaller = context.createMarshaller();\n\n" +
-            "Configuration configuration = new Configuration();\n" +
-            "MappedNamespaceConvention convention = new MappedNamespaceConvention(configuration);\n" +
-            "StringWriter jsonDocument = new StringWriter();\n" +
-            "XMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(convention, jsonDocument);\n" +
-            "marshaller.marshal(beanObject, xmlStreamWriter);\n\n" +
-            "return jsonDocument.toString();";
+            "ObjectMapper mapper = new ObjectMapper();\n" +
+            "mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);\n" +
+            "mapper.configure(SerializationFeature.INDENT_OUTPUT, true);\n\n" +
+            "AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(mapper.getTypeFactory());\n" +
+            "mapper.setAnnotationIntrospector(introspector);\n\n" +
+            "return mapper.writeValueAsString(beanObject);";
     instanceToJSON.getBody().setSource(methodBody);
 
     // Add required imports
-    this.addRequiredImport("java.io.StringWriter");
-    this.addRequiredImport("javax.xml.bind.JAXBContext");
-    this.addRequiredImport("javax.xml.bind.Marshaller");
-    this.addRequiredImport("javax.xml.stream.XMLStreamWriter");
-    this.addRequiredImport("org.codehaus.jettison.mapped.Configuration");
-    this.addRequiredImport("org.codehaus.jettison.mapped.MappedNamespaceConvention");
-    this.addRequiredImport("org.codehaus.jettison.mapped.MappedXMLStreamWriter");
+    this.addRequiredImport("com.fasterxml.jackson.databind.AnnotationIntrospector");
+    this.addRequiredImport("com.fasterxml.jackson.databind.ObjectMapper");
+    this.addRequiredImport("com.fasterxml.jackson.databind.SerializationFeature");
+    this.addRequiredImport("com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector");
 
     return instanceToJSON;
   }
@@ -180,28 +175,24 @@ public class JSONMarshallerGenerator extends FDefaultWSDLHandler
     JParameter jsonDocument = JParameter.factory.create(JModifier.FINAL, "String", "jsonDocument");
     JMethodSignature jms = JMethodSignature.factory.create(beanClass, jsonDocument);
 
-    JMethod jsonToInstance = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC, "T", "jsonToInstance", jms);
+    JMethod jsonToInstance = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC,
+            "T", "jsonToInstance", jms, new String[] { "Exception" });
     jsonToInstance.setComment(new JMethodCommentImpl("Deserialize JSON document to bean object."));
 
     // Set method body
     String methodBody =
-            "JAXBContext context = JAXBContext.newInstance(beanClass);\n" +
-            "Unmarshaller unmarshaller = context.createUnmarshaller();\n\n" +
-            "JSONObject jsonObject = new JSONObject(jsonDocument);\n" +
-            "Configuration configuration = new Configuration();\n" +
-            "MappedNamespaceConvention convention = new MappedNamespaceConvention(configuration);\n" +
-            "XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(jsonObject, convention);\n\n" +
-            "return (T)unmarshaller.unmarshal(xmlStreamReader);";
+            "ObjectMapper mapper = new ObjectMapper();\n" +
+            "mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, false);\n\n" +
+            "AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(mapper.getTypeFactory());\n" +
+            "mapper.setAnnotationIntrospector(introspector);\n\n" +
+            "return mapper.readValue(jsonDocument, beanClass);";
     jsonToInstance.getBody().setSource(methodBody);
 
     // Add required imports
-    this.addRequiredImport("javax.xml.bind.JAXBContext");
-    this.addRequiredImport("javax.xml.bind.Unmarshaller");
-    this.addRequiredImport("javax.xml.stream.XMLStreamReader");
-    this.addRequiredImport("org.codehaus.jettison.json.JSONObject");
-    this.addRequiredImport("org.codehaus.jettison.mapped.Configuration");
-    this.addRequiredImport("org.codehaus.jettison.mapped.MappedNamespaceConvention");
-    this.addRequiredImport("org.codehaus.jettison.mapped.MappedXMLStreamReader");
+    this.addRequiredImport("com.fasterxml.jackson.databind.AnnotationIntrospector");
+    this.addRequiredImport("com.fasterxml.jackson.databind.DeserializationFeature");
+    this.addRequiredImport("com.fasterxml.jackson.databind.ObjectMapper");
+    this.addRequiredImport("com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector");
 
     return jsonToInstance;
   }
