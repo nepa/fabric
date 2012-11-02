@@ -4,6 +4,7 @@ package fabric.module.midgen4j.websockets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -73,7 +74,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   @Override
   public void executeBeforeProcessing() throws Exception
   {
-    JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile("application"); // TODO: Use property to set application file name
+    JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
+            this.packageNameToPath("some.test.folder"), "application"); // TODO: Use property to set path and application file name
 
     // Add code before fields
     jssf.getCodeBeforeFields().setCode("\'use strict\';");
@@ -127,7 +129,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   @Override
   public void processPortTypes(final HashSet<FPortType> portTypes) throws Exception
   {
-    JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile("application"); // TODO: Use property to set application file name
+    JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
+            this.packageNameToPath("some.test.folder"), "application"); // TODO: Use property to set application file name
 
     // Process all service operations
     for (FPortType portType: portTypes)
@@ -339,5 +342,11 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "channelName", "websocket", "streaming"); // TODO: Add real arguments
 
     return codeBlock;
+  }
+
+  // TODO: Add comment
+  private String packageNameToPath(final String javaPackageName)
+  {
+    return javaPackageName.replace('.', File.separatorChar);
   }
 }

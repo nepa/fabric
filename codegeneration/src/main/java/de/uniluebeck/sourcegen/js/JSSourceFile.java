@@ -1,4 +1,4 @@
-/** 02.08.2012 21:02 */
+/** 02.11.2012 23:05 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -14,6 +14,9 @@ import de.uniluebeck.sourcegen.exceptions.JSDuplicateException;
  */
 public interface JSSourceFile extends JSComplexType, SourceFile
 {
+  public JSSourceFile setPath(final String path);
+  public String getPath();
+
   public JSSourceFile setFileName(final String fileName);
 
   public JSSourceFile add(final JSField... fields) throws JSDuplicateException;

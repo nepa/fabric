@@ -1,4 +1,4 @@
-/** 04.10.2012 00:33 */
+/** 02.11.2012 23:18 */
 package de.uniluebeck.sourcegen.js;
 
 import org.slf4j.Logger;
@@ -36,16 +36,17 @@ public class JavaScriptWorkspace
   }
 
   /**
-   * Get a JavaScript source file with the desired name. If
-   * such a file already exists in the workspace, the existing
-   * instance is returned. Otherwise a new empty source file
-   * will be created, added to workspace and returned.
+   * Get a JavaScript source file with the desired path and name.
+   * If such a file already exists in the workspace, the existing
+   * instance is returned. Otherwise a new empty source file will
+   * be created, added to workspace and returned.
    *
+   * @param path Path of JavaScript source file
    * @param fileName File name of JavaScript source file
    *
    * @return JavaScript source file with desired name
    */
-  public JSSourceFile getJSSourceFile(final String fileName)
+  public JSSourceFile getJSSourceFile(final String path, final String fileName)
   {
     JSSourceFile result = null;
 
@@ -57,10 +58,10 @@ public class JavaScriptWorkspace
         JSSourceFile sourceFile = (JSSourceFile)file;
 
         // Source file does already exist
-        if (fileName.equals(sourceFile.getFileName()))
+        if (path.equals(sourceFile.getPath()) && fileName.equals(sourceFile.getFileName()))
         {
-          LOGGER.info(String.format("JavaScript source file '%s' already exists. " +
-                  "Will return existing instance.", fileName));
+          LOGGER.info(String.format("JavaScript source file '%s' already exists in path '%s'. " +
+                  "Will return existing instance.", fileName, path));
 
           result = sourceFile;
           break;  // Early exit
@@ -71,7 +72,7 @@ public class JavaScriptWorkspace
     // Create a new source file
     if (null == result)
     {
-      result = new JSSourceFileImpl(fileName);
+      result = new JSSourceFileImpl(path, fileName);
       this.sourceFiles.add(result);
 
       LOGGER.info(String.format("New JavaScript source file '%s' added to workspace.", fileName));
@@ -81,15 +82,32 @@ public class JavaScriptWorkspace
   }
 
   /**
+   * Get a JavaScript source file with the desired name from the
+   * base folder of Fabric's workspace. If such a file already
+   * exists in the workspace, the existing instance is returned.
+   * Otherwise a new empty source file will be created, added
+   * to workspace and returned.
+   *
+   * @param fileName File name of JavaScript source file
+   *
+   * @return JavaScript source file with desired name
+   */
+  public JSSourceFile getJSSourceFile(final String fileName)
+  {
+    return this.getJSSourceFile("", fileName);
+  }
+
+  /**
    * Delete a source file from the JavaScript workspace. The method
    * will return 'true' on success or 'false' if no file with the
    * given name was found.
-   * 
+   *
+   * @param path Path of JavaScript source file
    * @param fileName File name of JavaScript source file
-   * 
+   *
    * @return True if file was deleted successfully, false otherwise
    */
-  public boolean deleteJSSourceFile(final String fileName)
+  public boolean deleteJSSourceFile(final String path, final String fileName)
   {
     boolean success = false;
 
@@ -105,7 +123,7 @@ public class JavaScriptWorkspace
       {
         JSSourceFile jssf = (JSSourceFile)sourceFile;
 
-        if (fileName.equals(jssf.getFileName()))
+        if (path.equals(jssf.getPath()) && fileName.equals(jssf.getFileName()))
         {
           iterator.remove();
           success = true;
@@ -123,5 +141,19 @@ public class JavaScriptWorkspace
     }
 
     return success;
+  }
+
+  /**
+   * Delete a source file from base folder of the JavaScript
+   * workspace. The method will return 'true' on success or
+   * 'false' if no file with the given name was found.
+   *
+   * @param fileName File name of JavaScript source file
+   *
+   * @return True if file was deleted successfully, false otherwise
+   */
+  public boolean deleteJSSourceFile(final String fileName)
+  {
+    return this.deleteJSSourceFile("", fileName);
   }
 }

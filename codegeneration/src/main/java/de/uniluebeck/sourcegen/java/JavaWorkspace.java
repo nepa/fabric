@@ -37,7 +37,7 @@ import de.uniluebeck.sourcegen.Workspace;
 
 public class JavaWorkspace {
 
-  /** Logger object */
+    /** Logger object */
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaWorkspace.class);
 
     // TODO Make sure that JMethod has a working Comparator

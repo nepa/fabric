@@ -172,7 +172,7 @@ public class Workspace {
 
             log.info("Generating file " + file.getAbsolutePath() + ".");
 
-            StringBuffer buffer = new StringBuffer(sourceFile.toString());
+            StringBuilder buffer = new StringBuilder(sourceFile.toString());
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
             writer.write(buffer.toString() + "\n");
@@ -246,20 +246,36 @@ public class Workspace {
         projectDirString = assureTrailingSeparator(projectDirString);
         projectDirString += subDir;
 
+        // Create folders for Java package name
         if (sourceFile instanceof JSourceFile) {
-            JSourceFile jSourceFile = (JSourceFile) sourceFile;
+            JSourceFile jsf = (JSourceFile)sourceFile;
             projectDirString = assureTrailingSeparator(projectDirString);
             projectDirString += jPackagePrefix.replace('.', File.separatorChar);
             projectDirString = assureTrailingSeparator(projectDirString);
 
-            if (null == jSourceFile.getPackageName())
-            {
-              throw new Exception(String.format("PackageName is null for source file '%s'. " +
-                      "Maybe you did not set it correctly in your module?", jSourceFile.getFileName()));
+            if (null == jsf.getPackageName()) {
+                throw new Exception(String.format("Package name is 'null' for source file '%s'. " +
+                        "Maybe you did not set it correctly in your module?", jsf.getFileName()));
             }
-            else
-            {
-            	projectDirString += jSourceFile.getPackageName().replace('.', File.separatorChar);
+            else {
+            	projectDirString += jsf.getPackageName().replace('.', File.separatorChar);
+            }
+        }
+        // Create folders for path of JavaScript source file
+        else if (sourceFile instanceof JSSourceFile) {
+            JSSourceFile jssf = (JSSourceFile)sourceFile;
+            projectDirString = assureTrailingSeparator(projectDirString);
+
+            if (null == jssf.getPath()) {
+                throw new Exception(String.format("Path is 'null' for source file '%s'. " +
+                        "Maybe you did not set it correctly in your module?", jssf.getFileName()));
+            }
+            else {
+                // Replace UNIX and Windows separators
+                String path = jssf.getPath().replace('/', File.separatorChar);
+                path = path.replace('\\', File.separatorChar);
+
+                projectDirString += path;
             }
         }
 

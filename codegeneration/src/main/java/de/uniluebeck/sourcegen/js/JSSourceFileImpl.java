@@ -1,4 +1,4 @@
-/** 03.08.2012 01:14 */
+/** 02.11.2012 23:03 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -14,6 +14,9 @@ import de.uniluebeck.sourcegen.exceptions.JSDuplicateException;
  */
 public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
 {
+  /** Path of the JavaScript source file */
+  private String path;
+
   /** Name of the JavaScript source file */
   private String fileName;
 
@@ -43,12 +46,14 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
 
   /**
    * Parameterized constructor creates new JavaScript
-   * source file with the given file name.
+   * source file with the given path and file name.
    *
+   * @param path Desired path for source file
    * @param fileName Desired name for source file
    */
-  public JSSourceFileImpl(final String fileName)
+  public JSSourceFileImpl(final String path, final String fileName)
   {
+    this.path = path;
     this.fileName = fileName;
     this.codeBeforeFields = JSCodeBlock.factory.create();
     this.fields = new LinkedList<JSField>();
@@ -58,6 +63,33 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
     this.functions = new LinkedList<JSFunction>();
     this.codeAfterFuntions = JSCodeBlock.factory.create();
     this.comment = null;
+  }
+
+  /**
+   * Parameterized constructor creates new JavaScript
+   * source file with the given file name in the base
+   * folder of Fabric's workspace.
+   *
+   * @param fileName Desired name for source file
+   */
+  public JSSourceFileImpl(final String fileName)
+  {
+    this("", fileName);
+  }
+
+  /**
+   * Set path of the JavaScript source file.
+   *
+   * @param path Desired path for source file
+   *
+   * @return JSSourceFile object
+   */
+  @Override
+  public JSSourceFile setPath(final String path)
+  {
+    this.path = path;
+
+    return this;
   }
 
   /**
@@ -73,6 +105,17 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
     this.fileName = fileName;
 
     return this;
+  }
+
+  /**
+   * Get path of the JavaScript source file.
+   *
+   * @return Path of source file
+   */
+  @Override
+  public String getPath()
+  {
+    return this.path;
   }
 
   /**
@@ -347,10 +390,10 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
 
   /**
    * Compare current JavaScript source file with another object
-   * of the same type. Equality comparison is based on the file
-   * name as well as all fields, classes and functions that are
-   * contained in the file. Code blocks before and after fields,
-   * classes and functions are also used in equality test.
+   * of the same type. Equality comparison is based on the path
+   * and file name as well as all fields, classes and functions
+   * that are contained in the file. Code blocks before and after
+   * fields, classes and functions are also used in equality test.
    *
    * @param object JSSourceFile object for comparison
    *
@@ -377,7 +420,8 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
       // Safe cast to desired type
       JSSourceFileImpl otherSourceFile = (JSSourceFileImpl)object;
 
-      if (this.fileName.equals(otherSourceFile.getFileName()) &&
+      if (this.path.equals(otherSourceFile.getPath()) &&
+          this.fileName.equals(otherSourceFile.getFileName()) &&
           this.codeBeforeFields.equals(otherSourceFile.getCodeBeforeFields()) &&
           this.codeBeforeClasses.equals(otherSourceFile.getCodeBeforeClasses()) &&
           this.codeBeforeFunctions.equals(otherSourceFile.getCodeBeforeFunctions()) &&
@@ -407,6 +451,7 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   {
     int hash = 7;
 
+    hash = 23 * hash + (this.path != null ? this.path.hashCode() : 0);
     hash = 23 * hash + (this.fileName != null ? this.fileName.hashCode() : 0);
     hash = 23 * hash + (this.codeBeforeFields != null ? this.codeBeforeFields.hashCode() : 0);
     hash = 23 * hash + (this.fields != null ? this.fields.hashCode() : 0);
