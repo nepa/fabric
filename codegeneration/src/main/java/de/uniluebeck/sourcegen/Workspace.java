@@ -24,6 +24,9 @@
  */
 package de.uniluebeck.sourcegen;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -31,8 +34,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Properties;
-
-import org.slf4j.LoggerFactory;
 
 import de.uniluebeck.sourcegen.c.CHeaderFile;
 import de.uniluebeck.sourcegen.c.CSourceFile;
@@ -44,6 +45,8 @@ import de.uniluebeck.sourcegen.java.JSourceFile;
 import de.uniluebeck.sourcegen.java.JavaWorkspace;
 import de.uniluebeck.sourcegen.js.JSSourceFile;
 import de.uniluebeck.sourcegen.js.JavaScriptWorkspace;
+import de.uniluebeck.sourcegen.plaintext.PlainTextFile;
+import de.uniluebeck.sourcegen.plaintext.PlainTextWorkspace;
 import de.uniluebeck.sourcegen.protobuf.ProtobufWorkspace;
 
 public class Workspace {
@@ -52,7 +55,7 @@ public class Workspace {
     // Logging
     // ###################################################################
 
-    private final org.slf4j.Logger log = LoggerFactory.getLogger(Workspace.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Workspace.class);
 
     // ###################################################################
     // Properties
@@ -95,6 +98,16 @@ public class Workspace {
     }
 
     // ###################################################################
+    // Plain text workspace
+    // ###################################################################
+
+    private PlainTextWorkspace plainText;
+
+    public PlainTextWorkspace getPlainText() {
+        return plainText;
+    }
+
+    // ###################################################################
     // Protobuf workspace
     // ###################################################################
 
@@ -108,18 +121,10 @@ public class Workspace {
     // Dot workspace
     // ###################################################################
 
-    /**
-     * Helper for dot graph creation in this workspace.
-     */
-    private final DotGraphWorkspace dot;
+    private DotGraphWorkspace dot;
 
-    /**
-     * Returns the helper for dot graph generation in this workspace.
-     *
-     * @return The dot graph helper instance.
-     */
     public DotGraphWorkspace getDotHelper() {
-        return this.dot;
+        return dot;
     }
 
     // ###################################################################
@@ -139,10 +144,11 @@ public class Workspace {
     public Workspace(Properties properties) {
         this.properties = properties;
 
-        // Set up the workspaces
+        // Set up all workspaces
         this.java = new JavaWorkspace(this);
         this.c = new CWorkspace(this);
         this.javaScript = new JavaScriptWorkspace(this);
+        this.plainText = new PlainTextWorkspace(this);
         this.protobuf = new ProtobufWorkspace(this);
         this.dot = new DotGraphWorkspace(this);
     }
@@ -153,7 +159,7 @@ public class Workspace {
      * @throws Exception
      */
     public void generate() throws Exception {
-        log.info("Generating " + sourceFiles.size() + " source files.");
+        LOGGER.info("Generating " + sourceFiles.size() + " source files.");
 
         jPackagePrefix = properties.getProperty(KEY_JAVA_PKG_PREFIX, "");
 
@@ -170,19 +176,19 @@ public class Workspace {
             assureDirExists(dir);
             assureFileExists(file);
 
-            log.info("Generating file " + file.getAbsolutePath() + ".");
+            LOGGER.info("Generating file " + file.getAbsolutePath() + ".");
 
             StringBuilder buffer = new StringBuilder(sourceFile.toString());
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
             writer.write(buffer.toString() + "\n");
-            log.debug("Sourcecode of " + sourceFile.getFileName() + ":\n");
-            log.debug(buffer.toString());
+            LOGGER.debug("Sourcecode of " + sourceFile.getFileName() + ":\n");
+            LOGGER.debug(buffer.toString());
             writer.close();
         }
 
         long timeEnd = (new Date()).getTime();
-        log.info("Generated " + sourceFiles.size() + " source files in " + (timeEnd - timeStart) + " ms.");
+        LOGGER.info("Generated " + sourceFiles.size() + " source files in " + (timeEnd - timeStart) + " ms.");
     }
 
     // ###################################################################
@@ -230,6 +236,9 @@ public class Workspace {
             return sourceFile.getFileName() + ".cpp";
         if (sourceFile instanceof JSSourceFile)
             return sourceFile.getFileName() + ".js";
+        if (sourceFile instanceof PlainTextFile)
+            return String.format("%s.%s", sourceFile.getFileName(), ((PlainTextFile)sourceFile).getExtension());
+
         return sourceFile.getFileName();
     }
 
