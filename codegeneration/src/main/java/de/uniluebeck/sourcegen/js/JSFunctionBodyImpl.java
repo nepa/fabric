@@ -1,4 +1,4 @@
-/** 02.08.2012 20:21 */
+/** 04.11.2012 00:55 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -58,7 +58,7 @@ public class JSFunctionBodyImpl extends JSElementImpl implements JSFunctionBody
   /**
    * Get JavaScript source code of the function body.
    *
-   * @return JSFunctionBody object
+   * @return JavaScript source code
    */
   @Override
   public String getCode()

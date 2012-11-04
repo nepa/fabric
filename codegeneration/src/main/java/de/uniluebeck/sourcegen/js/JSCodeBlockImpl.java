@@ -1,4 +1,4 @@
-/** 02.08.2012 15:07 */
+/** 04.11.2012 00:53 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -58,7 +58,7 @@ public class JSCodeBlockImpl extends JSElementImpl implements JSCodeBlock
   /**
    * Get JavaScript source code of the code block.
    *
-   * @return JSCodeBlock object
+   * @return JavaScript source code
    */
   @Override
   public String getCode()

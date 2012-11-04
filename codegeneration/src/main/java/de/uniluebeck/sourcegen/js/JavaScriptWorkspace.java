@@ -1,4 +1,4 @@
-/** 02.11.2012 23:18 */
+/** 03.11.2012 03:21 */
 package de.uniluebeck.sourcegen.js;
 
 import org.slf4j.Logger;
@@ -112,24 +112,24 @@ public class JavaScriptWorkspace
     boolean success = false;
 
     // Iterate all source files
-    SourceFile sourceFile = null;
+    SourceFile file = null;
     Iterator<SourceFile> iterator = this.sourceFiles.iterator();
     while (iterator.hasNext())
     {
-      sourceFile = iterator.next();
+      file = iterator.next();
 
       // Search JavaScript source files
-      if (sourceFile instanceof JSSourceFile)
+      if (file instanceof JSSourceFile)
       {
-        JSSourceFile jssf = (JSSourceFile)sourceFile;
+        JSSourceFile sourceFile = (JSSourceFile)file;
 
-        if (path.equals(jssf.getPath()) && fileName.equals(jssf.getFileName()))
+        if (path.equals(sourceFile.getPath()) && fileName.equals(sourceFile.getFileName()))
         {
           iterator.remove();
           success = true;
 
           LOGGER.info(String.format("Removed JavaScript source file '%s' from workspace.",
-                  jssf.getFileName()));
+                  sourceFile.getFileName()));
         }
       }
     }

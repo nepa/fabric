@@ -1,4 +1,4 @@
-/** 02.11.2012 23:03 */
+/** 03.11.2012 19:58 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -93,6 +93,17 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   }
 
   /**
+   * Get path of the JavaScript source file.
+   *
+   * @return Path of source file
+   */
+  @Override
+  public String getPath()
+  {
+    return this.path;
+  }
+
+  /**
    * Set name of the JavaScript source file.
    *
    * @param fileName Desired name for source file
@@ -105,17 +116,6 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
     this.fileName = fileName;
 
     return this;
-  }
-
-  /**
-   * Get path of the JavaScript source file.
-   *
-   * @return Path of source file
-   */
-  @Override
-  public String getPath()
-  {
-    return this.path;
   }
 
   /**
