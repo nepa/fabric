@@ -1,4 +1,4 @@
-/** 03.08.2012 01:14 */
+/** 04.11.2012 06:05 */
 package de.uniluebeck.sourcegen.js;
 
 import org.junit.Test;
@@ -166,7 +166,7 @@ public class JSSourceFileTest
 
     // Equality
     assertTrue("Source files must be equal.", firstFile.equals(secondFile));
-    assertTrue("Source file must be equal to itselt.", firstFile.equals(firstFile));
+    assertTrue("Source file must be equal to itself.", firstFile.equals(firstFile));
 
     // Unequality
     secondFile.setFileName("bar");
