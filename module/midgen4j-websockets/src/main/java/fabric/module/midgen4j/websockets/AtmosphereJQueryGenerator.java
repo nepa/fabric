@@ -1,4 +1,4 @@
-/** 29.10.2012 20:07 */
+/** 12.11.2012 04:14 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -75,7 +75,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   public void executeBeforeProcessing() throws Exception
   {
     JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
-            this.packageNameToPath("some.test.folder"), "application"); // TODO: Use property to set path and application file name
+            this.packageNameToPath(this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY)),
+            this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY));
 
     // Add code before fields
     jssf.getCodeBeforeFields().setCode("\'use strict\';");
@@ -130,7 +131,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   public void processPortTypes(final HashSet<FPortType> portTypes) throws Exception
   {
     JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
-            this.packageNameToPath("some.test.folder"), "application"); // TODO: Use property to set application file name
+            this.packageNameToPath(this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY)),
+            this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY));
 
     // Process all service operations
     for (FPortType portType: portTypes)
@@ -147,7 +149,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
         // Set method body
         String methodBody = String.format(
                 "if (dispatcher != undefined) {\n" +
-                "\tdispatcher.trackedCall(\'%s\', JSON.stringify(%s),\n" + // TODO: Send null or empty string, if no input at all?
+                "\tdispatcher.trackedCall(\'%s\', JSON.stringify(%s),\n" +
                 "\t\tfunction(response) {\n" +
                 "\t\t\tconsole.log('Got response to %s() request: ' + JSON.parse(response).result);\n" +
                 "\t\t});\n" +
@@ -339,12 +341,22 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "\t}\n" +
 
             "});",
-            "channelName", "websocket", "streaming"); // TODO: Add real arguments
+            this.properties.getProperty(MidGen4JWebSocketsModule.CHANNEL_NAME_KEY),
+            this.properties.getProperty(MidGen4JWebSocketsModule.TRANSPORT_KEY),
+            this.properties.getProperty(MidGen4JWebSocketsModule.FALLBACK_TRANSPORT_KEY));
 
     return codeBlock;
   }
 
-  // TODO: Add comment
+  /**
+   * Private helper method to convert a Java package name to
+   * a relative path that can be used in a file system (i.e.
+   * replace all dots with platform-specific separators).
+   *
+   * @param javaPackageName Java package name
+   *
+   * @return File path equivalent to Java package name
+   */
   private String packageNameToPath(final String javaPackageName)
   {
     return javaPackageName.replace('.', File.separatorChar);
