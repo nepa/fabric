@@ -287,6 +287,23 @@ public class Workspace {
                 projectDirString += path;
             }
         }
+        // Create folders for path of plain text file
+        else if (sourceFile instanceof PlainTextFile) {
+            PlainTextFile ptf = (PlainTextFile)sourceFile;
+            projectDirString = assureTrailingSeparator(projectDirString);
+
+            if (null == ptf.getPath()) {
+                throw new Exception(String.format("Path is 'null' for plain text file '%s.%s'. " +
+                        "Maybe you did not set it correctly in your module?", ptf.getFileName(), ptf.getExtension()));
+            }
+            else {
+                // Replace UNIX and Windows separators
+                String path = ptf.getPath().replace('/', File.separatorChar);
+                path = path.replace('\\', File.separatorChar);
+
+                projectDirString += path;
+            }
+        }
 
         projectDirString = assureTrailingSeparator(projectDirString);
         return projectDirString;
