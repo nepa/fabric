@@ -63,7 +63,7 @@ public class FabricDotGraphModule implements FModuleBase {
     }
 
     @Override
-    public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception {
+    public ArrayList<FItemHandlerBase> getHandlers(final Workspace workspace) throws Exception {
         ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
         handlers.add(new FabricDotGraphHandler(workspace, this.properties));
 

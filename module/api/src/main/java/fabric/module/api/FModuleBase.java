@@ -63,5 +63,5 @@ public interface FModuleBase {
      * 
      * @throws Exception Error during handler instantiation
      */
-    public abstract ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception;
+    public abstract ArrayList<FItemHandlerBase> getHandlers(final Workspace workspace) throws Exception;
 }

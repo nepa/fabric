@@ -1,4 +1,4 @@
-/** 18.09.2012 01:35 */
+/** 14.11.2012 18:46 */
 package fabric.module.exi;
 
 import java.util.ArrayList;
@@ -122,7 +122,7 @@ public class FabricEXIModule implements FModuleBase
    * @throws Exception Error during handler instantiation
    */
   @Override
-  public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
+  public ArrayList<FItemHandlerBase> getHandlers(final Workspace workspace) throws Exception
   {
     this.validateProperties();
 

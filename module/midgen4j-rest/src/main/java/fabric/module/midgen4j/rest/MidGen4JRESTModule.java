@@ -1,4 +1,4 @@
-/** 12.10.2012 03:02 */
+/** 14.11.2012 18:44 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -125,7 +125,7 @@ public class MidGen4JRESTModule implements FModuleBase
    * @throws Exception Error during handler instantiation
    */
   @Override
-  public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
+  public ArrayList<FItemHandlerBase> getHandlers(final Workspace workspace) throws Exception
   {
     this.validateProperties();
 
