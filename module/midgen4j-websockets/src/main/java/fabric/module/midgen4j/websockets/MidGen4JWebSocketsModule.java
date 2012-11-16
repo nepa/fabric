@@ -1,4 +1,4 @@
-/** 12.11.2012 03:23 */
+/** 14.11.2012 18:44 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -44,6 +44,15 @@ public class MidGen4JWebSocketsModule implements FModuleBase
 
   /** Alternative key for package name */
   public static final String PACKAGE_NAME_ALT_KEY = "midgen4j.package_name";
+
+  /** Key for path to project in properties object */
+  public static final String PROJECT_PATH_KEY = "midgen4j.websockets.project_path"; // TODO: Add to wiki
+
+  /** Key for Maven group id of project in properties object */
+  public static final String MAVEN_GROUP_ID_KEY = "midgen4j.websockets.maven_group_id"; // TODO: Add to wiki
+
+  /** Key for Maven artifact id of project in properties object */
+  public static final String MAVEN_ARTIFACT_ID_KEY = "midgen4j.websockets.maven_artifact_id"; // TODO: Add to wiki
 
   /** Key for JavaScript application name in properties object */
   public static final String JS_APPLICATION_NAME_KEY = "midgen4j.websockets.js_application_name";
@@ -102,9 +111,10 @@ public class MidGen4JWebSocketsModule implements FModuleBase
   public String getDescription()
   {
     return String.format("MidGen4J extension to create WebSockets interface. " +
-            "Valid options are '%s', '%s', '%s', '%s', '%s', '%s', '%s' and '%s'. " +
+            "Valid options are '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' and '%s'. " +
             "Alternatively '%s', '%s' and '%s' can be used.",
             INTERFACE_CLASS_NAME_KEY, PACKAGE_NAME_KEY, JS_APPLICATION_NAME_KEY,
+            PROJECT_PATH_KEY, MAVEN_GROUP_ID_KEY, MAVEN_ARTIFACT_ID_KEY,
             CHANNEL_NAME_KEY, TRANSPORT_KEY, FALLBACK_TRANSPORT_KEY,
             SERVICE_PROVIDER_CLASS_NAME_KEY, SERVICE_PROVIDER_PACKAGE_NAME_KEY,
             PACKAGE_NAME_ALT_KEY, SERVICE_PROVIDER_CLASS_NAME_ALT_KEY,
@@ -127,11 +137,12 @@ public class MidGen4JWebSocketsModule implements FModuleBase
    * @throws Exception Error during handler instantiation
    */
   @Override
-  public ArrayList<FItemHandlerBase> getHandlers(Workspace workspace) throws Exception
+  public ArrayList<FItemHandlerBase> getHandlers(final Workspace workspace) throws Exception
   {
     this.validateProperties();
 
     ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
+    handlers.add(new ProjectFileGenerator(workspace, this.properties));
     handlers.add(new AtmosphereJQueryGenerator(workspace, this.properties));
     handlers.add(new JSONMarshallerGenerator(workspace, this.properties));
 
@@ -162,6 +173,9 @@ public class MidGen4JWebSocketsModule implements FModuleBase
     // Check properties
     this.checkInterfaceClassName();
     this.checkPackageName();
+    this.checkProjectPath();
+    this.checkMavenGroupId();
+    this.checkMavenArtifactId();
     this.checkJSApplicationName();
     this.checkChannelName();
     this.checkTransport();
@@ -258,6 +272,24 @@ public class MidGen4JWebSocketsModule implements FModuleBase
     {
       this.properties.setProperty(PACKAGE_NAME_KEY, packageName.toLowerCase());
     }
+  }
+
+  // TODO: Add comment
+  private void checkProjectPath()
+  {
+
+  }
+
+  // TODO: Add comment
+  private void checkMavenGroupId()
+  {
+
+  }
+
+  // TODO: Add comment
+  private void checkMavenArtifactId()
+  {
+
   }
 
   /**
