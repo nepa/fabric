@@ -1,4 +1,4 @@
-/** 15.11.2012 23:06 */
+/** 18.11.2012 03:00 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -42,6 +42,9 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
   /** Path for files of the WebSockets project */
   private String projectPath;
 
+  /** Name of broadcast channel */
+  private String channelName;
+
   /**
    * Constructor initializes the ProjectFileGenerator, which
    * can create various files for an independent WebSockets
@@ -58,6 +61,7 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
     // Extract global properties
     this.projectName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.projectPath = this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY);
+    this.channelName = this.properties.getProperty(MidGen4JWebSocketsModule.CHANNEL_NAME_KEY);
   }
 
   /**
@@ -272,7 +276,7 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "    <url-pattern>/%s/*</url-pattern>\n" +
 "  </servlet-mapping>\n" +
 "</web-app>",
-            this.projectName, this.projectName);
+            this.projectName, this.channelName);
 
     textFile.getContent().setCode(fileContent);
 

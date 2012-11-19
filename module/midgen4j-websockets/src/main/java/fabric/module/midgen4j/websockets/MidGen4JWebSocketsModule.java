@@ -1,9 +1,10 @@
-/** 14.11.2012 18:44 */
+/** 19.11.2012 17:20 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -46,13 +47,13 @@ public class MidGen4JWebSocketsModule implements FModuleBase
   public static final String PACKAGE_NAME_ALT_KEY = "midgen4j.package_name";
 
   /** Key for path to project in properties object */
-  public static final String PROJECT_PATH_KEY = "midgen4j.websockets.project_path"; // TODO: Add to wiki
+  public static final String PROJECT_PATH_KEY = "midgen4j.websockets.project_path";
 
   /** Key for Maven group id of project in properties object */
-  public static final String MAVEN_GROUP_ID_KEY = "midgen4j.websockets.maven_group_id"; // TODO: Add to wiki
+  public static final String MAVEN_GROUP_ID_KEY = "midgen4j.websockets.maven_group_id";
 
   /** Key for Maven artifact id of project in properties object */
-  public static final String MAVEN_ARTIFACT_ID_KEY = "midgen4j.websockets.maven_artifact_id"; // TODO: Add to wiki
+  public static final String MAVEN_ARTIFACT_ID_KEY = "midgen4j.websockets.maven_artifact_id";
 
   /** Key for JavaScript application name in properties object */
   public static final String JS_APPLICATION_NAME_KEY = "midgen4j.websockets.js_application_name";
@@ -244,11 +245,11 @@ public class MidGen4JWebSocketsModule implements FModuleBase
   /**
    * Check parameter for the WebSockets interface class name. This property
    * is optional. However, it is strongly recommended to provide a value,
-   * because otherwise "WebSocketInterface" is used as default.
+   * because otherwise "WebSocketsInterface" is used as default.
    */
   private void checkInterfaceClassName()
   {
-    String className = this.properties.getProperty(INTERFACE_CLASS_NAME_KEY, "WebSocketInterface");
+    String className = this.properties.getProperty(INTERFACE_CLASS_NAME_KEY, "WebSocketsInterface");
 
     // Capitalize first letter of class name
     if (null != className)
@@ -274,22 +275,64 @@ public class MidGen4JWebSocketsModule implements FModuleBase
     }
   }
 
-  // TODO: Add comment
+  /**
+   * Check parameter for desired path of generated project. This
+   * property is optional. However, it is strongly recommended
+   * to provide a value, because otherwise "websockets-project"
+   * is used as default.
+   */
   private void checkProjectPath()
   {
+    String projectPath = this.properties.getProperty(PROJECT_PATH_KEY, "websockets-project");
 
+    // Replace UNIX and Windows separators
+    if (null != projectPath)
+    {
+      projectPath = projectPath.replace('/', File.separatorChar);
+      projectPath = projectPath.replace('\\', File.separatorChar);
+
+      this.properties.setProperty(PROJECT_PATH_KEY, projectPath);
+    }
   }
 
-  // TODO: Add comment
+  /**
+   * Check parameter for the Maven group id. This property is optional.
+   * However, it is strongly recommended to provide a value, because
+   * otherwise "de.nptech.fabric" is used as default.
+   *
+   * Also see:
+   *   http://maven.apache.org/pom.html#Maven_Coordinates
+   */
   private void checkMavenGroupId()
   {
+    String groupId = this.properties.getProperty(MAVEN_GROUP_ID_KEY, "de.nptech.fabric");
 
+    // Convert group id to lower case
+    if (null != groupId)
+    {
+      this.properties.setProperty(MAVEN_GROUP_ID_KEY, groupId.toLowerCase());
+    }
   }
 
-  // TODO: Add comment
+  /**
+   * Check parameter for the Maven artifact id. This property is
+   * optional. However, it is strongly recommended to provide a
+   * value, because otherwise "WebSocketsInterface" is used as
+   * default.
+   *
+   * Also see:
+   *   http://maven.apache.org/pom.html#Maven_Coordinates
+   */
   private void checkMavenArtifactId()
   {
+    String artifactId = this.properties.getProperty(MAVEN_ARTIFACT_ID_KEY, "WebSocketsInterface");
 
+    // Capitalize first letter of artifact id
+    if (null != artifactId)
+    {
+      this.properties.setProperty(MAVEN_ARTIFACT_ID_KEY,
+              artifactId.substring(0, 1).toUpperCase() + artifactId.substring(1, artifactId.length()));
+    }
   }
 
   /**
