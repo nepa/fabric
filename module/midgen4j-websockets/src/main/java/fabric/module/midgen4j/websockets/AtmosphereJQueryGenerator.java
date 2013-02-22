@@ -1,4 +1,4 @@
-/** 16.11.2012 00:41 */
+/** 22.02.2013 18:47 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   private static final Logger LOGGER = LoggerFactory.getLogger(AtmosphereJQueryGenerator.class);
 
   /** Name of the WebSockets test client in HTML file */
-  public static final String TEST_CLIENT_NAME = "MidGen4J-WebSockets Test Client";
+  public static final String TEST_CLIENT_NAME = "WebSockets Test Client";
 
   /** Workspace object for code write-out */
   private Workspace workspace;
@@ -121,6 +121,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     JSFunction sendMessage = JSFunction.factory.create("sendMessage", "message");
     sendMessage.setComment(new JSCommentImpl("Send untracked message to server."));
     methodBody =
+            "logMessage(\'Now sending untracked message \\'\' + message + \'\\'.\');\n\n" +
             "// This bypasses the tracking mechanism!\n" +
             "subSocket.push(message);";
     sendMessage.getBody().setCode(methodBody);
@@ -145,6 +146,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   public void executeAfterProcessing() throws Exception
   {
     // Create test client with RPC controls
+    this.createButtonsStyleSheet();
     this.createTestClient(this.operations);
 
     // Create JavaScript code with RPC methods
@@ -256,19 +258,19 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "var uuid = new GUID().create();\n\n" +
             "// Add call to pending messages\n" +
             "this.pendingMessages[uuid] = callback;\n\n" +
-            "console.log(\'Now tracking call of method \' + method + \' with GUID \' + uuid + \'.\');\n\n" +
+            "logMessage(\'Now tracking call of method \\'\' + method + \'()\\' with GUID \\'\' + uuid + \'\\'.\');\n\n" +
             "this.socket.push(uuid + this.delimiter + method + this.delimiter + payload);";
     trackedCall.getBody().setCode(methodBody);
     dispatcherClass.add(trackedCall);
 
     // Add method to dispatch response messages
     JSMethod dispatch = JSMethod.factory.create("dispatch", "response");
-    dispatch.setComment(new JSCommentImpl("Dispatch response to a tracked message."));
+    dispatch.setComment(new JSCommentImpl("Dispatch response of a tracked message."));
     methodBody =
             "var data = response.split(this.delimiter);\n\n" +
 
             "if (data.length != 3) {\n" +
-            "\tconsole.log(\'Invalid response format.\');\n" +
+            "\tlogMessage(\'Invalid message format. This is not an RPC response.\');\n" +
             "}\n" +
             "else {\n" +
             "\tvar uuid = data[0];\n" +
@@ -277,12 +279,12 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 
             "\t// UUID lookup\n" +
             "\tif (!(uuid in this.pendingMessages)) {\n" +
-            "\t\tconsole.log(\'Response with untracked message ID.\');\n" +
+            "\t\tlogMessage(\'Response with untracked message ID.\');\n" +
             "\t}\n" +
             "\telse {\n" +
             "\t\t// Pass payload to registered callback\n" +
             "\t\tif (this.pendingMessages[uuid] != undefined && typeof this.pendingMessages[uuid] == 'function') {\n" +
-            "\t\t\tconsole.log(\'Now dispatching result of method \' + method + \' with UUID \' + uuid + \'.\');\n\n" +
+            "\t\t\tlogMessage(\'Now dispatching result of method \\'\' + method + \'()\\' with UUID \\'\' + uuid + \'\\'.\');\n\n" +
 
             "\t\t\t// Execute callback method\n" +
             "\t\t\tthis.pendingMessages[uuid](payload);\n\n" +
@@ -291,7 +293,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "\t\t\tdelete this.pendingMessages[uuid];\n" +
             "\t\t}\n" +
             "\t\telse {\n" +
-            "\t\t\tconsole.log(\'Could not execute callback.\');\n" +
+            "\t\t\tlogMessage(\'Could not execute callback.\');\n" +
             "\t\t}\n" +
             "\t}\n" +
             "}";
@@ -335,20 +337,20 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "\trequest.headers = { \'Access-Control-Allow-Origin\': \'*\' };\n\n" + // TODO: Do we really need this?
 
             "\trequest.onOpen = function(response) {\n" +
-            "\t\tconsole.log(\'Connection opened.\');\n" +
+            "\t\tlogMessage(\'Connection opened.\');\n" +
             "\t}\n\n" +
 
             "\trequest.onClose = function(response) {\n" +
-            "\t\tconsole.log(\'Connection closed.\');\n" +
+            "\t\tlogMessage(\'Connection closed.\');\n" +
             "\t}\n\n" +
 
             "\trequest.onTransportFailure = function(request) {\n" +
-            "\t\tconsole.log(\'This browser or the remote server does not support WebSockets.\');\n" +
+            "\t\tlogMessage(\'This browser or the remote server does not support WebSockets.\');\n" +
             "\t}\n\n" +
 
             "\trequest.onMessage = function(response) {\n" +
             "\t\tvar message = response.responseBody;\n\n" +
-            "\t\tconsole.log(\'Message received: \' + message);\n" +
+            "\t\tlogMessage(\'Message received: \\'\' + message + \'\\'\');\n" +
             "\t\tdispatcher.dispatch(message);\n" +
             "\t}\n" +
 
@@ -358,6 +360,308 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             this.properties.getProperty(MidGen4JWebSocketsModule.FALLBACK_TRANSPORT_KEY));
 
     return codeBlock;
+  }
+
+  /**
+   * Create a CSS file that is used to style control buttons in
+   * the test client, which is generated by createTestClient().
+   */
+  private void createButtonsStyleSheet()
+  {
+    PlainTextFile textFile = this.workspace.getPlainText().getPlainTextFile(
+            this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp",
+            "buttons", "css");
+
+    // Create file content
+    String fileContent =
+"/**\n" +
+" * Button definition.\n" +
+" */\n" +
+".button\n" +
+"{\n" +
+"  display: inline-block;\n\n" +
+
+"  /* IE7 hack for display: inline-block */\n" +
+"  zoom: 1;\n" +
+"  *display: inline; /* The asterisk is intended! */\n" +
+"  /* Hack end */\n\n" +
+
+"  margin: 0 2px;\n" +
+"  padding: 0.5em 2em 0.55em;\n\n" +
+
+"  vertical-align: baseline;\n" +
+"  outline: none;\n\n" +
+
+"  font-family: Helvetica, Arial, sans-serif;\n" +
+"  font-size: 14px;\n" +
+"  text-align: center;\n" +
+"  text-decoration: none;\n" +
+"  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);\n\n" +
+
+"  cursor: pointer;\n\n" +
+
+"  -moz-border-radius: 0.5em;\n" +
+"  -webkit-border-radius: 0.5em;\n" +
+"  -khtml-border-radius: 0.5em;\n" +
+"  border-radius: 0.5em;\n\n" +
+
+"  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n" +
+"  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n" +
+"  -khtml-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n" +
+"  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n" +
+"}\n\n" +
+
+".button:hover\n" +
+"{\n" +
+"  text-decoration: none;\n" +
+"}\n\n" +
+
+".button:active\n" +
+"{\n" +
+"  position: relative;\n" +
+"  top: 1px;\n" +
+"}\n\n\n" +
+
+
+"/**\n" +
+" * Button forms and sizes.\n" +
+" */\n" +
+".bigrounded\n" +
+"{\n" +
+"  -moz-border-radius: 2em;\n" +
+"  -webkit-border-radius: 2em;\n" +
+"  -khtml-border-radius: 2em;\n" +
+"  border-radius: 2em;\n" +
+"}\n\n" +
+
+".medium\n" +
+"{\n" +
+"  padding: 0.4em 1.5em 0.42em;\n" +
+"  font-size: 12px;\n" +
+"}\n\n" +
+
+".small\n" +
+"{\n" +
+"  padding: 0.2em 1em 0.275em;\n" +
+"  font-size: 11px;\n" +
+"}\n\n\n" +
+
+
+"/**\n" +
+" * Button color styles.\n" +
+" */\n\n" +
+
+"/**\n" +
+" * Black button.\n" +
+" */\n" +
+".black\n" +
+"{\n" +
+"  color: #D7D7D7;\n" +
+"  border: 1px solid #333333;\n" +
+"  background-color: #333333;\n" +
+"  background: -moz-linear-gradient(top, #666666, #000000);\n" +
+"  background: -webkit-linear-gradient(top, #666666, #000000);\n" +
+"  background: -khtml-linear-gradient(top, #666666, #000000);\n" +
+"  background: linear-gradient(top, #666666, #000000);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#666666', endColorstr='#000000');\n" +
+"}\n\n" +
+
+".black:hover\n" +
+"{\n" +
+"  background-color: #000000;\n" +
+"  background: -moz-linear-gradient(top, #444444, #000000);\n" +
+"  background: -webkit-linear-gradient(top, #444444, #000000);\n" +
+"  background: -khtml-linear-gradient(top, #444444, #000000);\n" +
+"  background: linear-gradient(top, #444444, #000000);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#444444', endColorstr='#000000');\n" +
+"}\n\n" +
+
+".black:active\n" +
+"{\n" +
+"  color: #666666;\n" +
+"  background: -moz-linear-gradient(top, #000000, #444444);\n" +
+"  background: -webkit-linear-gradient(top, #000000, #444444);\n" +
+"  background: -khtml-linear-gradient(top, #000000, #444444);\n" +
+"  background: linear-gradient(top, #000000, #444444);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#444444');\n" +
+"}\n\n" +
+
+"/**\n" +
+" * Gray button.\n" +
+" */\n" +
+".gray\n" +
+"{\n" +
+"  color: #E9E9E9;\n" +
+"  border: 1px solid #555555;\n" +
+"  background-color: #6E6E6E;\n" +
+"  background: -moz-linear-gradient(top, #888888, #575757);\n" +
+"  background: -webkit-linear-gradient(top, #888888, #575757);\n" +
+"  background: -khtml-linear-gradient(top, #888888, #575757);\n" +
+"  background: linear-gradient(top, #888888, #575757);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#888888', endColorstr='#575757');\n" +
+"}\n\n" +
+
+".gray:hover\n" +
+"{\n" +
+"  background-color: #616161;\n" +
+"  background: -moz-linear-gradient(top, #757575, #4B4B4B);\n" +
+"  background: -webkit-linear-gradient(top, #757575, #4B4B4B);\n" +
+"  background: -khtml-linear-gradient(top, #757575, #4B4B4B);\n" +
+"  background: linear-gradient(top, #757575, #4B4B4B);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#757575', endColorstr='#4B4B4B');\n" +
+"}\n\n" +
+
+".gray:active\n" +
+"{\n" +
+"  color: #AFAFAF;\n" +
+"  background: -moz-linear-gradient(top, #575757, #888888);\n" +
+"  background: -webkit-linear-gradient(top, #575757, #888888);\n" +
+"  background: -khtml-linear-gradient(top, #575757, #888888);\n" +
+"  background: linear-gradient(top, #575757, #888888);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#575757', endColorstr='#888888');\n" +
+"}\n\n" +
+
+"/**\n" +
+" * White button.\n" +
+" */\n" +
+".white\n" +
+"{\n" +
+"  color: #606060;\n" +
+"  border: 1px solid #B7B7B7;\n" +
+"  background-color: #FFFFFF;\n" +
+"  background: -moz-linear-gradient(top, #FFFFFF, #EDEDED);\n" +
+"  background: -webkit-linear-gradient(top, #FFFFFF, #EDEDED);\n" +
+"  background: -khtml-linear-gradient(top, #FFFFFF, #EDEDED);\n" +
+"  background: linear-gradient(top, #FFFFFF, #EDEDED);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#EDEDED');\n" +
+"}\n\n" +
+
+".white:hover\n" +
+"{\n" +
+"  background-color: #EDEDED;\n" +
+"  background: -moz-linear-gradient(top, #FFFFFF, #DCDCDC);\n" +
+"  background: -webkit-linear-gradient(top, #FFFFFF, #DCDCDC);\n" +
+"  background: -khtml-linear-gradient(top, #FFFFFF, #DCDCDC);\n" +
+"  background: linear-gradient(top, #FFFFFF, #DCDCDC);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#DCDCDC');\n" +
+"}\n\n" +
+
+".white:active\n" +
+"{\n" +
+"  color: #999999;\n" +
+"  background: -moz-linear-gradient(top, #EDEDED, #FFFFFF);\n" +
+"  background: -webkit-linear-gradient(top, #EDEDED, #FFFFFF);\n" +
+"  background: -khtml-linear-gradient(top, #EDEDED, #FFFFFF);\n" +
+"  background: linear-gradient(top, #EDEDED, #FFFFFF);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#EDEDED', endColorstr='#FFFFFF');\n" +
+"}\n\n" +
+
+"/**\n" +
+" * Orange button.\n" +
+" */\n" +
+".orange\n" +
+"{\n" +
+"  color: #FEF4E9;\n" +
+"  border: 1px solid #DA7C0C;\n" +
+"  background-color: #F78D1D;\n" +
+"  background: -moz-linear-gradient(top, #FAA51A, #F47A20);\n" +
+"  background: -webkit-linear-gradient(top, #FAA51A, #F47A20);\n" +
+"  background: -khtml-linear-gradient(top, #FAA51A, #F47A20);\n" +
+"  background: linear-gradient(top, #FAA51A, #F47A20);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FAA51A', endColorstr='#F47A20');\n" +
+"}\n\n" +
+
+".orange:hover\n" +
+"{\n" +
+"  background-color: #F47C20;\n" +
+"  background: -moz-linear-gradient(top, #F88E11, #F06015);\n" +
+"  background: -webkit-linear-gradient(top, #F88E11, #F06015);\n" +
+"  background: -khtml-linear-gradient(top, #F88E11, #F06015);\n" +
+"  background: linear-gradient(top, #F88E11, #F06015);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F88E11', endColorstr='#F06015');\n" +
+"}\n\n" +
+
+".orange:active\n" +
+"{\n" +
+"  color: #FCD3A5;\n" +
+"  background: -moz-linear-gradient(top, #F47A20, #FAA51A);\n" +
+"  background: -webkit-linear-gradient(top, #F47A20, #FAA51A);\n" +
+"  background: -khtml-linear-gradient(top, #F47A20, #FAA51A);\n" +
+"  background: linear-gradient(top, #F47A20, #FAA51A);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F47A20', endColorstr='#FAA51A');\n" +
+"}\n\n" +
+
+"/**\n" +
+" * Red button.\n" +
+" */\n" +
+".red\n" +
+"{\n" +
+"  color: #FADDDE;\n" +
+"  border: 1px solid #980C10;\n" +
+"  background-color: #D81B21;\n" +
+"  background: -moz-linear-gradient(top, #ED1C24, #AA1317);\n" +
+"  background: -webkit-linear-gradient(top, #ED1C24, #AA1317);\n" +
+"  background: -khtml-linear-gradient(top, #ED1C24, #AA1317);\n" +
+"  background: linear-gradient(top, #ED1C24, #AA1317);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ED1C24', endColorstr='#AA1317');\n" +
+"}\n\n" +
+
+".red:hover\n" +
+"{\n" +
+"  background-color: #B61318;\n" +
+"  background: -moz-linear-gradient(top, #C9151B, #A11115);\n" +
+"  background: -webkit-linear-gradient(top, #C9151B, #A11115);\n" +
+"  background: -khtml-linear-gradient(top, #C9151B, #A11115);\n" +
+"  background: linear-gradient(top, #C9151B, #A11115);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#C9151B', endColorstr='#A11115');\n" +
+"}\n\n" +
+
+".red:active\n" +
+"{\n" +
+"  color: #DE898C;\n" +
+"  background: -moz-linear-gradient(top, #AA1317, #ED1C24);\n" +
+"  background: -webkit-linear-gradient(top, #AA1317, #ED1C24);\n" +
+"  background: -khtml-linear-gradient(top, #AA1317, #ED1C24);\n" +
+"  background: linear-gradient(top, #AA1317, #ED1C24);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#AA1317', endColorstr='#ED1C24');\n" +
+"}\n\n" +
+
+"/**\n" +
+" * Green button.\n" +
+" */\n" +
+".green\n" +
+"{\n" +
+"  color: #E8F0DE;\n" +
+"  border: 1px solid #538312;\n" +
+"  background-color: #64991E;\n" +
+"  background: -moz-linear-gradient(top, #7DB72F, #4E7D0E);\n" +
+"  background: -webkit-linear-gradient(top, #7DB72F, #4E7D0E);\n" +
+"  background: -khtml-linear-gradient(top, #7DB72F, #4E7D0E);\n" +
+"  background: linear-gradient(top, #7DB72F, #4E7D0E);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#7DB72F', endColorstr='#4E7D0E');\n" +
+"}\n\n" +
+
+".green:hover\n" +
+"{\n" +
+"  background-color: #538018;\n" +
+"  background: -moz-linear-gradient(top, #6B9D28, #436B0C);\n" +
+"  background: -webkit-linear-gradient(top, #6B9D28, #436B0C);\n" +
+"  background: -khtml-linear-gradient(top, #6B9D28, #436B0C);\n" +
+"  background: linear-gradient(top, #6B9D28, #436B0C);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6B9D28', endColorstr='#436B0C');\n" +
+"}\n\n" +
+
+".green:active\n" +
+"{\n" +
+"  color: #A9C08C;\n" +
+"  background: -moz-linear-gradient(top, #4E7D0E, #7DB72F);\n" +
+"  background: -webkit-linear-gradient(top, #4E7D0E, #7DB72F);\n" +
+"  background: -khtml-linear-gradient(top, #4E7D0E, #7DB72F);\n" +
+"  background: linear-gradient(top, #4E7D0E, #7DB72F);\n" +
+"  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4E7D0E', endColorstr='#7DB72F');\n" +
+"}";
+
+    textFile.getContent().setCode(fileContent);
   }
 
   /**
@@ -374,13 +678,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "index", "html");
 
     // Create controls to call RPC methods
-    String rpcControls = "";
-    for (FOperation operation: operations)
-    {
-      rpcControls += String.format(
-              "  <h3 class=\"control\" onClick=\"%s();\">Call %s()</h3>\n",
-              operation.getOperationName(), operation.getOperationName());
-    }
+    String rpcControls = this.createRpcControls(operations);
 
     // Create file content
     String fileContent = String.format(
@@ -394,12 +692,60 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 
 "  <script type=\"text/javascript\" src=\"./jquery/jquery-1.7.2.js\"></script>\n" +
 "  <script type=\"text/javascript\" src=\"./jquery/jquery.atmosphere.js\"></script>\n" +
-"  <script type=\"text/javascript\" src=\"./application.js\"></script>\n\n" +
+"  <script type=\"text/javascript\" src=\"./%s.js\"></script>\n" +
+"  <script type=\"text/javascript\" src=\"./logger.js\"></script>\n\n" +
+
+"  <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"./buttons.css\" />\n\n" +
 
 "  <style type=\"text/css\">\n" +
-"    h3.control\n" +
+"    body\n" +
 "    {\n" +
-"      cursor: pointer;\n" +
+"      font-family: 'Lucida Grande', 'Bitstream Vera Sans', 'Trebuchet MS', Verdana, Arial, sans-serif;\n" +
+"      color: #FF9900;\n" +
+"      text-shadow: 2px 2px 2px #555555;\n" +
+"      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADSCAIAAAAE3T1fAAAAA3NCSVQIC" +
+            "Ajb4U/gAAAACXBIWXMAAA2sAAANrAHvBsZHAAAAJXRFWHRTb2Z0d2FyZQBNYWNyb21lZGlhIEZpcmV3b3JrcyBNWCAyMDA0h3" +
+            "aszwAAAGFJREFUeJzdkUsKgDAMRF8GmgvlLF6g1/RwuqgFrdYP7hoY8oPJDIEm3F1PSCn1dgDknBURigiWeRIgMGEIVHqr2coO" +
+            "u67/zA53tozudXzW03AO5bHDOYLH/f9OnPWvr7ECMg8IAMa/iuoAAAAASUVORK5CYII%%3D');\n" + // %% will escape %
+"      background-repeat: repeat-x;\n" +
+"    }\n\n" +
+
+"    h1\n" +
+"    {\n" +
+"      margin: 0;\n" +
+"      margin-top: 30px;\n" +
+"      margin-bottom: 10px;\n" +
+"      padding: 0;\n" +
+"      font-size: 48px;\n" +
+"      text-align: center;\n" +
+"    }\n\n" +
+
+"    div.controls\n" +
+"    {\n" +
+"      margin: 10px auto;\n" +
+"    }\n\n" +
+
+"    div.buttonRow\n" +
+"    {\n" +
+"      margin-bottom: 10px;\n" +
+"      padding: 3px;\n\n" +
+
+"      text-align: center;\n" +
+"    }\n\n" +
+
+"    textarea#console\n" +
+"    {\n" +
+"      display: block;\n" +
+"      margin: 0 auto;\n" +
+"      padding: 5px;\n\n" +
+
+"      font-family: monospace;\n" +
+"      font-size: 12px;\n" +
+"      font-weight: bold;\n" +
+"      color: #00FF00;\n\n" +
+
+"      background-color: #000000;\n" +
+"      border: 5px ridge #CCCCCC;\n" +
 "    }\n" +
 "  </style>\n" +
 "</head>\n\n" +
@@ -407,16 +753,63 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 "<body>\n" +
 "  <h1>%s</h1>\n\n" +
 
-"  <h3 class=\"control\" onClick=\"openConnection();\">Open connection</h3>\n" +
-"  <h3 class=\"control\" onClick=\"sendMessage('Hello World!');\">Send untracked message</h3>\n" +
+"  <textarea id=\"console\" cols=\"102\" rows=\"20\" readonly=\"readonly\"></textarea>\n\n" +
+
+"  <div class=\"controls\">\n" +
+"    <div class=\"buttonRow\">\n" +
+"      <span class=\"button medium green\" onClick=\"openConnection();\">Open connection</span>\n" +
+"      <span class=\"button medium orange\" onClick=\"sendMessage(window.prompt('Enter desired message:', 'uuid$method$payload'));\">Send message</span>\n" +
+"      <span class=\"button medium gray\" onClick=\"document.getElementById('console').value = '';\">Clear console</span>\n" +
+"      <span class=\"button medium red\" onClick=\"closeConnection();\">Close connection</span>\n" +
+"    </div>\n" +
 "%s" +
-"  <h3 class=\"control\" onClick=\"closeConnection();\">Close connection</h3>\n" +
+"  </div>\n" +
 "</body>\n\n" +
 
 "</html>",
-            TEST_CLIENT_NAME, TEST_CLIENT_NAME, rpcControls);
+            TEST_CLIENT_NAME, this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY),
+            TEST_CLIENT_NAME, rpcControls);
 
     textFile.getContent().setCode(fileContent);
+  }
+
+  /**
+   * Private helper method to create a single string that contains
+   * controls to call all RPC methods of the service. The controls
+   * are grouped in rows of four buttons each.
+   *
+   * @param operations Service operations that need controls
+   */
+  private String createRpcControls(final Set<FOperation> operations)
+  {
+    String result = "";
+    int i = 0;
+
+    // Iterate all service operations
+    for (FOperation operation: operations)
+    {
+      // Begin of row
+      if (i % 4 == 0)
+      {
+        result += "\n";
+        result += "    <div class=\"buttonRow\">\n";
+      }
+
+      // Controls in current row
+      result += String.format(
+              "      <span class=\"button medium black\" onClick=\"%s();\">Call %s()</span>\n",
+              operation.getOperationName(), operation.getOperationName());
+
+      // End of current row or end of last row
+      if (i % 4 == 3 || i == operations.size() - 1)
+      {
+        result += "    </div>\n";
+      }
+
+      ++i;
+    }
+
+    return result;
   }
 
   /**
@@ -446,7 +839,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "if (dispatcher != undefined) {\n" +
             "\tdispatcher.trackedCall(\'%s\', JSON.stringify(%s),\n" +
             "\t\tfunction(response) {\n" +
-            "\t\t\tconsole.log('Got response to %s() request: ' + JSON.parse(response).result);\n" +
+            "\t\t\tlogMessage('Got response to \\'%s()\\' request: ' + JSON.parse(response).result);\n\n" +
+            "\t\t\t/* TODO: Add your custom callback code here */\n" +
             "\t\t});\n" +
             "\t}\n" +
             "}",
