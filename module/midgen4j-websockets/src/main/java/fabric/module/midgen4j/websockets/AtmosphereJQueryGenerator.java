@@ -1,4 +1,4 @@
-/** 23.02.2013 01:31 */
+/** 25.02.2013 17:50 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ import fabric.wsdlschemaparser.wsdl.FPortType;
  * handler is part of the MidGen4J-WebSockets extension and generates
  * the client-side code to use the Atmosphere framework. Atmosphere
  * provides technical means to connect both, a Java server and a
- * JavaScript client, via WebSockets and variety of other Comet
+ * JavaScript client, via WebSockets and a variety of other Comet
  * technologies (e.g. streaming and long-polling).
  *
  * On the client-side, Atmosphere uses the jQuery library to open
@@ -83,7 +83,67 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   @Override
   public void executeBeforeProcessing() throws Exception
   {
-    // TODO: Refactor code and move to its own method
+    // Create WebSockets client
+    this.createClientApplication();
+  }
+
+  /**
+   * Create a test client in HTML with controls to call each RPC
+   * method from a webbrowser. Furthermore, generate JavaScript
+   * code for all service operations.
+   *
+   * The service operations will be collected in processPortTypes()
+   * and can then be used further here, after processing any other
+   * element of the WSDL document.
+   *
+   * @throws Exception Error during code generation
+   */
+  @Override
+  public void executeAfterProcessing() throws Exception
+  {
+    // Create files for WebSockets test client
+    this.createJavaScriptLogger();
+    this.createButtonsStyleSheet();
+    this.createTestClient(this.operations);
+
+    // Create JavaScript code with RPC methods
+    for (FOperation operation: this.operations)
+    {
+      this.addRpcMethod(operation);
+    }
+  }
+
+  /**
+   * Process port types (WSDL 2.0: interfaces) that are defined in WSDL document.
+   *
+   * @param portTypes Port types of WSDL document
+   *
+   * @throws Exception Error during processing
+   */
+  @Override
+  public void processPortTypes(final HashSet<FPortType> portTypes) throws Exception
+  {
+    // Process all service operations
+    for (FPortType portType: portTypes)
+    {
+      for (FOperation operation: portType.getOperations())
+      {
+        // Collect all service operations
+        this.operations.add(operation);
+      }
+    }
+  }
+
+  /**
+   * Create JavaScript application that serves as a WebSockets
+   * client in the webbrowser. The generated code controls the
+   * Atmosphere framework and provides a higher-level RPC protocol
+   * on top of WebSockets.
+   *
+   * @throws Exception Error during code generation
+   */
+  private void createClientApplication() throws Exception
+  {
     JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
             this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp/javascript",
             this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY));
@@ -132,53 +192,6 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   }
 
   /**
-   * Create a test client in HTML with controls to call each RPC
-   * method from a webbrowser. Furthermore, generate JavaScript
-   * code for all service operations.
-   *
-   * The service operations will be collected in processPortTypes()
-   * and can then be used further here, after processing any other
-   * element of the WSDL document.
-   *
-   * @throws Exception Error during code generation
-   */
-  @Override
-  public void executeAfterProcessing() throws Exception
-  {
-    // Create files for test client with RPC controls
-    this.createJavaScriptLogger();
-    this.createButtonsStyleSheet();
-    this.createTestClient(this.operations);
-
-    // Create JavaScript code with RPC methods
-    for (FOperation operation: this.operations)
-    {
-      this.addRpcMethod(operation);
-    }
-  }
-
-  /**
-   * Process port types (WSDL 2.0: interfaces) that are defined in WSDL document.
-   *
-   * @param portTypes Port types of WSDL document
-   *
-   * @throws Exception Error during processing
-   */
-  @Override
-  public void processPortTypes(final HashSet<FPortType> portTypes) throws Exception
-  {
-    // Process all service operations
-    for (FPortType portType: portTypes)
-    {
-      for (FOperation operation: portType.getOperations())
-      {
-        // Collect all service operations
-        this.operations.add(operation);
-      }
-    }
-  }
-
-  /**
    * Create a JavaScript class that can generate globally unique
    * identifiers (GUIDs). The GUIDs will later be used to identify
    * messages, which are sent accross the WebSocket connection to
@@ -223,7 +236,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 
   /**
    * Create a JavaScript class that can track WebSocket messages
-   * by their unique ID and is able to dispatch responses the
+   * by their unique ID and is able to dispatch responses to the
    * custom callback functions, that were defined before issuing
    * the RPC method call.
    *
@@ -339,6 +352,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 
             "\trequest.onOpen = function(response) {\n" +
             "\t\tlogMessage(\'Connection opened.\');\n" +
+            "\t\tlogMessage(\'Now connected to \\\'\' + request.url + \'\\\'.\', LogTarget.LOG);\n" +
             "\t}\n\n" +
 
             "\trequest.onClose = function(response) {\n" +
@@ -435,8 +449,9 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   }
 
   /**
-   * Create a CSS file that is used to style control buttons in
-   * the test client, which is generated by createTestClient().
+   * Create a CSS file that is used to style control buttons
+   * in the WebSockets test client, which is generated by
+   * createTestClient().
    */
   private void createButtonsStyleSheet()
   {
@@ -737,9 +752,9 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   }
 
   /**
-   * Create a test client in HTML that can be used to call each
-   * RPC method of MidGen4J's central service provider. The client
-   * can be run in any webbrowser with WebSockets support.
+   * Create a WebSockets test client in HTML that can be used to
+   * call each RPC method of MidGen4J's central service provider.
+   * The client can be run in any browser with WebSockets support.
    *
    * @param operations Service operations that need controls
    */
