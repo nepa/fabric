@@ -1,4 +1,4 @@
-/** 29.10.2012 02:40 */
+/** 25.02.2013 18:33 */
 package fabric.module.midgen4j.rest;
 
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class MidGen4JRESTHandler extends FDefaultWSDLHandler
   /** Name of the REST service interface class */
   private String restInterfaceClassName;
 
-  /** Java packane name of service provider class */
+  /** Java package name of service provider class */
   private String serviceProviderPackageName;
 
   /** Class with REST service interface */
