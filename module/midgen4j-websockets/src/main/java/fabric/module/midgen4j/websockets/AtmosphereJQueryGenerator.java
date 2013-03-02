@@ -1,4 +1,4 @@
-/** 25.02.2013 17:50 */
+/** 02.03.2013 00:58 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -346,9 +346,9 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "\trequest.contentType = \'application/json\';\n" +
             "\trequest.transport = \'%s\';\n" +
             "\trequest.fallbackTransport = \'%s\';\n" +
-            "\trequest.shared = true;\n" +
-            "\trequest.enableXDR = true;\n" +
-            "\trequest.headers = { \'Access-Control-Allow-Origin\': \'*\' };\n\n" + // TODO: Do we really need this?
+            "\trequest.shared = false; // Do NOT share connection between multiple browser tabs\n" +
+            "\trequest.enableXDR = true; // Enable Cross-Origin Resource Sharing (CORS)\n" +
+            "\trequest.readResponsesHeaders = false;\n\n" +
 
             "\trequest.onOpen = function(response) {\n" +
             "\t\tlogMessage(\'Connection opened.\');\n" +

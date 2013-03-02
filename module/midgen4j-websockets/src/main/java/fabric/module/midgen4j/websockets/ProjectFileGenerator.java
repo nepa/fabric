@@ -1,4 +1,4 @@
-/** 18.11.2012 03:00 */
+/** 02.03.2013 01:27 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -45,6 +45,9 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
   /** Name of broadcast channel */
   private String channelName;
 
+  /** Java package name for WebSocket interface classes */
+  private String packageName;
+
   /**
    * Constructor initializes the ProjectFileGenerator, which
    * can create various files for an independent WebSockets
@@ -62,6 +65,7 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
     this.projectName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.projectPath = this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY);
     this.channelName = this.properties.getProperty(MidGen4JWebSocketsModule.CHANNEL_NAME_KEY);
+    this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
   }
 
   /**
@@ -247,6 +251,16 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "  <display-name>%s</display-name>\n" +
 "  <description>WebSockets interface for the central MidGen4J service provider.</description>\n\n" +
 
+"  <filter>\n" +
+"    <filter-name>CORS-Filter</filter-name>\n" +
+"    <filter-class>%s.CORSFilter</filter-class>\n" +
+"  </filter>\n\n" +
+
+"  <filter-mapping>\n" +
+"    <filter-name>CORS-Filter</filter-name>\n" +
+"    <servlet-name>AtmosphereServlet</servlet-name>\n" +
+"  </filter-mapping>\n\n" +
+
 "  <servlet>\n" +
 "    <description>AtmosphereServlet</description>\n" +
 "    <servlet-name>AtmosphereServlet</servlet-name>\n" +
@@ -276,7 +290,7 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "    <url-pattern>/%s/*</url-pattern>\n" +
 "  </servlet-mapping>\n" +
 "</web-app>",
-            this.projectName, this.channelName);
+            this.projectName, this.packageName, this.channelName);
 
     textFile.getContent().setCode(fileContent);
 
@@ -332,7 +346,7 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
   private void createGlassfishWebXML()
   {
     PlainTextFile textFile = this.workspace.getPlainText().getPlainTextFile(
-            this.projectPath + "/webapp", "glassfish-web", "xml");
+            this.projectPath + "/webapp/WEB-INF", "glassfish-web", "xml");
 
     // Create file content
     String fileContent =
