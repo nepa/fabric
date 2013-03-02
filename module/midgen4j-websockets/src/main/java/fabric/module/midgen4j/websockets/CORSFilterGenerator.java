@@ -1,4 +1,4 @@
-/** 02.03.2013 02:56 */
+/** 02.03.2013 21:27 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -20,7 +20,12 @@ import de.uniluebeck.sourcegen.java.JSourceFile;
 import fabric.module.api.FDefaultWSDLHandler;
 
 /**
- * TODO: Add class comment
+ * Fabric handler class to extend the Java Middleware Generator. This
+ * handler is part of the MidGen4J-WebSockets extension and generates
+ * a CORS filter compliant to the Java Servlet 2.3 specification. The
+ * filter is later used to activate Cross-Origin Resource Sharing, so
+ * that the WebSockets service interface can process cross-domain
+ * requests.
  *
  * @author seidel
  */
@@ -42,10 +47,8 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
   private String packageName;
 
   /**
-   * TODO: Update comment
-   *
-   * Constructor initializes the JSONMarshallerGenerator, which
-   * can create code to de-/serialize bean objects to JSON.
+   * Constructor initializes the CORSFilterGenerator, which can
+   * create a filter to activate Cross-Domain Resource Sharing.
    *
    * @param workspace Workspace object for source code write-out
    * @param properties Properties object with module options
@@ -60,11 +63,8 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
   }
 
   /**
-   * TODO: Update comment
-   *
-   * Create a Maven pom.xml file and deployment descriptors
-   * for the WebSockets project, before processing any other
-   * element of the WSDL document.
+   * Create a Java class that contains the CORS filter, before
+   * processing any other element of the WSDL document.
    *
    * @throws Exception Error during code generation
    */
@@ -74,16 +74,22 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
     this.createCORSFilterFile();
   }
 
-  // TODO: Add comment
+  /**
+   * Create a source file that contains the CORS filter. The
+   * method will generate the corresponding Java class and
+   * add all necessary Java imports to the file.
+   *
+   * @throws Exception Error during code generation
+   */
   private void createCORSFilterFile() throws Exception
   {
-    // Add required imports to source file
+    // Create source file
     JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName, FILTER_CLASS_NAME);
 
     // Add CORS filter class
     jsf.add(this.createCORSFilterClass());
 
-    // Add required Java imports
+    // Add required imports to source file
     jsf.addImport("java.io.IOException");
     jsf.addImport("javax.servlet.Filter");
     jsf.addImport("javax.servlet.FilterChain");
@@ -96,15 +102,19 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
   }
 
   /**
-   * TODO: Update comment
+   * Create CORS filter class with its three default methods
+   * init(), destroy() and doFilter(). Filters were introduced
+   * with the Java Servlet 2.3 specifications and are used to
+   * apply various changes to HTTP requests and responses.
    *
-   * Create JSON marshaller class that is able to convert bean
-   * objects to JSON documents and vice versa. The beans must
-   * be created with the Fabric TypeGen module and must have
-   * JAXB annotations. The marshaller uses generics, so that
-   * we do not need a new serializer class for each bean type.
+   * For example, filters can implement compression and encoding
+   * algorithems that should be applied to all requests a servlet
+   * container receives.
    *
-   * @return JClass object with JSON marshaller class
+   * Also read:
+   *   http://www.oracle.com/technetwork/java/filters-137243.html
+   *
+   * @return JClass object with CORS filter class
    *
    * @throws Exception Error during code generation
    */
@@ -114,9 +124,23 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
     corsFilter.addImplements(JInterface.factory.create(JModifier.NONE, "Filter"));
     corsFilter.setComment(new JClassCommentImpl("Filter to enable Cross-Origin Resource Sharing (CORS)."));
 
-    // TODO: Refactor method creation to own functions (3x)
+    // Add methods to class
+    corsFilter.add(this.createInitMethod());
+    corsFilter.add(this.createDestroyMethod());
+    corsFilter.add(this.createDoFilterMethod());
 
-    // Add init() method
+    return corsFilter;
+  }
+
+  /**
+   * Create method to initialize the CORS filter.
+   *
+   * @return JMethod object to initialize filter
+   *
+   * @throws Exception Error during code generation
+   */
+  private JMethod createInitMethod() throws Exception
+  {
     JParameter filterConfig = JParameter.factory.create("FilterConfig", "filterConfig");
     JMethodSignature jms = JMethodSignature.factory.create(filterConfig);
 
@@ -129,26 +153,42 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
     String methodBody = "// Empty implementation";
     init.getBody().setSource(methodBody);
 
-    // Add method to class
-    corsFilter.add(init);
+    return init;
+  }
 
-    // Add destroy() method
+  /**
+   * Create method to destroy the CORS filter.
+   *
+   * @return JMethod object to destroy filter
+   *
+   * @throws Exception Error during code generation
+   */
+  private JMethod createDestroyMethod() throws Exception
+  {
     JMethod destroy = JMethod.factory.create(JModifier.PUBLIC, "void", "destroy");
     destroy.addAnnotation(new JMethodAnnotationImpl("Override"));
     destroy.setComment(new JMethodCommentImpl("Destroy filter."));
 
     // Set method body
-    methodBody = "// Empty implementation";
+    String methodBody = "// Empty implementation";
     destroy.getBody().setSource(methodBody);
 
-    // Add method to class
-    corsFilter.add(destroy);
+    return destroy;
+  }
 
-    // Add doFilter() method
+  /**
+   * Create method to apply the CORS filter.
+   *
+   * @return JMethod object to apply filter
+   *
+   * @throws Exception Error during code generation
+   */
+  private JMethod createDoFilterMethod() throws Exception
+  {
     JParameter request = JParameter.factory.create("ServletRequest", "request");
     JParameter response = JParameter.factory.create("ServletResponse", "response");
     JParameter chain = JParameter.factory.create("FilterChain", "chain");
-    jms = JMethodSignature.factory.create(request, response, chain);
+    JMethodSignature jms = JMethodSignature.factory.create(request, response, chain);
 
     JMethod doFilter = JMethod.factory.create(JModifier.PUBLIC, "void", "doFilter",
             jms, new String[] { "IOException", "ServletException" });
@@ -156,19 +196,17 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
     doFilter.setComment(new JMethodCommentImpl("Filter request and add CORS header to response."));
 
     // Set method body
-    methodBody =
+    String methodBody =
             "HttpServletRequest httpRequest = (HttpServletRequest)request;\n" +
             "HttpServletResponse httpResponse = (HttpServletResponse)response;\n\n" +
 
             "// Origin of request was NOT set\n" +
-            "if (null != httpRequest.getHeader(\"Origin\"))\n" +
-            "{\n" +
+            "if (null != httpRequest.getHeader(\"Origin\")) {\n" +
             "\thttpResponse.addHeader(\"Access-Control-Allow-Origin\", \"*\");\n" +
             "}\n\n" +
 
             "// Client is requesting OPTIONS\n" +
-            "if (\"OPTIONS\".equals(httpRequest.getMethod()))\n" +
-            "{\n" +
+            "if (\"OPTIONS\".equals(httpRequest.getMethod())) {\n" +
             "\thttpResponse.addHeader(\"Access-Control-Allow-Methods\", \"GET, POST, PUT, DELETE, OPTIONS\");\n" +
             "\thttpResponse.addHeader(\"Access-Control-Expose-Headers\", \"X-Cache-Date, X-Atmosphere-tracking-id\");\n" +
             "\thttpResponse.addHeader(\"Access-Control-Allow-Headers\", \"Origin, Content-Type, X-Cache-Date, \" +\n" +
@@ -179,9 +217,6 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
             "chain.doFilter(httpRequest, httpResponse);";
     doFilter.getBody().setSource(methodBody);
 
-    // Add method to class
-    corsFilter.add(doFilter);
-
-    return corsFilter;
+    return doFilter;
   }
 }
