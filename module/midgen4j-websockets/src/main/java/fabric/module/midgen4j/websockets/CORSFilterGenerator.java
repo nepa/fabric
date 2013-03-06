@@ -1,4 +1,4 @@
-/** 02.03.2013 21:27 */
+/** 06.03.2013 15:00 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -123,6 +123,8 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
     JClass corsFilter = JClass.factory.create(JModifier.PUBLIC, FILTER_CLASS_NAME);
     corsFilter.addImplements(JInterface.factory.create(JModifier.NONE, "Filter"));
     corsFilter.setComment(new JClassCommentImpl("Filter to enable Cross-Origin Resource Sharing (CORS)."));
+
+    LOGGER.debug(String.format("Created '%s' class for cross-domain requests in servlet container.", FILTER_CLASS_NAME));
 
     // Add methods to class
     corsFilter.add(this.createInitMethod());

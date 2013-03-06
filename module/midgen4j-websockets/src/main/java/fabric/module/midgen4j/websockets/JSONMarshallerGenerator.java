@@ -1,4 +1,4 @@
-/** 31.10.2012 01:18 */
+/** 06.03.2013 14:57 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -78,8 +78,7 @@ public class JSONMarshallerGenerator extends FDefaultWSDLHandler
     JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName, MARSHALLER_CLASS_NAME);
 
     // Create JSON marshaller class
-    jsf.add(this.createJSONMarshallerClass());
-    LOGGER.info(String.format("Created '%s' class for JSON de-/serialization of bean objects.", MARSHALLER_CLASS_NAME));
+    jsf.add(this.createJSONMarshallerClass());   
   }
 
   /**
@@ -117,6 +116,8 @@ public class JSONMarshallerGenerator extends FDefaultWSDLHandler
   {
     JClass jsonMarshaller = JClass.factory.create(JModifier.PUBLIC, MARSHALLER_CLASS_NAME + "<T>");
     jsonMarshaller.setComment(new JClassCommentImpl("The JSON marshaller class."));
+
+    LOGGER.debug(String.format("Created '%s' class for JSON de-/serialization of bean objects.", MARSHALLER_CLASS_NAME));
 
     // Add methods to class
     jsonMarshaller.add(this.createSerializeMethod());

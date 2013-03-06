@@ -1,4 +1,4 @@
-/** 27.02.2013 17:34 */
+/** 06.03.2013 15:06 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -189,6 +189,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     workerThread.setExtends("Thread");
     workerThread.setComment(new JClassCommentImpl("Base class for all worker threads."));
 
+    LOGGER.debug(String.format("Created '%s' class for base worker thread.", WORKER_THREAD_CLASS_NAME));
+
     // Add member variables
     workerThread.add(JField.factory.create(JModifier.PROTECTED, "String", "method"));
     workerThread.add(JField.factory.create(JModifier.PROTECTED, "String", "uuid"));
@@ -245,6 +247,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     JClass workerClass = JClass.factory.create(JModifier.PUBLIC, workerClassName);
     workerClass.setExtends(WORKER_THREAD_CLASS_NAME);
     workerClass.setComment(new JClassCommentImpl(String.format("The '%s' class.", workerClassName)));
+
+    LOGGER.debug(String.format("Created '%s' class for child worker thread.", workerClassName));
 
     /*****************************************************************
      * Add fields
@@ -328,6 +332,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     // Create inner builder class
     JClass builderClass = JClass.factory.create(JModifier.PUBLIC | JModifier.STATIC | JModifier.FINAL, builderClassName);
     builderClass.setComment(new JClassCommentImpl(String.format("Inner '%s' class.", builderClassName)));
+
+    LOGGER.debug(String.format("Created '%s' class as inner class of '%s'.", builderClassName, workerThreadClassName));
 
     /*****************************************************************
      * Add fields

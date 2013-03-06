@@ -1,4 +1,4 @@
-/** 02.03.2013 00:58 */
+/** 06.03.2013 15:18 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -57,6 +57,12 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   /** Service operations from WSDL file */
   private Set<FOperation> operations;
 
+  /** Path for files of the WebSockets project */
+  private String projectPath;
+
+  /** Name of JavaScript application */
+  private String applicationName;
+
   /**
    * Constructor initializes the AtmosphereJQueryGenerator, which
    * can create the client-side part of the WebSockets service
@@ -71,6 +77,10 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     this.properties = properties;
 
     this.operations = new HashSet<FOperation>();
+
+    // Extract global properties
+    this.projectPath = this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY);
+    this.applicationName = this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY);
   }
 
   /**
@@ -145,8 +155,9 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   private void createClientApplication() throws Exception
   {
     JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
-            this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp/javascript",
-            this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY));
+            this.projectPath + "/webapp/javascript", this.applicationName);
+
+    LOGGER.debug(String.format("Created WebSockets client '%s'.", this.applicationName + ".js"));
 
     // Add code before fields
     jssf.getCodeBeforeFields().setCode("\'use strict\';");
@@ -207,6 +218,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     JSClass guidClass = JSClass.factory.create("GUID");
     guidClass.setComment(new JSCommentImpl("Helper class to generate unique IDs."));
 
+    LOGGER.debug("Created 'GUID' class for WebSockets client.");
+
     // Create helper method to generate random strings
     JSMethod s4 = JSMethod.factory.create("S4");
     s4.setComment(new JSCommentImpl("Create a block of four random characters."));
@@ -249,6 +262,8 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     // Create dispatcher class
     JSClass dispatcherClass = JSClass.factory.create("Dispatcher", "subSocket");
     dispatcherClass.setComment(new JSCommentImpl("Dispatcher class to handle RPC methods and track messages."));
+
+    LOGGER.debug("Created 'Dispatcher' class for WebSockets client.");
 
     // Add member field for delimiter
     JSField delimiter = JSField.factory.create("delimiter", "\'$\'");
@@ -388,8 +403,10 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   private void createJavaScriptLogger() throws Exception
   {
     JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
-            this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp/javascript",
-            "logger");
+            this.projectPath + "/webapp/javascript", "logger");
+
+    LOGGER.debug(String.format("Created JavaScript file '%s' for WebSockets client.",
+            jssf.getFileName() + ".js"));
 
     // Add global enum
     String enumDefinition =
@@ -456,8 +473,10 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   private void createButtonsStyleSheet()
   {
     PlainTextFile textFile = this.workspace.getPlainText().getPlainTextFile(
-            this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp/css",
-            "buttons", "css");
+            this.projectPath + "/webapp/css", "buttons", "css");
+
+    LOGGER.debug(String.format("Created CSS file '%s' for WebSockets client.",
+            textFile.getFileName() + "." + textFile.getExtension()));
 
     // Create file content
     String fileContent =
@@ -761,8 +780,10 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   private void createTestClient(final Set<FOperation> operations)
   {
     PlainTextFile textFile = this.workspace.getPlainText().getPlainTextFile(
-            this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp",
-            "index", "html");
+            this.projectPath + "/webapp", "index", "html");
+
+    LOGGER.debug(String.format("Created WebSockets test client '%s'.",
+            textFile.getFileName() + "." + textFile.getExtension()));
 
     // Create controls to call RPC methods
     String rpcControls = this.createRpcControls(operations);
@@ -854,8 +875,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 "</body>\n\n" +
 
 "</html>",
-            TEST_CLIENT_NAME, this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY),
-            TEST_CLIENT_NAME, rpcControls);
+            TEST_CLIENT_NAME, this.applicationName, TEST_CLIENT_NAME, rpcControls);
 
     textFile.getContent().setCode(fileContent);
   }
@@ -883,9 +903,12 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
       }
 
       // Controls in current row
+      String name = operation.getOperationName();
       result += String.format(
               "      <span class=\"button medium black\" onClick=\"%s();\">Call %s()</span>\n",
-              operation.getOperationName(), operation.getOperationName());
+              name, name);
+
+      LOGGER.debug(String.format("Added user control for RPC method '%s' to WebSockets client.", name));
 
       // End of current row or end of last row
       if (i % 4 == 3 || i == operations.size() - 1)
@@ -911,8 +934,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
   private void addRpcMethod(final FOperation operation) throws Exception
   {
     JSSourceFile jssf = this.workspace.getJavaScript().getJSSourceFile(
-            this.properties.getProperty(MidGen4JWebSocketsModule.PROJECT_PATH_KEY) + "/webapp/javascript",
-            this.properties.getProperty(MidGen4JWebSocketsModule.JS_APPLICATION_NAME_KEY));
+            this.projectPath + "/webapp/javascript", this.applicationName);
 
     String name = operation.getOperationName();
     String inputMessage = (null == operation.getInputMessage() ? "{}" : "{ /* TODO: Add your custom JSON code here */ }");
@@ -934,5 +956,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     rpcFunction.getBody().setCode(methodBody);
 
     jssf.add(rpcFunction);
+
+    LOGGER.debug(String.format("Added RPC method '%s' to WebSockets client.", name));
   }
 }
