@@ -1,4 +1,4 @@
-/** 06.03.2013 16:48 */
+/** 06.03.2013 21:51 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -111,7 +111,6 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
       for (FOperation operation: portType.getOperations())
       {
         // Create file that holds per-operation worker thread class
-// TODO:        this.createWorkerThreadFile(this.firstLetterCapital(operation.getOperationName()));
         this.createWorkerThreadFile(operation);
       }
     }
@@ -151,18 +150,15 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
    * required Java imports to the source file.
    *
    * @param operation FOperation object from WSDL parser
-   * @param rpcMethodName Name of the RPC method TODO: Remove line and update comment text
    *
    * @throws Exception Error during code generation
    */
-// TODO  private void createWorkerThreadFile(final String rpcMethodName) throws Exception
   private void createWorkerThreadFile(final FOperation operation) throws Exception
   {
-    String rpcMethodName = this.firstLetterCapital(operation.getOperationName()); // TODO
+    String rpcMethodName = WorkerThreadGenerator.firstLetterCapital(operation.getOperationName());
     JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.threadWorkerPackageName, rpcMethodName + "Worker");
 
     // Add child worker thread class
-// TODO    jsf.add(this.createWorkerThreadClass(rpcMethodName));
     jsf.add(this.createWorkerThreadClass(operation));
 
     // Add required imports
@@ -239,16 +235,14 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
    * objects at runtime.
    *
    * @param operation FOperation object from WSDL parser
-   * @param rpcMethodName Name of the RPC method TODO: Remove line and update comment text
    *
    * @return JClass object with child worker thread class
    *
    * @throws Exception Error during code generation
    */
-// TODO:  private JClass createWorkerThreadClass(final String rpcMethodName) throws Exception
   private JClass createWorkerThreadClass(final FOperation operation) throws Exception
   {
-    String rpcMethodName = this.firstLetterCapital(operation.getOperationName()); // TODO
+    String rpcMethodName = WorkerThreadGenerator.firstLetterCapital(operation.getOperationName());
     String workerClassName = rpcMethodName + "Worker";
 
     // Create worker thread class
@@ -304,42 +298,49 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     run.setComment(new JMethodCommentImpl("Run worker thread to handle request."));
 
     // TODO: Block begin
-    // TODO: Call method on service provider here (use JSONMarshaller)
 
     // Set method body
     methodBody = "";
 
-    methodBody += String.format(
-            "LOGGER.info(\"Processing '%s()' request...\");\n\n",
-            WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
-
     // 1. Operation has input? -> Convert it from String to Bean
     if (null != operation.getInputMessage())
     {
-      methodBody +=
-              "String jsonRequest = this.payload;\n" + // TODO: Add further checks (!= null and so on)
-              "// TODO: Convert payload to Bean object\n" +
-              "BeanObject beanRequest = (BeanObject)JSONMarshaller.jsonToInstance(jsonRequest);\n\n"; // TODO (casting required?)
+      String inputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
+              operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
+
+      methodBody += String.format(
+              "// Unmarshal JSON code from request\n" +
+              "%s requestBeanObject = (%s)%s.jsonToInstance(%s.class, this.payload);\n\n",
+              inputMessageClassName, inputMessageClassName,
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, inputMessageClassName);
+    }
+
+    String outputMessageClassName = "";
+    if (null != operation.getOutputMessage())
+    {
+      outputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
+              operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
     }
 
     // 2. Call operation
     methodBody += String.format(
+            "LOGGER.info(\"Processing '%s()' request...\");\n" +
             "%sthis.serviceProvider.%s(%s);",
-            (null != operation.getOutputMessage() ? "BeanObject beanResponse = " : ""), // Method has return value?
+            WorkerThreadGenerator.firstLetterLowercase(rpcMethodName),
+            (null != operation.getOutputMessage() ? String.format("%s responseBeanObject = ", outputMessageClassName) : ""), // Method has return value?
             operation.getOperationName(),
-            (null != operation.getInputMessage() ? "beanRequest" : "")); // Method has input?
+            (null != operation.getInputMessage() ? "requestBeanObject" : "")); // Method has input?
 
     // 3. Operation has output? -> Convert Bean to String and send response
     if (null != operation.getOutputMessage())
     {
-      methodBody +=
-              "\n\n" +
-              "String jsonResponse = JSONMarshaller.instanceToJson(beanResponse);\n" +
-              "String responseMessage = Server.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n" +
-              "Server.sendMessage(this.webSocket, responseMessage);\n\n";
-
       methodBody += String.format(
-              "LOGGER.info(\"Responding to '%s()' request...\");",
+              "\n\n" +
+              "String jsonResponse = %s.instanceToJSON(responseBeanObject);\n" +
+              "String responseMessage = Server.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n" +
+              "LOGGER.info(\"Responding to '%s()' request...\");\n" +
+              "Server.sendMessage(this.webSocket, responseMessage);\n\n",
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME,
               WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
     }
 
@@ -545,7 +546,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
    *
    * @return Text with first letter capitalized or null
    */
-  private String firstLetterCapital(final String text)
+  private static String firstLetterCapital(final String text)
   {
     return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
