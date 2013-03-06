@@ -1,4 +1,4 @@
-/** 06.03.2013 15:06 */
+/** 06.03.2013 16:48 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -111,7 +111,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
       for (FOperation operation: portType.getOperations())
       {
         // Create file that holds per-operation worker thread class
-        this.createWorkerThreadFile(this.firstLetterCapital(operation.getOperationName()));
+// TODO:        this.createWorkerThreadFile(this.firstLetterCapital(operation.getOperationName()));
+        this.createWorkerThreadFile(operation);
       }
     }
   }
@@ -149,16 +150,20 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
    * This method will trigger the class generation and add all
    * required Java imports to the source file.
    *
-   * @param rpcMethodName Name of the RPC method
+   * @param operation FOperation object from WSDL parser
+   * @param rpcMethodName Name of the RPC method TODO: Remove line and update comment text
    *
    * @throws Exception Error during code generation
    */
-  private void createWorkerThreadFile(final String rpcMethodName) throws Exception
+// TODO  private void createWorkerThreadFile(final String rpcMethodName) throws Exception
+  private void createWorkerThreadFile(final FOperation operation) throws Exception
   {
+    String rpcMethodName = this.firstLetterCapital(operation.getOperationName()); // TODO
     JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.threadWorkerPackageName, rpcMethodName + "Worker");
-    
+
     // Add child worker thread class
-    jsf.add(this.createWorkerThreadClass(rpcMethodName));
+// TODO    jsf.add(this.createWorkerThreadClass(rpcMethodName));
+    jsf.add(this.createWorkerThreadClass(operation));
 
     // Add required imports
     jsf.addImport("org.slf4j.Logger");
@@ -233,14 +238,17 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
    * Singleton and Builder design pattern, to create new worker thread
    * objects at runtime.
    *
-   * @param rpcMethodName Name of the RPC method
+   * @param operation FOperation object from WSDL parser
+   * @param rpcMethodName Name of the RPC method TODO: Remove line and update comment text
    *
    * @return JClass object with child worker thread class
    *
    * @throws Exception Error during code generation
    */
-  private JClass createWorkerThreadClass(final String rpcMethodName) throws Exception
+// TODO:  private JClass createWorkerThreadClass(final String rpcMethodName) throws Exception
+  private JClass createWorkerThreadClass(final FOperation operation) throws Exception
   {
+    String rpcMethodName = this.firstLetterCapital(operation.getOperationName()); // TODO
     String workerClassName = rpcMethodName + "Worker";
 
     // Create worker thread class
@@ -295,11 +303,49 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     run.addAnnotation(new JMethodAnnotationImpl("Override"));
     run.setComment(new JMethodCommentImpl("Run worker thread to handle request."));
 
+    // TODO: Block begin
+    // TODO: Call method on service provider here (use JSONMarshaller)
+
     // Set method body
-    methodBody = String.format(
-            "LOGGER.info(\"Responding to '%s()' request...\");", // TODO: Call method on service provider here (use JSONMarshaller)
+    methodBody = "";
+
+    methodBody += String.format(
+            "LOGGER.info(\"Processing '%s()' request...\");\n\n",
             WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
+
+    // 1. Operation has input? -> Convert it from String to Bean
+    if (null != operation.getInputMessage())
+    {
+      methodBody +=
+              "String jsonRequest = this.payload;\n" + // TODO: Add further checks (!= null and so on)
+              "// TODO: Convert payload to Bean object\n" +
+              "BeanObject beanRequest = (BeanObject)JSONMarshaller.jsonToInstance(jsonRequest);\n\n"; // TODO (casting required?)
+    }
+
+    // 2. Call operation
+    methodBody += String.format(
+            "%sthis.serviceProvider.%s(%s);",
+            (null != operation.getOutputMessage() ? "BeanObject beanResponse = " : ""), // Method has return value?
+            operation.getOperationName(),
+            (null != operation.getInputMessage() ? "beanRequest" : "")); // Method has input?
+
+    // 3. Operation has output? -> Convert Bean to String and send response
+    if (null != operation.getOutputMessage())
+    {
+      methodBody +=
+              "\n\n" +
+              "String jsonResponse = JSONMarshaller.instanceToJson(beanResponse);\n" +
+              "String responseMessage = Server.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n" +
+              "Server.sendMessage(this.webSocket, responseMessage);\n\n";
+
+      methodBody += String.format(
+              "LOGGER.info(\"Responding to '%s()' request...\");",
+              WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
+    }
+
     run.getBody().setSource(methodBody);
+
+    // TODO: Block end
 
     // Add method to class
     workerClass.add(run);
