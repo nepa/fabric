@@ -1,4 +1,4 @@
-/** 07.03.2013 15:38 */
+/** 07.03.2013 16:50 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -135,7 +135,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     jsf.addImport("org.atmosphere.websocket.WebSocket");
 
     // Do not import from same package!
-    if (!this.serviceProviderPackageName.equals(this.packageName))
+    if (!this.threadWorkerPackageName.equals(this.serviceProviderPackageName))
     {
       // Import service provider class
       jsf.addImport(this.serviceProviderPackageName + "." + this.serviceProviderClassName);
@@ -167,11 +167,52 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     jsf.addImport("org.slf4j.LoggerFactory");
     jsf.addImport("org.atmosphere.websocket.WebSocket");
 
+    // TODO: Refactor imports management
+
     // Do not import from same package!
-    if (!this.serviceProviderPackageName.equals(this.threadWorkerPackageName))
+    if (!this.threadWorkerPackageName.equals(this.serviceProviderPackageName))
     {
       // Import service provider class
       jsf.addImport(this.serviceProviderPackageName + "." + this.serviceProviderClassName);
+    }
+
+    // Do not import from same package!
+    if (!this.threadWorkerPackageName.equals(this.packageName))
+    {
+      jsf.addImport(this.packageName + "." + JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
+    }
+
+    // Do not import from same package!
+    if (!this.threadWorkerPackageName.equals(this.packageName))
+    {
+      // TODO: Only add import, if it is really needed
+      if (null != operation.getOutputMessage())
+      {
+        jsf.addImport(this.packageName + "." + AtmosphereServerGenerator.SERVER_CLASS_NAME);
+      }
+    }
+
+    // Do not import from same package!
+    // TODO: Get real name of beans package from properties object (3x)
+    if (!this.threadWorkerPackageName.equals(this.serviceProviderPackageName))
+    {
+      // Operation has input message
+      if (null != operation.getInputMessage())
+      {
+        String inputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
+                operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
+
+        jsf.addImport(this.serviceProviderPackageName + "." + inputMessageClassName); // TODO: this.getInputMessageName(operation)
+      }
+
+      // Operation has output message
+      if (null != operation.getOutputMessage())
+      {
+        String outputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
+                operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
+
+        jsf.addImport(this.serviceProviderPackageName + "." + outputMessageClassName); // TODO: this.getOutputMessageName(operation)
+      }
     }
   }
 
@@ -557,8 +598,9 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
       methodBody += String.format(
               "// Send response to client\n" +
               "LOGGER.info(\"Responding to '%s()' request...\");\n" +
-              "Server.sendMessage(this.webSocket, responseMessage);",
-              WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
+              "%s.sendMessage(this.webSocket, responseMessage);",
+              WorkerThreadGenerator.firstLetterLowercase(rpcMethodName),
+              AtmosphereServerGenerator.SERVER_CLASS_NAME);
     }
 
     // Surround code with try..catch-block
