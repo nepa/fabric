@@ -1,9 +1,10 @@
-/** 06.03.2013 21:51 */
+/** 07.03.2013 15:38 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Scanner;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -263,7 +264,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
 
     String builderClassName = workerClassName + "Builder";
     JField builder = JField.factory.create(JModifier.PUBLIC | JModifier.STATIC | JModifier.FINAL,
-            builderClassName, "BUILDER", String.format("%s.getInstance", builderClassName));
+            builderClassName, "BUILDER", String.format("%s.getInstance()", builderClassName));
     builder.setComment(new JFieldCommentImpl(String.format("Builder instance to create new '%s' objects.", workerClassName)));
     workerClass.add(builder);
 
@@ -297,56 +298,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     run.addAnnotation(new JMethodAnnotationImpl("Override"));
     run.setComment(new JMethodCommentImpl("Run worker thread to handle request."));
 
-    // TODO: Block begin
-
     // Set method body
-    methodBody = "";
-
-    // 1. Operation has input? -> Convert it from String to Bean
-    if (null != operation.getInputMessage())
-    {
-      String inputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
-              operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
-
-      methodBody += String.format(
-              "// Unmarshal JSON code from request\n" +
-              "%s requestBeanObject = (%s)%s.jsonToInstance(%s.class, this.payload);\n\n",
-              inputMessageClassName, inputMessageClassName,
-              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, inputMessageClassName);
-    }
-
-    String outputMessageClassName = "";
-    if (null != operation.getOutputMessage())
-    {
-      outputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
-              operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
-    }
-
-    // 2. Call operation
-    methodBody += String.format(
-            "LOGGER.info(\"Processing '%s()' request...\");\n" +
-            "%sthis.serviceProvider.%s(%s);",
-            WorkerThreadGenerator.firstLetterLowercase(rpcMethodName),
-            (null != operation.getOutputMessage() ? String.format("%s responseBeanObject = ", outputMessageClassName) : ""), // Method has return value?
-            operation.getOperationName(),
-            (null != operation.getInputMessage() ? "requestBeanObject" : "")); // Method has input?
-
-    // 3. Operation has output? -> Convert Bean to String and send response
-    if (null != operation.getOutputMessage())
-    {
-      methodBody += String.format(
-              "\n\n" +
-              "String jsonResponse = %s.instanceToJSON(responseBeanObject);\n" +
-              "String responseMessage = Server.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n" +
-              "LOGGER.info(\"Responding to '%s()' request...\");\n" +
-              "Server.sendMessage(this.webSocket, responseMessage);\n\n",
-              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME,
-              WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
-    }
-
-    run.getBody().setSource(methodBody);
-
-    // TODO: Block end
+    run.getBody().setSource(this.createRunMethodBody(operation, rpcMethodName));
 
     // Add method to class
     workerClass.add(run);
@@ -536,6 +489,141 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     builderClass.add(buildMethod);
 
     return builderClass;
+  }
+
+  /**
+   * Create code for method body of the run() method that is
+   * generated in each of the child thread worker classes.
+   * This function will generate code to unmarshal a request
+   * message, call the RPC method and finally marshal the
+   * response message (if RPC method has any output).
+   * 
+   * The code generation was moved to this method for
+   * better readability.
+   *
+   * @param operation FOperation object from WSDL parser
+   * @param rpcMethodName Name of RPC method
+   *
+   * @return Code for method body of run() method
+   */
+  private String createRunMethodBody(final FOperation operation, final String rpcMethodName)
+  {
+    String methodBody = "";
+
+    // Operation has input message?
+    if (null != operation.getInputMessage())
+    {
+      String inputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
+              operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
+
+      // Create code to convert JSON code to a bean object
+      methodBody += String.format(
+              "// Unmarshal JSON code from request\n" +
+              "%s requestBeanObject = (%s)%s.jsonToInstance(%s.class, this.payload);\n\n",
+              inputMessageClassName, inputMessageClassName,
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, inputMessageClassName);
+    }
+
+    // Get name of output message (if any)
+    String outputMessageClassName = "";
+    if (null != operation.getOutputMessage())
+    {
+      outputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
+              operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
+    }
+
+    // Create code to call RPC method
+    methodBody += String.format(
+            "// Call service operation\n" +
+            "LOGGER.info(\"Processing '%s()' request...\");\n" +
+            "%sthis.serviceProvider.%s(%s);",
+            WorkerThreadGenerator.firstLetterLowercase(rpcMethodName),
+            (null != operation.getOutputMessage() ? String.format("%s responseBeanObject = ", outputMessageClassName) : ""), // Method has return value?
+            operation.getOperationName(),
+            (null != operation.getInputMessage() ? "requestBeanObject" : "")); // Method has input?
+
+    // Operation has output message?
+    if (null != operation.getOutputMessage())
+    {
+      // Create code to convert bean object to JSON code
+      methodBody += String.format(
+              "\n\n" +
+              "// Marshal bean and create response message\n" +
+              "String jsonResponse = %s.instanceToJSON(responseBeanObject);\n" +
+              "String responseMessage = Server.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n",
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
+
+      // Create code to send response
+      methodBody += String.format(
+              "// Send response to client\n" +
+              "LOGGER.info(\"Responding to '%s()' request...\");\n" +
+              "Server.sendMessage(this.webSocket, responseMessage);",
+              WorkerThreadGenerator.firstLetterLowercase(rpcMethodName));
+    }
+
+    // Surround code with try..catch-block
+    methodBody =
+            "try {\n" +
+            WorkerThreadGenerator.indentCode(methodBody) +
+            "}\n" +
+            "catch (Exception e) {\n" +
+            "\tLOGGER.error(\"Error: \" + e.getMessage());\n" +
+            "}";
+
+    return methodBody;
+  }
+
+  /**
+   * Private helper method to indent each line of a code block.
+   * This method indents code by one tab. Internally, it calls
+   * the indentCode(code, depth) method and is provided for
+   * convenience only.
+   *
+   * @param code Code to be indented
+   *
+   * @return Code indented by one tab
+   */
+  private static String indentCode(final String code)
+  {
+    return WorkerThreadGenerator.indentCode(code, 1);
+  }
+
+  /**
+   * Private helper method to indent each line of a code block
+   * by desired amount of tabs. The method will add tabs to
+   * the beginning of each line and return the indented code.
+   * The depth argument must be a positive integer number.
+   *
+   * @param code Code to be indented
+   * @param depth Desired depth of indention
+   *
+   * @return Code indented by desired amount of tabs
+   */
+  private static String indentCode(final String code, int depth)
+  {
+    String result = "";
+
+    // Depth must be positive
+    if (depth < 0)
+    {
+      depth = 0;
+    }
+
+    // Create tabs for code indention
+    String tabs = "";
+    for (int i = 0; i < depth; ++i)
+    {
+      tabs += "\t";
+    }
+
+    // Add tabs to beginning of each line
+    Scanner scanner = new Scanner(code);
+    while (scanner.hasNext())
+    {
+      result += tabs + scanner.nextLine() + "\n";
+    }
+
+    return result;
   }
 
   /**
