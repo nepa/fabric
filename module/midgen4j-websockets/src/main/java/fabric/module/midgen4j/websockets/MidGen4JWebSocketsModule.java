@@ -1,4 +1,4 @@
-/** 02.03.2013 02:25 */
+/** 07.03.2013 16:56 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -144,6 +144,7 @@ public class MidGen4JWebSocketsModule implements FModuleBase
 
     ArrayList<FItemHandlerBase> handlers = new ArrayList<FItemHandlerBase>();
     handlers.add(new ProjectFileGenerator(workspace, this.properties));
+    handlers.add(new AtmosphereServerGenerator(workspace, this.properties));
     handlers.add(new AtmosphereJQueryGenerator(workspace, this.properties));
     handlers.add(new CORSFilterGenerator(workspace, this.properties));
     handlers.add(new JSONMarshallerGenerator(workspace, this.properties));
