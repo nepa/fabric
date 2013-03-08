@@ -1,4 +1,4 @@
-/** 07.03.2013 16:50 */
+/** 07.03.2013 17:53 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
+import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.java.JClass;
 import de.uniluebeck.sourcegen.java.JClassCommentImpl;
 import de.uniluebeck.sourcegen.java.JConstructor;
@@ -132,14 +133,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     jsf.add(this.createBaseWorkerThreadClass());
 
     // Add required imports
-    jsf.addImport("org.atmosphere.websocket.WebSocket");
-
-    // Do not import from same package!
-    if (!this.threadWorkerPackageName.equals(this.serviceProviderPackageName))
-    {
-      // Import service provider class
-      jsf.addImport(this.serviceProviderPackageName + "." + this.serviceProviderClassName);
-    }
+    this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
+    this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.serviceProviderClassName);
   }
 
   /**
@@ -163,56 +158,29 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     jsf.add(this.createWorkerThreadClass(operation));
 
     // Add required imports
-    jsf.addImport("org.slf4j.Logger");
-    jsf.addImport("org.slf4j.LoggerFactory");
-    jsf.addImport("org.atmosphere.websocket.WebSocket");
+    this.addRequiredImport(jsf, "org.slf4j.Logger");
+    this.addRequiredImport(jsf, "org.slf4j.LoggerFactory");
+    this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
 
-    // TODO: Refactor imports management
+    this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.serviceProviderClassName);
+    this.addRequiredImport(jsf, this.packageName + "." + JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
 
-    // Do not import from same package!
-    if (!this.threadWorkerPackageName.equals(this.serviceProviderPackageName))
+    // Import server only if required
+    if (null != operation.getOutputMessage())
     {
-      // Import service provider class
-      jsf.addImport(this.serviceProviderPackageName + "." + this.serviceProviderClassName);
+      this.addRequiredImport(jsf, this.packageName + "." + AtmosphereServerGenerator.SERVER_CLASS_NAME);
     }
 
-    // Do not import from same package!
-    if (!this.threadWorkerPackageName.equals(this.packageName))
+    // Operation has input message
+    if (null != operation.getInputMessage())
     {
-      jsf.addImport(this.packageName + "." + JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
+      this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.getInputMessageName(operation));
     }
 
-    // Do not import from same package!
-    if (!this.threadWorkerPackageName.equals(this.packageName))
+    // Operation has output message
+    if (null != operation.getOutputMessage())
     {
-      // TODO: Only add import, if it is really needed
-      if (null != operation.getOutputMessage())
-      {
-        jsf.addImport(this.packageName + "." + AtmosphereServerGenerator.SERVER_CLASS_NAME);
-      }
-    }
-
-    // Do not import from same package!
-    // TODO: Get real name of beans package from properties object (3x)
-    if (!this.threadWorkerPackageName.equals(this.serviceProviderPackageName))
-    {
-      // Operation has input message
-      if (null != operation.getInputMessage())
-      {
-        String inputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
-                operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
-
-        jsf.addImport(this.serviceProviderPackageName + "." + inputMessageClassName); // TODO: this.getInputMessageName(operation)
-      }
-
-      // Operation has output message
-      if (null != operation.getOutputMessage())
-      {
-        String outputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
-                operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
-
-        jsf.addImport(this.serviceProviderPackageName + "." + outputMessageClassName); // TODO: this.getOutputMessageName(operation)
-      }
+      this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.getOutputMessageName(operation));
     }
   }
 
@@ -554,8 +522,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     // Operation has input message?
     if (null != operation.getInputMessage())
     {
-      String inputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
-              operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
+      String inputMessageClassName = this.getInputMessageName(operation);
 
       // Create code to convert JSON code to a bean object
       methodBody += String.format(
@@ -569,8 +536,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     String outputMessageClassName = "";
     if (null != operation.getOutputMessage())
     {
-      outputMessageClassName = WorkerThreadGenerator.firstLetterCapital(
-              operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
+      outputMessageClassName = this.getOutputMessageName(operation);
     }
 
     // Create code to call RPC method
@@ -613,6 +579,92 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
             "}";
 
     return methodBody;
+  }
+
+  /**
+   * Private helper method to get the name of the input message
+   * class for a FOperation object. The method will return null,
+   * if the operation has no input message at all.
+   *
+   * @param operation FOperation object from WSDL parser
+   *
+   * @return Input message class name or null
+   */
+  private String getInputMessageName(final FOperation operation)
+  {
+    String result = null;
+
+    // Operation has input message?
+    if (null != operation.getInputMessage())
+    {
+      result = WorkerThreadGenerator.firstLetterCapital(
+              operation.getInputMessage().getMessageAttribute().getLocalPart()) + "Message";
+    }
+
+    return result;
+  }
+
+  /**
+   * Private helper method to get the name of the output message
+   * class for a FOperation object. The method will return null,
+   * if the operation has no output message at all.
+   *
+   * @param operation FOperation object from WSDL parser
+   *
+   * @return Output message class name or null
+   */
+  private String getOutputMessageName(final FOperation operation)
+  {
+    String result = null;
+
+    //Operation has output message?
+    if (null != operation.getOutputMessage())
+    {
+      result = WorkerThreadGenerator.firstLetterCapital(
+              operation.getOutputMessage().getMessageAttribute().getLocalPart()) + "Message";
+    }
+
+    return result;
+  }
+
+  /**
+   * Private helper method to add required Java imports to the
+   * source file of a worker thread class. The method will only
+   * import a class, if it does not reside in the same package
+   * as the worker thread class. Furthermore, the method checks
+   * for duplicate imports automatically. It will only import
+   * a class, if it is not present in the source file's imports
+   * already.
+   *
+   * Multiple calls to this function with the same arguments will
+   * result in a single import statement on source code write-out.
+   *
+   * @param requiredImport Name of required import
+   */
+  private void addRequiredImport(final JSourceFile sourceFile, final String requiredImport)
+  {
+    if (null != requiredImport)
+    {
+      // Extract package name from fully qualified class name
+      String importPackageName = requiredImport.substring(0, requiredImport.lastIndexOf("."));
+
+      // Do not import from same package!
+      if (!this.threadWorkerPackageName.equals(importPackageName))
+      {
+        // No duplicate imports!
+        if (!sourceFile.containsImport(requiredImport))
+        {
+          try
+          {
+            sourceFile.addImport(requiredImport);
+          }
+          catch (JDuplicateException e)
+          {
+            // Exception ignored intentionally
+          }
+        }
+      }
+    }
   }
 
   /**
