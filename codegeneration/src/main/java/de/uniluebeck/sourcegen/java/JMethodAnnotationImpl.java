@@ -27,9 +27,15 @@ package de.uniluebeck.sourcegen.java;
 /**
  * Annotation implementation for the annotation of methods in Java.
  */
-public class JMethodAnnotationImpl extends JElemImpl implements JMethodAnnotation {
+public class JMethodAnnotationImpl extends JElemImpl implements JMethodAnnotation
+{
+  /** Constant to add @Override annotation to a method */
+  public static final JMethodAnnotationImpl OVERRIDE = new JMethodAnnotationImpl("Override");
 
-	/**
+  /** Constant to add @Deprecated annotation to a method */
+  public static final JMethodAnnotationImpl DEPRECATED = new JMethodAnnotationImpl("Deprecated");
+
+  /**
 	 * The actual annotation description.
 	 */
 	private final String description;
