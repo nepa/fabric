@@ -1,4 +1,4 @@
-/** 06.03.2013 15:00 */
+/** 08.03.2013 23:45 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -148,7 +148,7 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
 
     JMethod init = JMethod.factory.create(JModifier.PUBLIC, "void", "init",
             jms, new String[] { "ServletException" });
-    init.addAnnotation(new JMethodAnnotationImpl("Override"));
+    init.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     init.setComment(new JMethodCommentImpl("Initialize filter."));
 
     // Set method body
@@ -168,7 +168,7 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
   private JMethod createDestroyMethod() throws Exception
   {
     JMethod destroy = JMethod.factory.create(JModifier.PUBLIC, "void", "destroy");
-    destroy.addAnnotation(new JMethodAnnotationImpl("Override"));
+    destroy.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     destroy.setComment(new JMethodCommentImpl("Destroy filter."));
 
     // Set method body
@@ -194,7 +194,7 @@ public class CORSFilterGenerator extends FDefaultWSDLHandler
 
     JMethod doFilter = JMethod.factory.create(JModifier.PUBLIC, "void", "doFilter",
             jms, new String[] { "IOException", "ServletException" });
-    doFilter.addAnnotation(new JMethodAnnotationImpl("Override"));
+    doFilter.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     doFilter.setComment(new JMethodCommentImpl("Filter request and add CORS header to response."));
 
     // Set method body

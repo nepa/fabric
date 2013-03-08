@@ -1,4 +1,4 @@
-/** 08.03.2013 23:20 */
+/** 08.03.2013 23:44 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -105,7 +105,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     JMethodSignature jms = JMethodSignature.factory.create(webSocket);
 
     JMethod onOpen = JMethod.factory.create(JModifier.PUBLIC, "void", "onOpen", jms);
-    onOpen.addAnnotation(new JMethodAnnotationImpl("Override"));
+    onOpen.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     onOpen.setComment(new JMethodCommentImpl("Callback for newly opened connection."));
 
     // Set method body
@@ -124,7 +124,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 
     // Add onClose() method
     JMethod onClose = JMethod.factory.create(JModifier.PUBLIC, "void", "onClode", jms);
-    onClose.addAnnotation(new JMethodAnnotationImpl("Override"));
+    onClose.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     onClose.setComment(new JMethodCommentImpl("Callback for recently closed connection."));
 
     // Set method body
@@ -142,7 +142,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     jms = JMethodSignature.factory.create(webSocket, message);
 
     JMethod onTextMessage = JMethod.factory.create(JModifier.PUBLIC, "void", "onTextMessage", jms);
-    onTextMessage.addAnnotation(new JMethodAnnotationImpl("Override"));
+    onTextMessage.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     onTextMessage.setComment(new JMethodCommentImpl("Callback for received message."));
 
     // Set method body

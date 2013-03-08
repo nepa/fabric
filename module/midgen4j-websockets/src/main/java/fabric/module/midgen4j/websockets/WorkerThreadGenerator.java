@@ -1,4 +1,4 @@
-/** 07.03.2013 17:53 */
+/** 08.03.2013 23:46 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -304,7 +304,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
      *****************************************************************/
 
     JMethod run = JMethod.factory.create(JModifier.PUBLIC, "void", "run");
-    run.addAnnotation(new JMethodAnnotationImpl("Override"));
+    run.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     run.setComment(new JMethodCommentImpl("Run worker thread to handle request."));
 
     // Set method body
