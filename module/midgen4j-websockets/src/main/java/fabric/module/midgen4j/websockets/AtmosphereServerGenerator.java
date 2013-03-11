@@ -1,13 +1,16 @@
-/** 11.03.2013 01:44 */
+/** 11.03.2013 21:03 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
+import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.java.JClass;
 import de.uniluebeck.sourcegen.java.JClassAnnotationImpl;
 import de.uniluebeck.sourcegen.java.JClassCommentImpl;
@@ -23,6 +26,9 @@ import de.uniluebeck.sourcegen.java.JModifier;
 import de.uniluebeck.sourcegen.java.JParameter;
 import de.uniluebeck.sourcegen.java.JSourceFile;
 import fabric.module.api.FDefaultWSDLHandler;
+
+import fabric.wsdlschemaparser.wsdl.FOperation;
+import fabric.wsdlschemaparser.wsdl.FPortType;
 
 /**
  * Fabric handler class to extend the Java Middleware Generator. This
@@ -54,6 +60,9 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
   /** Properties object for module configuration */
   private Properties properties;
 
+  /** Names of service operations from WSDL file */
+  private Set<String> operationNames;
+
   /** Name of WebSockets interface class */
   private String interfaceName;
 
@@ -79,6 +88,8 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     this.workspace = workspace;
     this.properties = properties;
 
+    this.operationNames = new HashSet<String>();
+
     // Extract global properties
     this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
@@ -99,6 +110,27 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
   }
 
   /**
+   * Process port types (WSDL 2.0: interfaces) that are defined in WSDL document.
+   *
+   * @param portTypes Port types of WSDL document
+   *
+   * @throws Exception Error during processing
+   */
+  @Override
+  public void processPortTypes(final HashSet<FPortType> portTypes) throws Exception
+  {
+    // Process all service operations
+    for (FPortType portType: portTypes)
+    {
+      for (FOperation operation: portType.getOperations())
+      {
+        // Collect names of all service operations
+        this.operationNames.add(operation.getOperationName());
+      }
+    }
+  }
+
+  /**
    * Create a source file that contains the WebSockets server.
    * The method will generate the corresponding Java class and
    * add all necessary Java imports to the file.
@@ -113,16 +145,22 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     jsf.add(this.createWebSocketsServerClass());
 
     // Add required imports to source file
-    jsf.addImport("org.slf4j.Logger");
-    jsf.addImport("org.slf4j.LoggerFactory");
-    jsf.addImport("java.util.regex.Pattern");
-    jsf.addImport("org.atmosphere.config.service.WebSocketHandlerService");
-    jsf.addImport("org.atmosphere.cpr.BroadcasterFactory");
-    jsf.addImport("org.atmosphere.cpr.MetaBroadcaster");
-    jsf.addImport("org.atmosphere.websocket.WebSocket");
-    jsf.addImport("org.atmosphere.websocket.WebSocketHandlerAdapter");
+    this.addRequiredImport(jsf, "org.slf4j.Logger");
+    this.addRequiredImport(jsf, "org.slf4j.LoggerFactory");
+    this.addRequiredImport(jsf, "java.util.regex.Pattern");
+    this.addRequiredImport(jsf, "org.atmosphere.config.service.WebSocketHandlerService");
+    this.addRequiredImport(jsf, "org.atmosphere.cpr.BroadcasterFactory");
+    this.addRequiredImport(jsf, "org.atmosphere.cpr.MetaBroadcaster");
+    this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
+    this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocketHandlerAdapter");
 
-    // TODO: Add imports for worker thread classes
+    // Add imports for worker thread classes
+    for (String operationName: this.operationNames)
+    {
+      String workerThreadClassName = AtmosphereServerGenerator.firstLetterCapital(operationName) + "Worker";
+
+      jsf.addImport(String.format("%s.%s.%s", this.packageName, WorkerThreadGenerator.WORKER_THREAD_PACKAGE_SEGMENT, workerThreadClassName));
+    }
   }
 
   /**
@@ -141,7 +179,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     JClass serverClass = JClass.factory.create(JModifier.PUBLIC, this.interfaceName);
     serverClass.setExtends("WebSocketHandlerAdapter");
     serverClass.addAnnotation(new JClassAnnotationImpl(String.format(
-            "WebSocketHandlerService(path = \"/%s\"})", this.channelName)));
+            "WebSocketHandlerService(path = \"/%s\")", this.channelName)));
     serverClass.setComment(new JClassCommentImpl(String.format("The '%s' class.", this.interfaceName)));
 
     LOGGER.debug(String.format("Created '%s' class for WebSockets server.", this.interfaceName));
@@ -245,8 +283,8 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "webSocket.resource().setBroadcaster(BroadcasterFactory.getDefault().lookup(\"/%s\", true));\n\n" +
 
             "// Send message\n" +
-            "%s.broadcastMessage(\"/%s\", \"Server opened connection.\"); // TODO: Do NOT broadcast to ALL clients!",
-            this.channelName, this.channelName, this.interfaceName, this.channelName);
+            "%s.send(webSocket, \"Server opened connection.\");",
+            this.channelName, this.channelName, this.interfaceName);
     onOpen.getBody().setSource(methodBody);
 
     return onOpen;
@@ -301,8 +339,33 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     onTextMessage.setComment(new JMethodCommentImpl("Callback for received message."));
 
     // Set method body
-    String methodBody =
-            "// TODO"; // TODO: Create method body
+    String methodBody = String.format(
+// TODO: Block begin
+            "LOGGER.info(\"Received message: \" + message);\n\n" +
+
+            "String data[] = message.split(Pattern.quote(String.valueOf(%s.DELIMITER)));\n" +
+            "if (data.length != 3) {\n" +
+            "\tString responseMessage = \"Invalid request structure. Use 'uuid$method$payload'. Part count was: \" + data.length;\n\n" +
+
+            "\tLOGGER.info(responseMessage);\n" +
+            "\t%s.sendMessage(webSocket, responseMessage);\n" +
+            "}\n" +
+            "else {\n" +
+            "\tString uuid = data[0];\n" +
+            "\tString method = data[1];\n" +
+            "\tString payload = data[2];\n\n" +
+
+            "\tLOGGER.info(String.format(\"Method '%%s' was called. UUID is '%%s'. Payload is '%%s'.\", method, uuid, payload));\n\n" +
+
+            "\t// Dispatch request\n" +
+            "try {\n" +
+            // TODO: Create code to dispatch requests
+            "}\n" +
+            "catch (Exception e) {\n" +
+            "\tSystem.out.println(\"Could not dispatch request: \" + e.getMessage());\n" +
+            "}",
+            this.interfaceName, this.interfaceName);
+// TODO: Block end
     onTextMessage.getBody().setSource(methodBody);
 
     return onTextMessage;
@@ -397,5 +460,58 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     broadcastMessage.getBody().setSource(methodBody);
 
     return broadcastMessage;
+  }
+
+  /**
+   * Private helper method to add required Java imports to the
+   * source file of the WebSockets server. The method will only
+   * import a class, if it does not reside in the same package
+   * as the WebSockets server class. Furthermore, the method
+   * checks for duplicate imports automatically. It will only
+   * import a class, if it is not present in the source file's
+   * imports already.
+   *
+   * Multiple calls to this function with the same arguments will
+   * result in a single import statement on source code write-out.
+   *
+   * @param requiredImport Name of required import
+   */
+  private void addRequiredImport(final JSourceFile sourceFile, final String requiredImport)
+  {
+    if (null != requiredImport)
+    {
+      // Extract package name from fully qualified class name
+      String importPackageName = requiredImport.substring(0, requiredImport.lastIndexOf("."));
+
+      // Do not import from same package!
+      if (!this.packageName.equals(importPackageName))
+      {
+        // No duplicate imports!
+        if (!sourceFile.containsImport(requiredImport))
+        {
+          try
+          {
+            sourceFile.addImport(requiredImport);
+          }
+          catch (JDuplicateException e)
+          {
+            // Exception ignored intentionally
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Private helper method to capitalize the first letter of a string.
+   * Function will return null, if argument was null.
+   *
+   * @param text Text to process
+   *
+   * @return Text with first letter capitalized or null
+   */
+  private static String firstLetterCapital(final String text)
+  {
+    return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
 }

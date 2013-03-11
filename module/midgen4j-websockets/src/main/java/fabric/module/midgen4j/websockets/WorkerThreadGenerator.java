@@ -1,4 +1,4 @@
-/** 11.03.2013 01:44 */
+/** 11.03.2013 19:06 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -47,6 +47,9 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
   /** Name of the base worker thread class */
   public static final String WORKER_THREAD_CLASS_NAME = "WorkerThread";
 
+  /** Java package segment for worker thread classes */
+  public static final String WORKER_THREAD_PACKAGE_SEGMENT = "threads";
+
   /** Workspace object for code write-out */
   private Workspace workspace;
 
@@ -84,7 +87,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     // Extract global properties
     this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
-    this.threadWorkerPackageName = this.packageName + ".threads";
+    this.threadWorkerPackageName = this.packageName + "." + WORKER_THREAD_PACKAGE_SEGMENT;
     this.serviceProviderPackageName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
   }
@@ -561,8 +564,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
               "\n\n" +
               "// Marshal bean and create response message\n" +
               "String jsonResponse = %s.instanceToJSON(responseBeanObject);\n" +
-              "String responseMessage = Server.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n",
-              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
+              "String responseMessage = %s.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n",
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, this.interfaceName);
 
       // Create code to send response
       methodBody += String.format(
