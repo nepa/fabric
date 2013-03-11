@@ -1,4 +1,4 @@
-/** 10.03.2013 17:22 */
+/** 11.03.2013 01:44 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -48,14 +48,14 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(AtmosphereServerGenerator.class);
 
-  /** Name of the WebSockets server class */
-  public static final String SERVER_CLASS_NAME = "Server"; // TODO: Use MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY instead?
-
   /** Workspace object for code write-out */
   private Workspace workspace;
 
   /** Properties object for module configuration */
   private Properties properties;
+
+  /** Name of WebSockets interface class */
+  private String interfaceName;
 
   /** Java package name for WebSocket interface classes */
   private String packageName;
@@ -80,6 +80,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     this.properties = properties;
 
     // Extract global properties
+    this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
     this.channelName = this.properties.getProperty(MidGen4JWebSocketsModule.CHANNEL_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
@@ -106,12 +107,22 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
    */
   private void createWebSocketsServerFile() throws Exception
   {
-    JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName, SERVER_CLASS_NAME);
+    JSourceFile jsf = this.workspace.getJava().getJSourceFile(this.packageName, this.interfaceName);
 
     // Add WebSockets server class
     jsf.add(this.createWebSocketsServerClass());
 
-    // TODO: Add required imports to source file
+    // Add required imports to source file
+    jsf.addImport("org.slf4j.Logger");
+    jsf.addImport("org.slf4j.LoggerFactory");
+    jsf.addImport("java.util.regex.Pattern");
+    jsf.addImport("org.atmosphere.config.service.WebSocketHandlerService");
+    jsf.addImport("org.atmosphere.cpr.BroadcasterFactory");
+    jsf.addImport("org.atmosphere.cpr.MetaBroadcaster");
+    jsf.addImport("org.atmosphere.websocket.WebSocket");
+    jsf.addImport("org.atmosphere.websocket.WebSocketHandlerAdapter");
+
+    // TODO: Add imports for worker thread classes
   }
 
   /**
@@ -127,13 +138,13 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
    */
   private JClass createWebSocketsServerClass() throws Exception
   {
-    JClass serverClass = JClass.factory.create(JModifier.PUBLIC, SERVER_CLASS_NAME);
+    JClass serverClass = JClass.factory.create(JModifier.PUBLIC, this.interfaceName);
     serverClass.setExtends("WebSocketHandlerAdapter");
     serverClass.addAnnotation(new JClassAnnotationImpl(String.format(
             "WebSocketHandlerService(path = \"/%s\"})", this.channelName)));
-    serverClass.setComment(new JClassCommentImpl(String.format("The '%s' class.", SERVER_CLASS_NAME)));
+    serverClass.setComment(new JClassCommentImpl(String.format("The '%s' class.", this.interfaceName)));
 
-    LOGGER.debug(String.format("Created '%s' class for WebSockets server.", SERVER_CLASS_NAME));
+    LOGGER.debug(String.format("Created '%s' class for WebSockets server.", this.interfaceName));
 
     // Add fields to class
     for (JField field: this.createFields())
@@ -168,7 +179,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 
     // Create LOGGER constant
     JField logger = JField.factory.create(JModifier.PRIVATE | JModifier.STATIC | JModifier.FINAL,
-            "Logger", "LOGGER", String.format("LoggerFactory.getLogger(%s.class)", SERVER_CLASS_NAME));
+            "Logger", "LOGGER", String.format("LoggerFactory.getLogger(%s.class)", this.interfaceName));
     logger.setComment(new JFieldCommentImpl("Logger object."));
     fields.add(logger);
 
@@ -195,8 +206,8 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
    */
   private JConstructor createConstructor() throws Exception
   {
-    JConstructor constructor = JConstructor.factory.create(JModifier.PUBLIC, SERVER_CLASS_NAME);
-    constructor.setComment(new JConstructorCommentImpl(String.format("Create new '%s' object.", SERVER_CLASS_NAME)));
+    JConstructor constructor = JConstructor.factory.create(JModifier.PUBLIC, this.interfaceName);
+    constructor.setComment(new JConstructorCommentImpl(String.format("Create new '%s' object.", this.interfaceName)));
 
     // Set method body
     String methodBody = String.format(
@@ -235,8 +246,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 
             "// Send message\n" +
             "%s.broadcastMessage(\"/%s\", \"Server opened connection.\"); // TODO: Do NOT broadcast to ALL clients!",
-            this.channelName, this.channelName,
-            SERVER_CLASS_NAME, this.channelName);
+            this.channelName, this.channelName, this.interfaceName, this.channelName);
     onOpen.getBody().setSource(methodBody);
 
     return onOpen;
@@ -323,7 +333,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     // Set method body
     String methodBody = String.format(
             "return uuid + %s.DELIMITER + method + %s.DELIMITER + payload;",
-            SERVER_CLASS_NAME, SERVER_CLASS_NAME);
+            this.interfaceName, this.interfaceName);
     buildResponse.getBody().setSource(methodBody);
 
     return buildResponse;

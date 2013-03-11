@@ -1,4 +1,4 @@
-/** 08.03.2013 23:46 */
+/** 11.03.2013 01:44 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -53,6 +53,9 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
   /** Properties object for module configuration */
   private Properties properties;
 
+  /** Name of WebSockets interface class */
+  private String interfaceName;
+
   /** Java package name for WebSockets interface class */
   private String packageName;
 
@@ -79,6 +82,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     this.properties = properties;
 
     // Extract global properties
+    this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
     this.threadWorkerPackageName = this.packageName + ".threads";
     this.serviceProviderPackageName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_PACKAGE_NAME_KEY);
@@ -168,7 +172,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     // Import server only if required
     if (null != operation.getOutputMessage())
     {
-      this.addRequiredImport(jsf, this.packageName + "." + AtmosphereServerGenerator.SERVER_CLASS_NAME);
+      this.addRequiredImport(jsf, this.packageName + "." + this.interfaceName);
     }
 
     // Operation has input message
@@ -566,7 +570,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
               "LOGGER.info(\"Responding to '%s()' request...\");\n" +
               "%s.sendMessage(this.webSocket, responseMessage);",
               WorkerThreadGenerator.firstLetterLowercase(rpcMethodName),
-              AtmosphereServerGenerator.SERVER_CLASS_NAME);
+              this.interfaceName);
     }
 
     // Surround code with try..catch-block
