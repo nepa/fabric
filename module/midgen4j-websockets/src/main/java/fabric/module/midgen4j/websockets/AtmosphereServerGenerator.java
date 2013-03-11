@@ -45,10 +45,8 @@ import fabric.module.api.FDefaultWSDLHandler;
  */
 public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 {
-  // TODO: Implement class
-
   /** Logger object */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AtmosphereServerGenerator.class); // TODO: Use logger in class
+  private static final Logger LOGGER = LoggerFactory.getLogger(AtmosphereServerGenerator.class);
 
   /** Name of the WebSockets server class */
   public static final String SERVER_CLASS_NAME = "Server"; // TODO: Use MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY instead?
@@ -135,6 +133,8 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "WebSocketHandlerService(path = \"/%s\"})", this.channelName)));
     serverClass.setComment(new JClassCommentImpl(String.format("The '%s' class.", SERVER_CLASS_NAME)));
 
+    LOGGER.debug(String.format("Created '%s' class for WebSockets server.", SERVER_CLASS_NAME));
+
     // Add fields to class
     for (JField field: this.createFields())
     {
@@ -186,7 +186,13 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     return fields;
   }
 
-  // TODO: Add comment
+  /**
+   * Create constructor for WebSockets server class.
+   *
+   * @return JConstructor object for server class
+   *
+   * @throws Exception Error during code generation
+   */
   private JConstructor createConstructor() throws Exception
   {
     JConstructor constructor = JConstructor.factory.create(JModifier.PUBLIC, SERVER_CLASS_NAME);
@@ -202,7 +208,15 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     return constructor;
   }
 
-  // TODO: Add comment
+  /**
+   * Create onOpen() method for WebSockets server class.
+   * This callback is executed, when a new connection is
+   * opened.
+   *
+   * @return JMethod object for onOpen() callback
+   *
+   * @throws Exception Error during code generation
+   */
   private JMethod createOnOpenMethod() throws Exception
   {
     JParameter webSocket = JParameter.factory.create("WebSocket", "webSocket");
@@ -228,7 +242,15 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     return onOpen;
   }
 
-  // TODO: Add comment
+  /**
+   * Create onClose() method for WebSockets server class.
+   * This callback is executed, when an open connection
+   * is closed.
+   *
+   * @return JMethod object for onClose() callback
+   *
+   * @throws Exception Error during code generation
+   */
   private JMethod createOnCloseMethod() throws Exception
   {
     JParameter webSocket = JParameter.factory.create("WebSocket", "webSocket");
@@ -248,8 +270,16 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     
     return onClose;
   }
-  
-  // TODO: Add comment
+
+  /**
+   * Create onTextMessage() method for WebSockets server
+   * class. This callback is executed, when a new text
+   * message is received.
+   *
+   * @return JMethod object for onTextMessage() callback
+   *
+   * @throws Exception Error during code generation
+   */
   private JMethod createOnTextMessage() throws Exception
   {
     JParameter webSocket = JParameter.factory.create("WebSocket", "webSocket");
@@ -268,7 +298,17 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     return onTextMessage;
   }
 
-  // TODO: Add comment
+  /**
+   * Create buildResponseMessage() method for WebSockets
+   * server class. The generated method can be used to
+   * build response messages for our own RPC protocol.
+   * Basically, it will append the UUID, operation name
+   * and payload, using a predefined delimiter.
+   *
+   * @return JMethod object to create response messages
+   *
+   * @throws Exception Error during code generation
+   */
   private JMethod createBuildResponse() throws Exception
   {
     JParameter uuid = JParameter.factory.create(JModifier.FINAL, "String", "uuid");
@@ -289,7 +329,15 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     return buildResponse;
   }
 
-  // TODO: Add comment
+  /**
+   * Create sendMessage() method for WebSockets server class.
+   * The generated method can be used to send a text message
+   * to a single, dedicated client.
+   *
+   * @return JMethod object to unicast text messages
+   *
+   * @throws Exception Error during code generation
+   */
   private JMethod createSendMessage() throws Exception
   {
     JParameter webSocket = JParameter.factory.create("WebSocket", "webSocket");
@@ -298,7 +346,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 
     JMethod sendMessage = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC,
             "void", "sendMessage", jms);
-    sendMessage.setComment(new JMethodCommentImpl("Send message to a single client,"));
+    sendMessage.setComment(new JMethodCommentImpl("Send message to a single client."));
 
     // Set method body
     String methodBody =
@@ -313,7 +361,15 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     return sendMessage;
   }
 
-  // TODO: Add comment
+  /**
+   * Create broadcastMessage() method for WebSockets server class.
+   * The generated method can be used to send a text message to
+   * multiple clients that are subscribed to a certain channel.
+   *
+   * @return JMethod object to broadcast text messages
+   *
+   * @throws Exception Error during code generation
+   */
   private JMethod createBroadcastMessage() throws Exception
   {
     JParameter targetChannel = JParameter.factory.create(JModifier.FINAL, "String", "targetChannel");
