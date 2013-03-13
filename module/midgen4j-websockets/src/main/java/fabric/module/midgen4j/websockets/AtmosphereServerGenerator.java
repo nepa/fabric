@@ -1,4 +1,4 @@
-/** 13.03.2013 15:59 */
+/** 13.03.2013 17:21 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -324,18 +324,22 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "\t}\n" +
             "\t// Could not dispatch request (e.g. unknown RPC method)\n" +
             "\tcatch (Exception e) {\n" +
-            "\t\tLOGGER.error(\"Could not dispatch request: \" + e.getMessage());\n" +
+            "\t\tString errorMessage = \"Could not dispatch request: \" + e.getMessage();\n\n" +
+
+            "\t\tLOGGER.error(errorMessage);\n" +
+            "\t\t%s.sendMessage(webSocket, errorMessage);\n" +
             "\t}\n" +
             "}\n" +
             "// Could not parse message (e.g. illegal message format)\n" +
             "catch (Exception e) {\n" +
-            "\tString errorMessage = e.getMessage();\n\n" +
+            "\tString errorMessage = \"Could not parse message: \" + e.getMessage();\n\n" +
 
-            "\tLOGGER.error(errorMessage);\n" +
-            "\t%s.sendMessage(webSocket, errorMessage);\n" +
+            "LOGGER.error(errorMessage);\n" +
+            "%s.sendMessage(webSocket, errorMessage);\n" +
             "}",
             this.messageClassFullName, this.messageClassFullName,
-            DispatcherGenerator.DISPATCHER_CLASS_NAME, this.interfaceName);
+            DispatcherGenerator.DISPATCHER_CLASS_NAME,
+            this.interfaceName, this.interfaceName);
     onTextMessage.getBody().setSource(methodBody);
 
     return onTextMessage;
@@ -462,7 +466,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     JParameter message = JParameter.factory.create(JModifier.FINAL, "String", "message");
     JMethodSignature jms = JMethodSignature.factory.create(message);
 
-    JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, this.interfaceName, jms, new String[] { "Exception" }); // TODO: Test output
+    JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, MESSAGE_CLASS_NAME, jms, new String[] { "Exception" });
     constructorMessage.setComment(new JConstructorCommentImpl("Parameterized constructor with message attribute."));
 
     // Set method body
@@ -604,7 +608,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 
     // Set method body
     methodBody =
-            "this.payload = payload";
+            "this.payload = payload;";
     setPayload.getBody().setSource(methodBody);
 
     // Add method to class
