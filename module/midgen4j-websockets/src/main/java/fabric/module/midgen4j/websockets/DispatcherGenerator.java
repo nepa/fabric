@@ -1,4 +1,4 @@
-/** 13.03.2013 00:18 */
+/** 13.03.2013 17:18 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
+import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.java.JClass;
 import de.uniluebeck.sourcegen.java.JClassCommentImpl;
 import de.uniluebeck.sourcegen.java.JConstructor;
@@ -60,6 +61,9 @@ public class DispatcherGenerator extends FDefaultWSDLHandler
   /** Java package name for WebSockets interface class */
   private String packageName;
 
+  /** Java package name of service provider class */
+  private String serviceProviderPackageName;
+
   /** Name of the service provider class */
   private String serviceProviderClassName;
 
@@ -81,6 +85,7 @@ public class DispatcherGenerator extends FDefaultWSDLHandler
     this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
     this.messageClassFullName = this.interfaceName + "." + AtmosphereServerGenerator.MESSAGE_CLASS_NAME;
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
+    this.serviceProviderPackageName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
   }
 
@@ -132,15 +137,18 @@ public class DispatcherGenerator extends FDefaultWSDLHandler
     jsf.add(this.createDispatcherClass());
 
     // Add required imports
-    jsf.addImport("org.atmosphere.websocket.WebSocket");
+    this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
+
+    this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.serviceProviderClassName);
 
     // Add imports for worker thread classes
     for (String operationName: this.operationNames)
     {
       String workerThreadClassName = DispatcherGenerator.firstLetterCapital(operationName) + "Worker";
+      String requiredImport = String.format("%s.%s.%s",
+              this.packageName, WorkerThreadGenerator.WORKER_THREAD_PACKAGE_SEGMENT, workerThreadClassName);
 
-      // TODO: Do proper duplicate and package checking?
-      jsf.addImport(String.format("%s.%s.%s", this.packageName, WorkerThreadGenerator.WORKER_THREAD_PACKAGE_SEGMENT, workerThreadClassName));
+      this.addRequiredImport(jsf, requiredImport);
     }
   }
 
@@ -210,7 +218,7 @@ public class DispatcherGenerator extends FDefaultWSDLHandler
       int counter = 0;
       for (String operationName: this.operationNames)
       {
-        String methodName = operationName; // TODO: firstLetterLowerCase?
+        String methodName = operationName;
         String workerThreadClassName = DispatcherGenerator.firstLetterCapital(operationName) + "Worker";
 
         // Create string with spaces for proper indention
@@ -257,14 +265,54 @@ public class DispatcherGenerator extends FDefaultWSDLHandler
 
       methodBody += String.format(
               "else {\n" +
-              "\t// TODO: Throw exception here?\n" +
-              "\t%s.sendMessage(webSocket, String.format(\"Method '%%s' is unknown.\", method));",
+              "\tthrow new Exception(String.format(\"Method '%%s()' is unknown.\", method));\n" +
+              "}",
               this.interfaceName);
     }
 
     dispatch.getBody().setSource(methodBody);
 
     return dispatch;
+  }
+
+  /**
+   * Private helper method to add required Java imports to the
+   * source file of the request dispatcher. The method will only
+   * import a class, if it does not reside in the same package
+   * as the request dispatcher class. Furthermore, the method
+   * checks for duplicate imports automatically. It will only
+   * import a class, if it is not present in the source file's
+   * imports already.
+   *
+   * Multiple calls to this function with the same arguments will
+   * result in a single import statement on source code write-out.
+   *
+   * @param requiredImport Name of required import
+   */
+  private void addRequiredImport(final JSourceFile sourceFile, final String requiredImport)
+  {
+    if (null != requiredImport)
+    {
+      // Extract package name from fully qualified class name
+      String importPackageName = requiredImport.substring(0, requiredImport.lastIndexOf("."));
+
+      // Do not import from same package!
+      if (!this.packageName.equals(importPackageName))
+      {
+        // No duplicate imports!
+        if (!sourceFile.containsImport(requiredImport))
+        {
+          try
+          {
+            sourceFile.addImport(requiredImport);
+          }
+          catch (JDuplicateException e)
+          {
+            // Exception ignored intentionally
+          }
+        }
+      }
+    }
   }
 
   /**
