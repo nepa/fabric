@@ -1,4 +1,4 @@
-/** 13.03.2013 01:02 */
+/** 13.03.2013 15:59 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -462,9 +462,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     JParameter message = JParameter.factory.create(JModifier.FINAL, "String", "message");
     JMethodSignature jms = JMethodSignature.factory.create(message);
 
-    // TODO: Add exception support to JConstructor class, so that we can do:
-    //   JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, this.interfaceName, jms, new String[] { "Exception" });
-    JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, MESSAGE_CLASS_NAME, jms);
+    JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, this.interfaceName, jms, new String[] { "Exception" }); // TODO: Test output
     constructorMessage.setComment(new JConstructorCommentImpl("Parameterized constructor with message attribute."));
 
     // Set method body
