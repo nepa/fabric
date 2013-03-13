@@ -36,8 +36,7 @@ import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
 
 class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 
-	private static final ResourceBundle res =
-		ResourceBundle.getBundle(JInterfaceMethodImpl.class.getCanonicalName());
+	private static final ResourceBundle res = ResourceBundle.getBundle(JInterfaceMethodImpl.class.getCanonicalName());
 
 	protected int modifiers;
 
@@ -52,7 +51,7 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	/**
 	 * This method's list of Java annotations (e.g. Override).
 	 */
-	private List<JMethodAnnotation> annotations = new ArrayList<JMethodAnnotation>( );
+	private List<JMethodAnnotation> annotations = new ArrayList<JMethodAnnotation>();
 
 	/**
 	 * This method's Javadoc comment.
@@ -76,12 +75,14 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 
 	}
 
+  @Override
 	public JInterfaceMethod add(JParameter... params) throws JDuplicateException {
 		for (JParameter param : params)
 			this.signature.add(param);
 		return this;
 	}
 
+  @Override
 	public JInterfaceMethod addException(String... exception) throws JDuplicateException {
 		for (String e : exception)
 			addExceptionInternal(e);
@@ -94,6 +95,7 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 		this.exceptions.add(exception);
 	}
 
+  @Override
 	public boolean containsException(String exception) {
 
 		for (String e : exceptions)
@@ -107,6 +109,7 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#addAnnotation(de.uniluebeck.sourcegen.java.JMethodAnnotation[])
 	 */
+  @Override
 	public JInterfaceMethod addAnnotation(JMethodAnnotation... annotations) {
 	    for (JMethodAnnotation ann : annotations) {
 	        this.annotations.add(ann);
@@ -117,11 +120,13 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#setComment(de.uniluebeck.sourcegen.java.JMethodComment)
 	 */
+  @Override
 	public JInterfaceMethod setComment(JMethodComment comment) {
 		this.comment = comment;
 		return this;
 	}
 
+  @Override
 	public boolean equals(JInterfaceMethod other) {
 		return
 			name.equals(((JInterfaceMethodImpl)other).name) &&
@@ -203,7 +208,7 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	}
 
 	public static void main(String[] args) throws Exception {
-		JMethodImpl meth = new JMethodImpl(
+		JMethodImpl method = new JMethodImpl(
 				Modifier.PUBLIC | Modifier.STATIC,
 				"String",
 				"toString",
@@ -215,7 +220,7 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 				"hello\n",
 				"world"
 		);
-		System.out.print(meth.toString(1));
+		System.out.print(method.toString(1));
 	}
 
   @Override

@@ -25,6 +25,7 @@
 package de.uniluebeck.sourcegen.java;
 
 import de.uniluebeck.sourcegen.exceptions.JConflictingModifierException;
+import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
 
 public interface JConstructor extends JLangElem {
@@ -42,26 +43,29 @@ public interface JConstructor extends JLangElem {
         private JavaConstructorFactory() { /* not to be invoked */ }
 
         public JConstructor create(int modifiers, String className, JMethodSignature signature,
-                String... source) throws JConflictingModifierException, JInvalidModifierException {
-            return new JConstructorImpl(modifiers, className, signature, source);
+                String[] exceptions, String... source) throws JDuplicateException, JConflictingModifierException, JInvalidModifierException {
+            return new JConstructorImpl(modifiers, className, signature, exceptions, source);
         }
 
         public JConstructor create(int modifiers, String className, JMethodSignature signature)
-                throws JConflictingModifierException, JInvalidModifierException {
-            return new JConstructorImpl(modifiers, className, signature);
+                throws JDuplicateException, JConflictingModifierException, JInvalidModifierException {
+            return new JConstructorImpl(modifiers, className, signature, null);
         }
 
         public JConstructor create(int modifiers, String className)
-                throws JConflictingModifierException, JInvalidModifierException {
-            return new JConstructorImpl(modifiers, className, null);
+                throws JDuplicateException, JConflictingModifierException, JInvalidModifierException {
+            return new JConstructorImpl(modifiers, className, null, null);
         }
 
     }
 
     public static final JavaConstructorFactory factory = JavaConstructorFactory.getInstance();
 
-    public boolean equals(JConstructorImpl other);
-    
+    public boolean equals(JConstructor other);
+
+    public JConstructor addException(String... exceptions) throws JDuplicateException;
+    public boolean containsException(String exception);
+
     public String getClassName();
     public JMethodSignature getSignature();
     public JMethodBody getBody();

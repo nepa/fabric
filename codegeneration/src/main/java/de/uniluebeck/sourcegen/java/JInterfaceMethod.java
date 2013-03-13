@@ -52,16 +52,16 @@ public interface JInterfaceMethod extends JLangElem {
 
 	public static final JavaInterfaceMethodFactory factory = JavaInterfaceMethodFactory.getInstance();
 
-	public JInterfaceMethod add					(JParameter... params) 	throws JDuplicateException;
+	public JInterfaceMethod add(JParameter... params) throws JDuplicateException;
 
-	public JInterfaceMethod addException		(String... exception) 	throws JDuplicateException;
-	public boolean 			containsException	(String exception)		;
+	public JInterfaceMethod addException(String... exception) throws JDuplicateException;
+	public boolean containsException(String exception);
 
   public int getModifiers();
   public String getReturnType();
   public JMethodSignature	getSignature();
 
-  public boolean 			equals				(JInterfaceMethod other);
+  public boolean equals(JInterfaceMethod other);
 
   /**
 	 * Adds an annotation to this method.
@@ -69,7 +69,7 @@ public interface JInterfaceMethod extends JLangElem {
 	 * @param annotations The Java method annotation.
 	 * @return This object.
 	 */
-	public JInterfaceMethod addAnnotation       (JMethodAnnotation... annotations);
+	public JInterfaceMethod addAnnotation(JMethodAnnotation... annotations);
 
 	/**
 	 * Set the Javadoc comment for the current method.
@@ -77,5 +77,5 @@ public interface JInterfaceMethod extends JLangElem {
 	 * @param comment The Java method comment.
 	 * @return This object.
 	 */
-	public JInterfaceMethod setComment			(JMethodComment comment);
+	public JInterfaceMethod setComment(JMethodComment comment);
 }

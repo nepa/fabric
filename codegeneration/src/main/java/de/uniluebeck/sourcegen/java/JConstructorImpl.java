@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import de.uniluebeck.sourcegen.exceptions.JConflictingModifierException;
+import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
-
 
 class JConstructorImpl extends JElemImpl implements JConstructor {
 
@@ -43,6 +43,8 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
 
     private JMethodSignatureImpl signature;
 
+    private ArrayList<String> exceptions = new ArrayList<String>();
+
     private JMethodBodyImpl body;
 
     private JConstructorComment comment = null;
@@ -52,22 +54,56 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
      */
     private List<JConstructorAnnotation> annotations = new ArrayList<JConstructorAnnotation>();
 
-    public JConstructorImpl(int modifiers, String className, JMethodSignature signature, String... source)
-            throws JConflictingModifierException, JInvalidModifierException {
+    public JConstructorImpl(int modifiers, String className, JMethodSignature signature, String[] exceptions, String... source)
+            throws JDuplicateException, JConflictingModifierException, JInvalidModifierException {
 
         this.modifiers = modifiers;
         this.className = className;
-        this.signature = (signature != null) ? (JMethodSignatureImpl) signature :
-                JMethodSignature.factory.createEmptySignature();
+        this.signature = (signature != null) ? (JMethodSignatureImpl) signature : JMethodSignature.factory.createEmptySignature();
         this.body = (source != null) ? new JMethodBodyImpl(source) : JMethodBody.factory.createEmpty();
+
+        if (null != exceptions) {
+            for (String e: exceptions) {
+                this.addException(e);
+            }
+        }
 
         validateModifiers();
 
     }
 
-    public boolean equals(JConstructorImpl other) {
-        return className.equals(other.className)
-                && signature.equals(other.signature);
+    @Override
+    public boolean equals(JConstructor other) {
+        return className.equals(((JConstructorImpl)other).className) &&
+                  signature.equals(((JConstructorImpl)other).signature);
+    }
+
+    @Override
+    public JConstructor addException(String... exceptions) throws JDuplicateException {
+        for (String e: exceptions) {
+            this.addExceptionInternal(e);
+        }
+
+        return this;
+    }
+
+    private void addExceptionInternal(String exception) throws JDuplicateException {
+        if (this.containsException(exception)) {
+            throw new JDuplicateException(res.getString("exception.exceptions.duplicate"));
+        }
+
+        this.exceptions.add(exception);
+    }
+
+    @Override
+    public boolean containsException(String exception) {
+        for (String e: this.exceptions) {
+            if (e.equals(exception)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -156,6 +192,19 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
             buffer.append(" ");
         buffer.append(className);
         signature.toString(buffer, 0);
+
+        if (this.exceptions.size() > 0) {
+            buffer.append(" throws ");
+
+            for (String e: this.exceptions) {
+                buffer.append(e);
+
+                if (!e.equals(this.exceptions.get(this.exceptions.size() - 1))) {
+                    buffer.append(", ");
+                }
+            }
+        }
+
         buffer.append(" {\n");
         body.toString(buffer, tabCount + 1);
         buffer.append("\n");
@@ -169,10 +218,34 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
                 "FooClass",
                 JMethodSignature.factory.create(
                     JParameter.factory.create(JModifier.NONE, "String", "barParam")),
+                new String[] { "TestException", "Test2Exception" },
                 "System.out.println(\"Hello World!\");\n" +
                 "System.out.println(barParam);"
         );
         System.out.println(constructor.toString(1));
+
+        JConstructor constructor2 = JConstructor.factory.create(
+                Modifier.PRIVATE,
+                "FooClass",
+                JMethodSignature.factory.create(
+                    JParameter.factory.create(JModifier.NONE, "String", "barParam")),
+                new String[] { "TestException", "Test2Exception" }
+        );
+        System.out.println(constructor2.toString(1));
+
+        JConstructor constructor3 = JConstructor.factory.create(
+                Modifier.PRIVATE,
+                "FooClass",
+                JMethodSignature.factory.create(
+                    JParameter.factory.create(JModifier.NONE, "String", "barParam"))
+        );
+        System.out.println(constructor3.toString(1));
+
+        JConstructor constructor4 = JConstructor.factory.create(
+                Modifier.PRIVATE,
+                "FooClass"
+        );
+        System.out.println(constructor4.toString(1));
     }
 
 }

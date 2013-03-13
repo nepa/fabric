@@ -30,8 +30,6 @@ import de.uniluebeck.sourcegen.exceptions.JCodeValidationException;
 import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
 
-
-
 class JMethodImpl extends JInterfaceMethodImpl implements JMethod {
 
 	private static final ResourceBundle res = ResourceBundle.getBundle(JMethodImpl.class.getCanonicalName());
