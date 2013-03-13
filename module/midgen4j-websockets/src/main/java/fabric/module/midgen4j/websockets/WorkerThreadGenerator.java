@@ -1,11 +1,11 @@
-/** 11.03.2013 19:06 */
+/** 12.03.2013 22:34 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Scanner;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Properties;
 
 import de.uniluebeck.sourcegen.Workspace;
@@ -59,6 +59,9 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
   /** Name of WebSockets interface class */
   private String interfaceName;
 
+  /** Full name of inner class for RPC protocol messages */
+  private String messageClassFullName;
+
   /** Java package name for WebSockets interface class */
   private String packageName;
 
@@ -86,6 +89,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
 
     // Extract global properties
     this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
+    this.messageClassFullName = this.interfaceName + "." + AtmosphereServerGenerator.MESSAGE_CLASS_NAME;
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
     this.threadWorkerPackageName = this.packageName + "." + WORKER_THREAD_PACKAGE_SEGMENT;
     this.serviceProviderPackageName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_PACKAGE_NAME_KEY);
@@ -142,6 +146,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     // Add required imports
     this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
     this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.serviceProviderClassName);
+    this.addRequiredImport(jsf, this.packageName + "." + this.interfaceName);
   }
 
   /**
@@ -170,6 +175,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
 
     this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.serviceProviderClassName);
+    this.addRequiredImport(jsf, this.packageName + "." + this.interfaceName);
     this.addRequiredImport(jsf, this.packageName + "." + JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
 
     // Import server only if required
@@ -210,30 +216,24 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     LOGGER.debug(String.format("Created '%s' class for base worker thread.", WORKER_THREAD_CLASS_NAME));
 
     // Add member variables
-    workerThread.add(JField.factory.create(JModifier.PROTECTED, "String", "method"));
-    workerThread.add(JField.factory.create(JModifier.PROTECTED, "String", "uuid"));
-    workerThread.add(JField.factory.create(JModifier.PROTECTED, "String", "payload"));
     workerThread.add(JField.factory.create(JModifier.PROTECTED, this.serviceProviderClassName, "serviceProvider"));
     workerThread.add(JField.factory.create(JModifier.PROTECTED, "WebSocket", "webSocket"));
+    workerThread.add(JField.factory.create(JModifier.PROTECTED, this.messageClassFullName, "requestMessage"));
 
     // Create constructor
-    JParameter method = JParameter.factory.create(JModifier.FINAL, "String", "method");
-    JParameter uuid = JParameter.factory.create(JModifier.FINAL, "String", "uuid");
-    JParameter payload = JParameter.factory.create(JModifier.FINAL, "String", "payload");
     JParameter serviceProvider = JParameter.factory.create(JModifier.FINAL, this.serviceProviderClassName, "serviceProvider");
     JParameter webSocket = JParameter.factory.create(JModifier.FINAL, "WebSocket", "webSocket");
+    JParameter requestMessage = JParameter.factory.create(JModifier.FINAL, this.messageClassFullName, "requestMessage");
 
-    JMethodSignature jms = JMethodSignature.factory.create(method, uuid, payload, serviceProvider, webSocket);
+    JMethodSignature jms = JMethodSignature.factory.create(serviceProvider, webSocket, requestMessage);
     JConstructor constructor = JConstructor.factory.create(JModifier.PROTECTED, WORKER_THREAD_CLASS_NAME, jms);
     constructor.setComment(new JConstructorCommentImpl(String.format("Constructor to initialize a new '%s' object.", WORKER_THREAD_CLASS_NAME)));
 
     // Set method body
     String methodBody =
-            "this.method = method;\n" +
-            "this.uuid = uuid;\n" +
-            "this.payload = payload;\n" +
             "this.serviceProvider = serviceProvider;\n" +
-            "this.webSocket = webSocket;";
+            "this.webSocket = webSocket;\n" +
+            "this.requestMessage = requestMessage;";
     constructor.getBody().setSource(methodBody);
 
     // Add constructor to class
@@ -270,7 +270,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     LOGGER.debug(String.format("Created '%s' class for child worker thread.", workerClassName));
 
     /*****************************************************************
-     * Add fields
+     * Create fields
      *****************************************************************/
 
     JField logger = JField.factory.create(JModifier.PRIVATE | JModifier.STATIC | JModifier.FINAL,
@@ -285,29 +285,27 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     workerClass.add(builder);
 
     /*****************************************************************
-     * Add constructor
+     * Create constructor
      *****************************************************************/
 
-    JParameter method = JParameter.factory.create(JModifier.FINAL, "String", "method");
-    JParameter uuid = JParameter.factory.create(JModifier.FINAL, "String", "uuid");
-    JParameter payload = JParameter.factory.create(JModifier.FINAL, "String", "payload");
     JParameter serviceProvider = JParameter.factory.create(JModifier.FINAL, this.serviceProviderClassName, "serviceProvider");
     JParameter webSocket = JParameter.factory.create(JModifier.FINAL, "WebSocket", "webSocket");
+    JParameter requestMessage = JParameter.factory.create(JModifier.FINAL, this.messageClassFullName, "requestMessage");
 
-    JMethodSignature jms = JMethodSignature.factory.create(method, uuid, payload, serviceProvider, webSocket);
+    JMethodSignature jms = JMethodSignature.factory.create(serviceProvider, webSocket, requestMessage);
     JConstructor constructor = JConstructor.factory.create(JModifier.PRIVATE, workerClassName, jms);
     constructor.setComment(new JConstructorCommentImpl(String.format("Constructor to create a new '%s' object.", workerClassName)));
 
     // Set method body
     String methodBody =
-            "super(method, uuid, payload, serviceProvider, webSocket);";
+            "super(serviceProvider, webSocket, requestMessage);";
     constructor.getBody().setSource(methodBody);
 
     // Add constructor to class
     workerClass.add(constructor);
 
     /*****************************************************************
-     * Add run method
+     * Create run method
      *****************************************************************/
 
     JMethod run = JMethod.factory.create(JModifier.PUBLIC, "void", "run");
@@ -352,21 +350,15 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     LOGGER.debug(String.format("Created '%s' class as inner class of '%s'.", builderClassName, workerThreadClassName));
 
     /*****************************************************************
-     * Add fields
+     * Create fields
      *****************************************************************/
 
     JField instance = JField.factory.create(JModifier.PRIVATE | JModifier.STATIC, builderClassName, "instance");
     instance.setComment(new JFieldCommentImpl("Builder instance for Singleton pattern"));
     builderClass.add(instance);
 
-    JField method = JField.factory.create(JModifier.PRIVATE, "String", "method");
-    builderClass.add(method);
-
-    JField uuid = JField.factory.create(JModifier.PRIVATE, "String", "uuid");
-    builderClass.add(uuid);
-
-    JField payload = JField.factory.create(JModifier.PRIVATE, "String", "payload");
-    builderClass.add(payload);
+    JField request = JField.factory.create(JModifier.PRIVATE, this.messageClassFullName, "request");
+    builderClass.add(request);
 
     JField serviceProvider = JField.factory.create(JModifier.PRIVATE, this.serviceProviderClassName, "serviceProvider");
     builderClass.add(serviceProvider);
@@ -382,8 +374,9 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     constructor.setComment(new JConstructorCommentImpl("Private constructor for Singleton pattern."));
 
     // Set method body
-    String methodBody =
-            "// Empty implementation";
+    String methodBody = String.format(
+            "this.request = new %s();",
+            this.messageClassFullName);
     constructor.getBody().setSource(methodBody);
 
     // Add constructor to class
@@ -420,7 +413,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
 
     // Set method body
     methodBody =
-            "this.method = method;\n\n" +
+            "this.request.setMethod(method);\n\n" +
             "return this;";
     executeMethod.getBody().setSource(methodBody);
 
@@ -439,8 +432,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
 
     // Set method body
     methodBody =
-            "this.uuid = uuid;\n" +
-            "this.payload = payload;\n\n" +
+            "this.request.setUUID(uuid);\n" +
+            "this.request.setPayload(payload);\n\n" +
             "return this;";
     dataMethod.getBody().setSource(methodBody);
 
@@ -493,11 +486,11 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
 
     // Set method body
     methodBody = String.format(
-            "if (null == this.method || null == this.uuid || null == this.payload || " +
-            "null == this.serviceProvider || null == this.webSocket) {\n" +
+            "if (null == this.request || null == this.serviceProvider || null == this.webSocket || " +
+            "null == this.request.method() || null == this.request.uuid() || null == this.request.payload()) {\n" +
             "\tthrow new Exception(\"Initialize '%s' object properly before building.\");\n" +
             "}\n\n" +
-            "return new %s(this.method, this.uuid, this.payload, this.serviceProvider, this.webSocket);",
+            "return new %s(this.serviceProvider, this.webSocket, this.request);",
             workerThreadClassName, workerThreadClassName);
     buildMethod.getBody().setSource(methodBody);
 
@@ -534,7 +527,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
       // Create code to convert JSON code to a bean object
       methodBody += String.format(
               "// Unmarshal JSON code from request\n" +
-              "%s requestBeanObject = (%s)%s.jsonToInstance(%s.class, this.payload);\n\n",
+              "%s requestBeanObject = (%s)%s.jsonToInstance(%s.class, this.requestMessage.payload());\n\n",
               inputMessageClassName, inputMessageClassName,
               JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, inputMessageClassName);
     }
@@ -564,14 +557,14 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
               "\n\n" +
               "// Marshal bean and create response message\n" +
               "String jsonResponse = %s.instanceToJSON(responseBeanObject);\n" +
-              "String responseMessage = %s.buildResponseMessage(this.uuid, this.method, jsonResponse);\n\n",
-              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, this.interfaceName);
+              "%s responseMessage = new %s(this.requestMessage.uuid(), this.requestMessage.method(), jsonResponse);\n\n",
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, this.messageClassFullName, this.messageClassFullName);
 
       // Create code to send response
       methodBody += String.format(
               "// Send response to client\n" +
               "LOGGER.info(\"Responding to '%s()' request...\");\n" +
-              "%s.sendMessage(this.webSocket, responseMessage);",
+              "%s.sendMessage(this.webSocket, responseMessage.asString());",
               WorkerThreadGenerator.firstLetterLowercase(rpcMethodName),
               this.interfaceName);
     }

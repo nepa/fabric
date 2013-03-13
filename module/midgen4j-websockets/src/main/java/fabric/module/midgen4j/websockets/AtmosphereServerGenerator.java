@@ -1,11 +1,9 @@
-/** 11.03.2013 21:03 */
+/** 13.03.2013 01:02 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -26,9 +24,6 @@ import de.uniluebeck.sourcegen.java.JModifier;
 import de.uniluebeck.sourcegen.java.JParameter;
 import de.uniluebeck.sourcegen.java.JSourceFile;
 import fabric.module.api.FDefaultWSDLHandler;
-
-import fabric.wsdlschemaparser.wsdl.FOperation;
-import fabric.wsdlschemaparser.wsdl.FPortType;
 
 /**
  * Fabric handler class to extend the Java Middleware Generator. This
@@ -54,23 +49,29 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
   /** Logger object */
   private static final Logger LOGGER = LoggerFactory.getLogger(AtmosphereServerGenerator.class);
 
+  /** Name of inner class for RPC protocol messages */
+  public static final String MESSAGE_CLASS_NAME = "Message";
+
   /** Workspace object for code write-out */
   private Workspace workspace;
 
   /** Properties object for module configuration */
   private Properties properties;
 
-  /** Names of service operations from WSDL file */
-  private Set<String> operationNames;
-
   /** Name of WebSockets interface class */
   private String interfaceName;
+
+  /** Full name of inner class for RPC protocol messages */
+  private String messageClassFullName;
 
   /** Java package name for WebSocket interface classes */
   private String packageName;
 
   /** Name of broadcast channel */
   private String channelName;
+
+  /** Java package name of service provider class */
+  private String serviceProviderPackageName;
 
   /** Name of the service provider class */
   private String serviceProviderClassName;
@@ -88,12 +89,12 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     this.workspace = workspace;
     this.properties = properties;
 
-    this.operationNames = new HashSet<String>();
-
     // Extract global properties
     this.interfaceName = this.properties.getProperty(MidGen4JWebSocketsModule.INTERFACE_CLASS_NAME_KEY);
+    this.messageClassFullName = this.interfaceName + "." + AtmosphereServerGenerator.MESSAGE_CLASS_NAME;
     this.packageName = this.properties.getProperty(MidGen4JWebSocketsModule.PACKAGE_NAME_KEY);
     this.channelName = this.properties.getProperty(MidGen4JWebSocketsModule.CHANNEL_NAME_KEY);
+    this.serviceProviderPackageName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_PACKAGE_NAME_KEY);
     this.serviceProviderClassName = this.properties.getProperty(MidGen4JWebSocketsModule.SERVICE_PROVIDER_CLASS_NAME_KEY);
   }
 
@@ -107,27 +108,6 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
   public void executeAfterProcessing() throws Exception
   {
     this.createWebSocketsServerFile();
-  }
-
-  /**
-   * Process port types (WSDL 2.0: interfaces) that are defined in WSDL document.
-   *
-   * @param portTypes Port types of WSDL document
-   *
-   * @throws Exception Error during processing
-   */
-  @Override
-  public void processPortTypes(final HashSet<FPortType> portTypes) throws Exception
-  {
-    // Process all service operations
-    for (FPortType portType: portTypes)
-    {
-      for (FOperation operation: portType.getOperations())
-      {
-        // Collect names of all service operations
-        this.operationNames.add(operation.getOperationName());
-      }
-    }
   }
 
   /**
@@ -154,13 +134,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocket");
     this.addRequiredImport(jsf, "org.atmosphere.websocket.WebSocketHandlerAdapter");
 
-    // Add imports for worker thread classes
-    for (String operationName: this.operationNames)
-    {
-      String workerThreadClassName = AtmosphereServerGenerator.firstLetterCapital(operationName) + "Worker";
-
-      jsf.addImport(String.format("%s.%s.%s", this.packageName, WorkerThreadGenerator.WORKER_THREAD_PACKAGE_SEGMENT, workerThreadClassName));
-    }
+    this.addRequiredImport(jsf, this.serviceProviderPackageName + "." + this.serviceProviderClassName);
   }
 
   /**
@@ -195,9 +169,11 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     serverClass.add(this.createOnOpenMethod());
     serverClass.add(this.createOnCloseMethod());
     serverClass.add(this.createOnTextMessage());
-    serverClass.add(this.createBuildResponse());
     serverClass.add(this.createSendMessage());
     serverClass.add(this.createBroadcastMessage());
+
+    // Add inner class for request messages
+    serverClass.add(this.createMessageInnerClass());
 
     return serverClass;
   }
@@ -220,12 +196,6 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "Logger", "LOGGER", String.format("LoggerFactory.getLogger(%s.class)", this.interfaceName));
     logger.setComment(new JFieldCommentImpl("Logger object."));
     fields.add(logger);
-
-    // Create DELIMITER constant
-    JField delimiter = JField.factory.create(JModifier.PRIVATE | JModifier.STATIC | JModifier.FINAL,
-            "char", "DELIMITER", "'$'");
-    delimiter.setComment(new JFieldCommentImpl("Delimiting character for RCP protocol."));
-    fields.add(delimiter);
 
     // Create ServiceProvider object
     JField serviceProvider = JField.factory.create(JModifier.PRIVATE, this.serviceProviderClassName, "serviceProvider");
@@ -283,7 +253,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "webSocket.resource().setBroadcaster(BroadcasterFactory.getDefault().lookup(\"/%s\", true));\n\n" +
 
             "// Send message\n" +
-            "%s.send(webSocket, \"Server opened connection.\");",
+            "%s.sendMessage(webSocket, \"Server opened connection.\");",
             this.channelName, this.channelName, this.interfaceName);
     onOpen.getBody().setSource(methodBody);
 
@@ -304,7 +274,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
     JParameter webSocket = JParameter.factory.create("WebSocket", "webSocket");
     JMethodSignature jms = JMethodSignature.factory.create(webSocket);
 
-    JMethod onClose = JMethod.factory.create(JModifier.PUBLIC, "void", "onClode", jms);
+    JMethod onClose = JMethod.factory.create(JModifier.PUBLIC, "void", "onClose", jms);
     onClose.addAnnotation(JMethodAnnotationImpl.OVERRIDE);
     onClose.setComment(new JMethodCommentImpl("Callback for recently closed connection."));
 
@@ -313,7 +283,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "LOGGER.info(\"WebSocket closed.\");\n\n" +
 
             "// Remove WebSocket from broadcasting channel\n" +
-            "BroadcastFactory.getDefault().removeAllAtmosphereResource(webSocket.resource());";
+            "BroadcasterFactory.getDefault().removeAllAtmosphereResource(webSocket.resource());";
     onClose.getBody().setSource(methodBody);
     
     return onClose;
@@ -340,66 +310,35 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
 
     // Set method body
     String methodBody = String.format(
-// TODO: Block begin
             "LOGGER.info(\"Received message: \" + message);\n\n" +
 
-            "String data[] = message.split(Pattern.quote(String.valueOf(%s.DELIMITER)));\n" +
-            "if (data.length != 3) {\n" +
-            "\tString responseMessage = \"Invalid request structure. Use 'uuid$method$payload'. Part count was: \" + data.length;\n\n" +
-
-            "\tLOGGER.info(responseMessage);\n" +
-            "\t%s.sendMessage(webSocket, responseMessage);\n" +
-            "}\n" +
-            "else {\n" +
-            "\tString uuid = data[0];\n" +
-            "\tString method = data[1];\n" +
-            "\tString payload = data[2];\n\n" +
-
-            "\tLOGGER.info(String.format(\"Method '%%s' was called. UUID is '%%s'. Payload is '%%s'.\", method, uuid, payload));\n\n" +
-
-            "\t// Dispatch request\n" +
             "try {\n" +
-            // TODO: Create code to dispatch requests
+            "\t// Parse message from client\n" +
+            "\t%s request = new %s(message);\n" +
+            "\tLOGGER.info(String.format(\"Method '%%s' was called. UUID is '%%s'. Payload is '%%s'.\", " +
+              "request.method(), request.uuid(), request.payload()));\n\n" +
+
+            "\ttry {\n" +
+            "\t\t// Dispatch request\n" +
+            "\t\t%s.dispatch(this.serviceProvider, webSocket, request);\n" +
+            "\t}\n" +
+            "\t// Could not dispatch request (e.g. unknown RPC method)\n" +
+            "\tcatch (Exception e) {\n" +
+            "\t\tLOGGER.error(\"Could not dispatch request: \" + e.getMessage());\n" +
+            "\t}\n" +
             "}\n" +
+            "// Could not parse message (e.g. illegal message format)\n" +
             "catch (Exception e) {\n" +
-            "\tSystem.out.println(\"Could not dispatch request: \" + e.getMessage());\n" +
+            "\tString errorMessage = e.getMessage();\n\n" +
+
+            "\tLOGGER.error(errorMessage);\n" +
+            "\t%s.sendMessage(webSocket, errorMessage);\n" +
             "}",
-            this.interfaceName, this.interfaceName);
-// TODO: Block end
+            this.messageClassFullName, this.messageClassFullName,
+            DispatcherGenerator.DISPATCHER_CLASS_NAME, this.interfaceName);
     onTextMessage.getBody().setSource(methodBody);
 
     return onTextMessage;
-  }
-
-  /**
-   * Create buildResponseMessage() method for WebSockets
-   * server class. The generated method can be used to
-   * build response messages for our own RPC protocol.
-   * Basically, it will append the UUID, operation name
-   * and payload, using a predefined delimiter.
-   *
-   * @return JMethod object to create response messages
-   *
-   * @throws Exception Error during code generation
-   */
-  private JMethod createBuildResponse() throws Exception
-  {
-    JParameter uuid = JParameter.factory.create(JModifier.FINAL, "String", "uuid");
-    JParameter method = JParameter.factory.create(JModifier.FINAL, "String", "method");
-    JParameter payload = JParameter.factory.create(JModifier.FINAL, "String", "payload");
-    JMethodSignature jms = JMethodSignature.factory.create(uuid, method, payload);
-
-    JMethod buildResponse = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC,
-            "String", "buildResponseMessage", jms);
-    buildResponse.setComment(new JMethodCommentImpl("Build a response message according to RPC protocol."));
-
-    // Set method body
-    String methodBody = String.format(
-            "return uuid + %s.DELIMITER + method + %s.DELIMITER + payload;",
-            this.interfaceName, this.interfaceName);
-    buildResponse.getBody().setSource(methodBody);
-
-    return buildResponse;
   }
 
   /**
@@ -463,6 +402,232 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
   }
 
   /**
+   * Create inner message class, that contains all data that is
+   * required for the RPC protocol placed on top of WebSockets.
+   * That is a unique ID, the name of the RPC method that was
+   * called and a JSON string with additional payload for the
+   * method call.
+   *
+   * @return JClass object with inner message class
+   *
+   * @throws Exception Error during code generation
+   */
+  private JClass createMessageInnerClass() throws Exception
+  {
+    // Create inner message class
+    JClass messageClass = JClass.factory.create(JModifier.PUBLIC | JModifier.STATIC | JModifier.FINAL, MESSAGE_CLASS_NAME);
+    messageClass.setComment(new JClassCommentImpl(String.format("Inner '%s' class.", MESSAGE_CLASS_NAME)));
+
+    LOGGER.debug(String.format("Created '%s' class as inner class of '%s'.", MESSAGE_CLASS_NAME, this.interfaceName));
+
+    /*****************************************************************
+     * Create fields
+     *****************************************************************/
+
+    JField delimiterField = JField.factory.create(JModifier.PRIVATE | JModifier.STATIC | JModifier.FINAL, "char", "DELIMITER", "'$'");
+    delimiterField.setComment(new JFieldCommentImpl("Delimiting character for RPC protocol."));
+    messageClass.add(delimiterField);
+
+    JField uuidField = JField.factory.create(JModifier.PRIVATE, "String", "uuid");
+    uuidField.setComment(new JFieldCommentImpl("Unique ID for protocol messages."));
+    messageClass.add(uuidField);
+
+    JField methodField = JField.factory.create(JModifier.PRIVATE, "String", "method");
+    methodField.setComment(new JFieldCommentImpl("RPC method called in protocol message."));
+    messageClass.add(methodField);
+
+    JField payloadField = JField.factory.create(JModifier.PRIVATE, "String", "payload");
+    payloadField.setComment(new JFieldCommentImpl("JSON Code as payload for protocol message."));
+    messageClass.add(payloadField);
+
+    /*****************************************************************
+     * Create parameterless constructor
+     *****************************************************************/
+
+    JConstructor constructorParameterless = JConstructor.factory.create(JModifier.PUBLIC, MESSAGE_CLASS_NAME);
+    constructorParameterless.setComment(new JConstructorCommentImpl("Parameterless constructor."));
+
+    // Set method body
+    String methodBody =
+            "this(\"\", \"\", \"\");";
+    constructorParameterless.getBody().setSource(methodBody);
+
+    // Add constructor to class
+    messageClass.add(constructorParameterless);
+
+    /*****************************************************************
+     * Create constructor with message attribute
+     *****************************************************************/
+
+    JParameter message = JParameter.factory.create(JModifier.FINAL, "String", "message");
+    JMethodSignature jms = JMethodSignature.factory.create(message);
+
+    // TODO: Add exception support to JConstructor class, so that we can do:
+    //   JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, this.interfaceName, jms, new String[] { "Exception" });
+    JConstructor constructorMessage = JConstructor.factory.create(JModifier.PUBLIC, MESSAGE_CLASS_NAME, jms);
+    constructorMessage.setComment(new JConstructorCommentImpl("Parameterized constructor with message attribute."));
+
+    // Set method body
+    methodBody =
+            "this.fromString(message);";
+    constructorMessage.getBody().setSource(methodBody);
+
+    // Add constructor to class
+    messageClass.add(constructorMessage);
+
+    /*****************************************************************
+     * Create constructor with UUID, method and payload attribute
+     *****************************************************************/
+
+    JParameter uuid = JParameter.factory.create(JModifier.FINAL, "String", "uuid");
+    JParameter method = JParameter.factory.create(JModifier.FINAL, "String", "method");
+    JParameter payload = JParameter.factory.create(JModifier.FINAL, "String", "payload");
+    jms = JMethodSignature.factory.create(uuid, method, payload);
+
+    JConstructor constructorMessageParts = JConstructor.factory.create(JModifier.PUBLIC, MESSAGE_CLASS_NAME, jms);
+    constructorMessageParts.setComment(new JConstructorCommentImpl("Parameterized constructor with UUID, method and payload attribute."));
+
+    // Set method body
+    methodBody =
+            "this.uuid = uuid;\n" +
+            "this.method = method;\n" +
+            "this.payload = payload;";
+    constructorMessageParts.getBody().setSource(methodBody);
+
+    // Add constructor to class
+    messageClass.add(constructorMessageParts);
+
+    /*****************************************************************
+     * Create method to populate message object from string
+     *****************************************************************/
+
+    jms = JMethodSignature.factory.create(message);
+
+    JMethod fromString = JMethod.factory.create(JModifier.PUBLIC, "void", "fromString", jms, new String[] { "Exception" });
+    fromString.setComment(new JMethodCommentImpl(String.format("Populate '%s' object from string.", MESSAGE_CLASS_NAME)));
+
+    // Set method body
+    methodBody =
+            "String[] data = message.split(Pattern.quote(String.valueOf(DELIMITER)));\n\n" +
+
+            "if (data.length == 3) {\n" +
+            "\tthis.uuid = data[0];\n" +
+            "\tthis.method = data[1];\n" +
+            "\tthis.payload = data[2];\n" +
+            "}\n" +
+            "else {\n" +
+            "\tthrow new Exception(\"Invalid message structure. " +
+              "Use 'uuid\" + DELIMITER + \"method\" + DELIMITER + \"payload'. " +
+              "Your message had '\" + data.length + \"' parts.\");\n" +
+            "}";
+    fromString.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(fromString);
+
+    /*****************************************************************
+     * Create method to print message object as string
+     *****************************************************************/
+
+    JMethod asString = JMethod.factory.create(JModifier.PUBLIC, "String", "asString");
+    asString.setComment(new JMethodCommentImpl(String.format("Print '%s' object as a string.", MESSAGE_CLASS_NAME)));
+
+    // Set method body
+    methodBody =
+            "return this.uuid + DELIMITER + this.method + DELIMITER + this.payload;";
+    asString.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(asString);
+
+    /*****************************************************************
+     * Create setter and getter for UUID
+     *****************************************************************/
+
+    jms = JMethodSignature.factory.create(uuid);
+
+    JMethod setUUID = JMethod.factory.create(JModifier.PUBLIC, "void", "setUUID", jms);
+    setUUID.setComment(new JMethodCommentImpl("Set UUID for protocol message."));
+
+    // Set method body
+    methodBody =
+            "this.uuid = uuid;";
+    setUUID.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(setUUID);
+
+    JMethod getUUID = JMethod.factory.create(JModifier.PUBLIC, "String", "uuid");
+    getUUID.setComment(new JMethodCommentImpl("Get UUID of protocol message."));
+
+    // Set method body
+    methodBody =
+            "return this.uuid;";
+    getUUID.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(getUUID);
+
+    /*****************************************************************
+     * Create setter and getter for RPC method
+     *****************************************************************/
+
+    jms = JMethodSignature.factory.create(method);
+
+    JMethod setMethod = JMethod.factory.create(JModifier.PUBLIC, "void", "setMethod", jms);
+    setMethod.setComment(new JMethodCommentImpl("Set RPC method called in protocol message."));
+
+    // Set method body
+    methodBody =
+            "this.method = method;";
+    setMethod.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(setMethod);
+
+    JMethod getMethod = JMethod.factory.create(JModifier.PUBLIC, "String", "method");
+    getMethod.setComment(new JMethodCommentImpl("Get RPC method called in protocol message."));
+
+    // Set method body
+    methodBody =
+            "return this.method;";
+    getMethod.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(getMethod);
+
+    /*****************************************************************
+     * Create setter and getter for payload
+     *****************************************************************/
+
+    jms = JMethodSignature.factory.create(payload);
+
+    JMethod setPayload = JMethod.factory.create(JModifier.PUBLIC, "void", "setPayload", jms);
+    setPayload.setComment(new JMethodCommentImpl("Set payload for protocol message."));
+
+    // Set method body
+    methodBody =
+            "this.payload = payload";
+    setPayload.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(setPayload);
+
+    JMethod getPayload = JMethod.factory.create(JModifier.PUBLIC, "String", "payload");
+    getPayload.setComment(new JMethodCommentImpl("Get payload of protocol message."));
+
+    // Set method body
+    methodBody =
+            "return this.payload;";
+    getPayload.getBody().setSource(methodBody);
+
+    // Add method to class
+    messageClass.add(getPayload);
+
+    return messageClass;
+  }
+
+  /**
    * Private helper method to add required Java imports to the
    * source file of the WebSockets server. The method will only
    * import a class, if it does not reside in the same package
@@ -500,18 +665,5 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
         }
       }
     }
-  }
-
-  /**
-   * Private helper method to capitalize the first letter of a string.
-   * Function will return null, if argument was null.
-   *
-   * @param text Text to process
-   *
-   * @return Text with first letter capitalized or null
-   */
-  private static String firstLetterCapital(final String text)
-  {
-    return (null == text ? null : text.substring(0, 1).toUpperCase() + text.substring(1, text.length()));
   }
 }
