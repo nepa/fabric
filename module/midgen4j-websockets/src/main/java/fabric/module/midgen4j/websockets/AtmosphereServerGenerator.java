@@ -516,8 +516,7 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "\tthis.payload = data[2];\n" +
             "}\n" +
             "else {\n" +
-            "\tthrow new Exception(\"Invalid message structure. " +
-              "Use 'uuid\" + DELIMITER + \"method\" + DELIMITER + \"payload'. " +
+            "\tthrow new Exception(\"Invalid message structure. Use 'uuid$method$payload'. " +
               "Your message had '\" + data.length + \"' parts.\");\n" +
             "}";
     fromString.getBody().setSource(methodBody);
