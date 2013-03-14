@@ -51,20 +51,20 @@ public interface JEnum extends JComplexType {
 
 	}
 
-	public static final JavaEnumFactory factory = JavaEnumFactory.getInstance();
+  public static final JavaEnumFactory factory = JavaEnumFactory.getInstance();
 
-	public JEnum 	add				(JConstructor... create)		throws JDuplicateException;
-	public JEnum	add				(JMethod... method)				throws JDuplicateException;
-	public JEnum	add				(JField... field)				throws JDuplicateException;
-	public JEnum 	addConstant		(String... constant) 			throws JDuplicateException;
+  public JEnum add(JConstructor... create) throws JDuplicateException;
+  public JEnum add(JMethod... method) throws JDuplicateException;
+  public JEnum add(JField... field) throws JDuplicateException;
+  public JEnum addConstant(String... constant) throws JDuplicateException;
 
-	public boolean 	contains		(JConstructor create)			;
-	public boolean 	contains		(JMethod method)				;
-	public boolean 	contains		(JField field)					;
-	public boolean 	containsConstant(String constant)				;
+  public boolean contains(JConstructor create);
+  public boolean contains(JMethod method);
+  public boolean contains(JField field);
+  public boolean containsConstant(String constant);
 
-	public JConstructor getJConstructorByName	(String name);
-	public JField 		getJFieldByName			(String name);
+  public JConstructor getJConstructorByName(String name);
+  public JField getJFieldByName(String name);
 
 	/**
 	 * Set the Javadoc comment for the current enum.
@@ -72,7 +72,7 @@ public interface JEnum extends JComplexType {
 	 * @param comment The Java enum comment.
 	 * @return This object.
 	 */
-	public JEnum setComment(JEnumComment comment);
+  public JEnum setComment(JEnumComment comment);
 
   /**
 	 * Adds an annotation to this enum.
@@ -80,5 +80,5 @@ public interface JEnum extends JComplexType {
 	 * @param annotations The Java enum annotation.
 	 * @return This object.
 	 */
-	public JEnum addAnnotation       (JEnumAnnotation... annotations);
+  public JEnum addAnnotation(JEnumAnnotation... annotations);
 }
