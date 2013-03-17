@@ -1,4 +1,4 @@
-/** 25.10.2012 22:56 */
+/** 17.03.2013 01:45 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -346,6 +346,20 @@ public class JSClassImpl extends JSComplexTypeImpl implements JSClass
     this.comment = comment;
 
     return this;
+  }
+
+  /**
+   * Set comment for the JavaScript class. The comment
+   * will be printed above of the class header.
+   *
+   * @param comment Comment for JavaScript class
+   *
+   * @return JSClass object
+   */
+  @Override
+  public JSClass setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
   }
 
   /**

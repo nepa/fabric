@@ -1,4 +1,4 @@
-/** 23.10.2012 18:34 */
+/** 17.03.2013 01:47 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -97,6 +97,19 @@ public class JSFieldImpl extends JSElementImpl implements JSField
     this.comment = comment;
 
     return this;
+  }
+
+  /**
+   * Set comment for the JavaScript field.
+   *
+   * @param comment Comment for JavaScript field
+   *
+   * @return JSField object
+   */
+  @Override
+  public JSField setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
   }
 
   /**

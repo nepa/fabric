@@ -1,4 +1,4 @@
-/** 03.11.2012 19:58 */
+/** 17.03.2013 01:49 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -386,6 +386,20 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
     this.comment = comment;
 
     return this;
+  }
+
+  /**
+   * Set a comment that will be printed right at the
+   * beginning of the JavaScript source file.
+   *
+   * @param comment Comment to be added
+   *
+   * @return JavaScript source file with comment
+   */
+  @Override
+  public JSSourceFile setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
   }
 
   /**

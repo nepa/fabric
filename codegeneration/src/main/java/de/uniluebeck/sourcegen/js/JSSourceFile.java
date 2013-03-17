@@ -1,4 +1,4 @@
-/** 02.11.2012 23:05 */
+/** 17.03.2013 01:47 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -39,4 +39,5 @@ public interface JSSourceFile extends JSComplexType, SourceFile
   public JSCodeBlock getCodeAfterFunctions();
 
   public JSSourceFile setComment(final JSComment comment);
+  public JSSourceFile setComment(final String comment);
 }
