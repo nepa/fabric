@@ -81,4 +81,6 @@ public interface JEnum extends JComplexType {
 	 * @return This object.
 	 */
   public JEnum addAnnotation(JEnumAnnotation... annotations);
+
+  public JEnum addAnnotation(String... annotations);
 }

@@ -84,4 +84,6 @@ public interface JField extends JLangElem {
 	 * @return This object.
 	 */
   public JField addAnnotation(JFieldAnnotation... annotations);
+
+  public JField addAnnotation(String... annotations);
 }

@@ -79,4 +79,6 @@ public interface JConstructor extends JLangElem {
      * @return This object.
      */
     public JConstructor addAnnotation(JConstructorAnnotation... annotations);
+
+    public JConstructor addAnnotation(String... annotations);
 }

@@ -104,4 +104,6 @@ public interface JClass extends JComplexType {
 	 * @return This object.
 	 */
   public JClass addAnnotation(JClassAnnotation... annotations);
+
+  public JClass addAnnotation(String... annotations);
 }

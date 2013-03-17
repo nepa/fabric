@@ -117,6 +117,15 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	    return this;
 	}
 
+  @Override
+  public JInterfaceMethod addAnnotation(String... annotations) {
+      for (String annotation: annotations) {
+          this.annotations.add(new JMethodAnnotationImpl(annotation));
+      }
+
+      return this;
+  }
+
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#setComment(de.uniluebeck.sourcegen.java.JMethodComment)
 	 */

@@ -62,6 +62,14 @@ public interface JInterfaceMethod extends JLangElem {
   public JMethodSignature getSignature();
 
   public boolean equals(JInterfaceMethod other);
+  
+  /**
+	 * Set the Javadoc comment for the current method.
+	 *
+	 * @param comment The Java method comment.
+	 * @return This object.
+	 */
+  public JInterfaceMethod setComment(JMethodComment comment);
 
   /**
 	 * Adds an annotation to this method.
@@ -71,11 +79,5 @@ public interface JInterfaceMethod extends JLangElem {
 	 */
   public JInterfaceMethod addAnnotation(JMethodAnnotation... annotations);
 
-	/**
-	 * Set the Javadoc comment for the current method.
-	 *
-	 * @param comment The Java method comment.
-	 * @return This object.
-	 */
-  public JInterfaceMethod setComment(JMethodComment comment);
+  public JInterfaceMethod addAnnotation(String... annotations);
 }

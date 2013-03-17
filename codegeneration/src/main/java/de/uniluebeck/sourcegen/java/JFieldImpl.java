@@ -118,6 +118,7 @@ class JFieldImpl extends JElemImpl implements JField {
 		buffer.append(";");
 	}
 
+  @Override
 	public boolean equals(JField other) {
 		return this.name.equals(((JFieldImpl)other).name);
 	}
@@ -126,6 +127,7 @@ class JFieldImpl extends JElemImpl implements JField {
 		return name;
 	}
 
+  @Override
 	public JField setComment(JFieldComment comment) {
 		this.comment = comment;
 		return this;
@@ -134,12 +136,22 @@ class JFieldImpl extends JElemImpl implements JField {
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JField#addAnnotation(de.uniluebeck.sourcegen.java.JFieldAnnotation[])
 	 */
+  @Override
 	public JField addAnnotation(JFieldAnnotation... annotations) {
 	    for (JFieldAnnotation ann : annotations) {
 	        this.annotations.add(ann);
 	    }
 	    return this;
 	}
+
+  @Override
+  public JField addAnnotation(String... annotations) {
+      for (String annotation: annotations) {
+          this.annotations.add(new JFieldAnnotationImpl(annotation));
+      }
+
+      return this;
+  }
 
 	protected void validateModifiers() throws JInvalidModifierException, JConflictingModifierException {
 
@@ -162,18 +174,18 @@ class JFieldImpl extends JElemImpl implements JField {
 			JModifier.isFinal(modifiers) &&
 			JModifier.isVolatile(modifiers);
 
-		if(invalid)
+		if (invalid)
 			throw new JInvalidModifierException(
 					res.getString("exception.modifier.invalid") + //$NON-NLS-1$
 					JModifier.toString(modifiers)
 			);
 
-		if(conflictFinalVolatile)
+		if (conflictFinalVolatile)
 			throw new JConflictingModifierException(
 					res.getString("exception.modifier.final_volatile") //$NON-NLS-1$
 			);
 
-		if(JModifier.isConflict(modifiers))
+		if (JModifier.isConflict(modifiers))
 			throw new JConflictingModifierException(
 					res.getString("exception.modifier.conflict") //$NON-NLS-1$
 			);

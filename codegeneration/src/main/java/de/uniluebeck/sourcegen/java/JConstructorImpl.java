@@ -176,6 +176,15 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
     }
 
     @Override
+    public JConstructor addAnnotation(String... annotations) {
+        for (String annotation: annotations) {
+            this.annotations.add(new JConstructorAnnotationImpl(annotation));
+        }
+
+        return this;
+    }
+
+    @Override
     public void toString(StringBuffer buffer, int tabCount) {
 
         // write comment if necessary

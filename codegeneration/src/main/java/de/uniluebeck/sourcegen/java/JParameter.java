@@ -80,4 +80,6 @@ public interface JParameter extends JLangElem {
 	 * @return Reference to this object
 	 */
   public JParameter addAnnotation(JParameterAnnotation... annotations);
+
+  public JParameter addAnnotation(String... annotations);
 }
