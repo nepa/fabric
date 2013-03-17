@@ -65,6 +65,7 @@ public interface CppNamespace extends CppComplexType {
     public boolean contains(CppClass cppClass);
 
     public CppNamespace setComment(CComment comment);
+    public CppNamespace setComment(String comment);
 
     public void prepare();
 }

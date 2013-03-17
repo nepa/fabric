@@ -821,6 +821,11 @@ class CppClassImpl extends CElemImpl implements CppClass {
         return this;
     }
 
+    @Override
+    public CppClass setComment(String comment) {
+      return this.setComment(new CCommentImpl(comment));
+    }
+
     /**
      * This method prepares the files.
      */

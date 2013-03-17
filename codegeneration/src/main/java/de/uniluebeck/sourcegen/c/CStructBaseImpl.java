@@ -478,9 +478,15 @@ abstract class CStructBaseImpl extends CElemImpl implements CStructBase {
 		System.out.println("----------");
 	}
 
+  @Override
 	public CStructBase setComment(CComment comment) {
 		this.comment = comment;
 		return this;
 	}
+
+  @Override
+	public CStructBase setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
 
 }

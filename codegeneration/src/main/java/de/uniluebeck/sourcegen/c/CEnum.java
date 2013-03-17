@@ -147,4 +147,12 @@ public interface CEnum extends CComplexType {
 	 */
 	public CEnum setComment(CComment comment);
 
+	/**
+	 * Set a comment
+	 *
+	 * @param comment The comment
+	 * @return
+	 */
+	public CEnum setComment(String comment);
+
 }

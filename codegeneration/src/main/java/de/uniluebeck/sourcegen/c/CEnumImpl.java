@@ -253,6 +253,11 @@ class CEnumImpl extends CElemImpl implements CEnum {
 		return this;
 	}
 
+	@Override
+	public CEnum setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
+
 	public static void main(String[] args) throws Exception {
 		CEnumImpl e = new CEnumImpl("TheEnum", "theVarName", true);
 		e.addBeforeDirective("IFNDEF _THE_ENUM_");

@@ -231,6 +231,7 @@ public interface CStructBase extends CComplexType {
 	 *
 	 * @return the name
 	 */
+  @Override
 	public String getName();
 
 	/**
@@ -240,5 +241,13 @@ public interface CStructBase extends CComplexType {
 	 * @return this
 	 */
 	public CStructBase setComment(CComment comment);
+
+	/**
+	 * Add a comment to the struct
+	 *
+	 * @param comment The comment
+	 * @return this
+	 */
+	public CStructBase setComment(String comment);
 
 }

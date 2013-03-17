@@ -76,12 +76,15 @@ public interface CppVar extends CppLangElem {
 	}
 
   public static final CppVarFactory factory = CppVarFactory.getInstance();
-  public CppVar setComment(CComment comment);
+
 
   public Long getVisability();
   public String getTypeName();
   public String getVarName();
   public String getInitCode();
   public String getInit();
+
+  public CppVar setComment(CComment comment);
+  public CppVar setComment(String comment);
 
 }

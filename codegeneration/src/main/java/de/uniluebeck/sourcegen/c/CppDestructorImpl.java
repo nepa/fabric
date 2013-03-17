@@ -44,8 +44,8 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
 		return this;
 	}
 
-	public CppDestructor appendCode(String str) {
-		this.body.append(str + Cpp.newline);
+	public CppDestructor appendCode(String code) {
+		this.body.append(code + Cpp.newline);
 		return this;
 	}
 
@@ -57,10 +57,16 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
 		return body.toString();
 	}
 
+  @Override
 	public CppDestructor setComment(CComment comment) {
 		this.comment = comment;
 		return this;
 	}
+
+  @Override
+	public CppDestructor setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
 
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {

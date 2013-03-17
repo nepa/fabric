@@ -53,9 +53,10 @@ public interface CppConstructor extends CppLangElem {
 
 	public CppConstructor add(CppVar... create) throws CppDuplicateException;
 	public CppConstructor add(String... pExtendeds) throws CppDuplicateException;
-	public CppConstructor appendCode(String string);
+	public CppConstructor appendCode(String code);
 	public String getSignature();
 	public CppConstructor setComment(CComment comment);
+	public CppConstructor setComment(String comment);
 
 	/**
 	 * This method is only used by the CppClass

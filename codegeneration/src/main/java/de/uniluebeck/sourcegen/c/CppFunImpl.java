@@ -187,6 +187,11 @@ class CppFunImpl extends CElemImpl implements CppFun {
     	return this;
     }
 
+    @Override
+    public CppFun setComment(String comment) {
+      return this.setComment(new CCommentImpl(comment));
+    }
+
     /**
      * Returns OUTER::NESTED1::NESTED2::...::NESTEDN
      */

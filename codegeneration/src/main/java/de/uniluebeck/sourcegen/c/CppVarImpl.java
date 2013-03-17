@@ -119,7 +119,12 @@ class CppVarImpl extends CElemImpl implements CppVar {
 	public CppVar setComment(CComment comment) {
 		this.comment = comment;
 		return this;
-	}
+  }
+
+  @Override
+	public CppVar setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
 
   /**
    * returns OUTER::NESTED1::NESTED2::...::NESTEDN

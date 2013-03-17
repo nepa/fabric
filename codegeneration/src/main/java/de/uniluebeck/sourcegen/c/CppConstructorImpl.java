@@ -50,8 +50,8 @@ class CppConstructorImpl extends CElemImpl implements CppConstructor {
 		return this;
 	}
 
-	public CppConstructor appendCode(String str) {
-		this.body.append(str + Cpp.newline);
+	public CppConstructor appendCode(String code) {
+		this.body.append(code + Cpp.newline);
 		return this;
 	}
 
@@ -92,7 +92,6 @@ class CppConstructorImpl extends CElemImpl implements CppConstructor {
 
 		return e;
 	}
-
 
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
@@ -141,6 +140,11 @@ class CppConstructorImpl extends CElemImpl implements CppConstructor {
 		this.comment = comment;
 		return this;
 	}
+
+	@Override
+	public CppConstructor setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
 
 	/**
 	 * returns OUTER::NESTED1::NESTED2::...::NESTEDN

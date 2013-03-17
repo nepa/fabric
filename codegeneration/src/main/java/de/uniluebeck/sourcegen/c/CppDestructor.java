@@ -51,8 +51,9 @@ public interface CppDestructor extends CppLangElem {
 	public static final CppDestructorFactory factory = CppDestructorFactory.getInstance();
 
 	public CppDestructor add(CppVar... vars) throws CppDuplicateException;
-	public CppDestructor appendCode(String string);
+	public CppDestructor appendCode(String code);
 	public CppDestructor setComment(CComment comment);
+	public CppDestructor setComment(String comment);
 	public String getSignature();
 
 	/**

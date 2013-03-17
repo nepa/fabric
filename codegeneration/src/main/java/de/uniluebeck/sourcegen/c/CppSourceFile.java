@@ -63,6 +63,7 @@ public interface CppSourceFile extends SourceFile, CppElem {
 
 	public CppSourceFile 	addUsingNamespace			(String... namespaces)					throws CppDuplicateException;
 	public CppSourceFile 	setComment(CComment comment);
+	public CppSourceFile 	setComment(String comment);
 
 	public boolean 			contains					(CEnum enumObj);
 	public boolean 			contains					(CFun function);

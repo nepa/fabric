@@ -166,6 +166,11 @@ class CppNamespaceImpl extends CElemImpl implements CppNamespace {
         return this;
     }
 
+    @Override
+    public CppNamespace setComment(String comment) {
+        return this.setComment(new CCommentImpl(comment));
+    }
+
     /**
      * This method prepares the files
      */

@@ -623,6 +623,11 @@ public class CppSourceFileImpl extends CElemImpl implements CppSourceFile {
 		return this;
 	}
 
+	@Override
+	public CppSourceFile setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
+
 	public void prepare() {
     if (isPrepared) {
         return;

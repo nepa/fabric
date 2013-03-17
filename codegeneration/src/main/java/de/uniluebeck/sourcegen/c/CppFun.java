@@ -63,6 +63,7 @@ public interface CppFun extends CppLangElem {
 	public static final CppFunFactory factory = CppFunFactory.getInstance();
 
 	public CppFun setComment(CComment comment);
+	public CppFun setComment(String comment);
 
 	public CppFun appendCode(String string);
 	public String getSignature();

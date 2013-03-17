@@ -185,6 +185,7 @@ public interface CFun extends CLangElem {
 	public String getName();
 
 	public CFun	setComment(CComment comment);
+	public CFun	setComment(String comment);
 
 	public CComment getComment();
 
