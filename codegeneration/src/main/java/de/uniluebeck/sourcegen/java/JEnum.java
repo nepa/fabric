@@ -74,6 +74,8 @@ public interface JEnum extends JComplexType {
 	 */
   public JEnum setComment(JEnumComment comment);
 
+  public JEnum setComment(String comment);
+
   /**
 	 * Adds an annotation to this enum.
 	 *

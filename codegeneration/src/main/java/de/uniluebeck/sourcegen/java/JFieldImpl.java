@@ -133,6 +133,12 @@ class JFieldImpl extends JElemImpl implements JField {
 		return this;
 	}
 
+  @Override
+  public JField setComment(String comment) {
+    this.comment = new JFieldCommentImpl(comment);
+    return this;
+  }
+
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JField#addAnnotation(de.uniluebeck.sourcegen.java.JFieldAnnotation[])
 	 */

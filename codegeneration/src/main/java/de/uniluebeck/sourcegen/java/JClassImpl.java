@@ -489,7 +489,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
     return result;
   }
 
-	/* (non-Javadoc)
+	/**
 	 * @see de.uniluebeck.sourcegen.JClass#setComment(de.uniluebeck.sourcegen.JClassComment)
 	 */
   @Override
@@ -497,6 +497,12 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		this.comment = comment;
 		return this;
 	}
+
+  @Override
+  public JClass setComment(String comment) {
+    this.comment = new JClassCommentImpl(comment);
+    return this;
+  }
 
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JClass#addAnnotation(de.uniluebeck.sourcegen.java.JClassAnnotation[])

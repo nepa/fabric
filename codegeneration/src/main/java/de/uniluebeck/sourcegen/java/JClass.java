@@ -97,6 +97,8 @@ public interface JClass extends JComplexType {
 	 */
   public JClass setComment(JClassComment comment);
 
+  public JClass setComment(String comment);
+
   /**
 	 * Adds an annotation to this class.
 	 *

@@ -293,6 +293,12 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return this;
 	}
 
+  @Override
+  public JEnum setComment(String comment) {
+    this.comment = new JEnumCommentImpl(comment);
+    return this;
+  }
+
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JEnum#addAnnotation(de.uniluebeck.sourcegen.java.JEnumAnnotation[])
 	 */

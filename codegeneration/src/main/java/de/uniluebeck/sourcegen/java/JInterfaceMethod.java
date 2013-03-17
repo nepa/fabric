@@ -71,6 +71,8 @@ public interface JInterfaceMethod extends JLangElem {
 	 */
   public JInterfaceMethod setComment(JMethodComment comment);
 
+  public JInterfaceMethod setComment(String comment);
+
   /**
 	 * Adds an annotation to this method.
 	 *

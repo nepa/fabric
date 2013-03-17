@@ -158,9 +158,14 @@ class JConstructorImpl extends JElemImpl implements JConstructor {
      * @see de.uniluebeck.sourcegen.JConstructor#setComment(de.uniluebeck.sourcegen.JConstructorComment)
      */
     @Override
-    public JConstructor setComment(JConstructorComment comment)
-    {
+    public JConstructor setComment(JConstructorComment comment) {
         this.comment = comment;
+        return this;
+    }
+
+    @Override
+    public JConstructor setComment(String comment) {
+        this.comment = new JConstructorCommentImpl(comment);
         return this;
     }
     

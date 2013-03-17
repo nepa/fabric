@@ -107,6 +107,21 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	}
 
 	/**
+	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#setComment(de.uniluebeck.sourcegen.java.JMethodComment)
+	 */
+  @Override
+	public JInterfaceMethod setComment(JMethodComment comment) {
+		this.comment = comment;
+		return this;
+	}
+
+  @Override
+  public JInterfaceMethod setComment(String comment) {
+    this.comment = new JMethodCommentImpl(comment);
+    return this;
+  }
+
+	/**
 	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#addAnnotation(de.uniluebeck.sourcegen.java.JMethodAnnotation[])
 	 */
   @Override
@@ -125,15 +140,6 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 
       return this;
   }
-
-	/**
-	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#setComment(de.uniluebeck.sourcegen.java.JMethodComment)
-	 */
-  @Override
-	public JInterfaceMethod setComment(JMethodComment comment) {
-		this.comment = comment;
-		return this;
-	}
 
   @Override
 	public boolean equals(JInterfaceMethod other) {

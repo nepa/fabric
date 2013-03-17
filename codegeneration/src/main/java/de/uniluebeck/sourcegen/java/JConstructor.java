@@ -70,7 +70,15 @@ public interface JConstructor extends JLangElem {
     public JMethodSignature getSignature();
     public JMethodBody getBody();
 
-    JConstructor setComment(JConstructorComment comment);
+    /**
+     * Set the Javadoc comment for the current constructor.
+     *
+     * @param comment The Java constructor comment.
+     * @return This object.
+     */
+    public JConstructor setComment(JConstructorComment comment);
+
+    public JConstructor setComment(String comment);
 
     /**
      * Adds an annotation to this class.
