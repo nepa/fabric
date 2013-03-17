@@ -71,11 +71,12 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 
-		if (comment != null) {
+    // Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
-        buffer.append(getParents() + this.clazz.getName() + "::~");
+    buffer.append(getParents() + this.clazz.getName() + "::~");
 		signature.toString(buffer, 0);
 
 		buffer.append(" {" + Cpp.newline);
@@ -96,7 +97,7 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
     	if(this.clazz != null) {
 	    	for (String s : this.clazz.getParents()) {
 	    		myParents.append(s + "::");
-			}
+        }
     	}
     	return myParents.toString();
     }

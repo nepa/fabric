@@ -652,7 +652,7 @@ class CppClassImpl extends CElemImpl implements CppClass {
         // TODO: Maybe beforeDirectives, globalDeclarations
 
         // Write comment if necessary
-        if (comment != null) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             comment.toString(buffer, tabCount);
         }
 

@@ -222,8 +222,8 @@ class CFunImpl extends CElemImpl implements CFun {
     }
     indent(buffer, tabCount);
 
-    // write comment if necessary
-    if (comment != null) {
+    // Write comment if necessary
+    if (null != this.comment && !this.comment.isEmpty()) {
       comment.toString(buffer, tabCount);
     }
 

@@ -1,4 +1,4 @@
-/** 25.10.2012 22:57 */
+/** 17.03.2013 03:29 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -46,6 +46,17 @@ public class JSCommentImpl extends JSElementImpl implements JSComment
   public String getDescription()
   {
     return this.description;
+  }
+
+  /**
+   * Check if the comment is empty or contains text.
+   *
+   * @return True if comment is empty, false otherwise
+   */
+  @Override
+  public boolean isEmpty()
+  {
+    return (null != this.description && this.description.isEmpty());
   }
 
   /**

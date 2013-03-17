@@ -94,12 +94,12 @@ class JFieldImpl extends JElemImpl implements JField {
 	 */
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
-		// write comment if necessary
-		if (comment != null) {
+		// Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
-    // write annotations if there are any
+    // Write annotations if there are any
     for (JFieldAnnotation ann: this.annotations) {
       ann.toString(buffer, tabCount);
     }

@@ -365,7 +365,7 @@ public class CppSourceFileImpl extends CElemImpl implements CppSourceFile {
 	    prepare();
 
 	    // Write comment if necessary
-	    if (null != this.comment) {
+	    if (null != this.comment && !this.comment.isEmpty()) {
 	        this.comment.toString(buffer, tabCount);
 	        buffer.append(Cpp.newline);
 	    }

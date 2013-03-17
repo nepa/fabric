@@ -106,7 +106,7 @@ class CppNamespaceImpl extends CElemImpl implements CppNamespace {
         prepare();
 
         // Write comment if necessary
-        if (comment != null) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             comment.toString(buffer, tabCount);
         }
 

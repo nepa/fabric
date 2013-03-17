@@ -30,5 +30,5 @@ package de.uniluebeck.sourcegen.java;
  * @author Marco Wegner
  */
 public abstract interface JComment extends JLangElem {
-	//
+  public boolean isEmpty();
 }

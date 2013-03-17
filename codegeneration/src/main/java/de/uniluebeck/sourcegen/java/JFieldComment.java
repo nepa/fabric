@@ -30,6 +30,6 @@ package de.uniluebeck.sourcegen.java;
 /**
  * @author Marco Wegner
  */
-public interface JFieldComment extends JLangElem {
+public interface JFieldComment extends JComment {
 	//
 }

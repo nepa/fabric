@@ -43,9 +43,15 @@ public class CCommentImpl extends CElemImpl implements CComment {
 		this.description = description;
 	}
 
+  @Override
 	public String getDescription() {
 		return this.description;
 	}
+
+  @Override
+  public boolean isEmpty() {
+    return (null != this.description && this.description.isEmpty());
+  }
 
 	/**
 	 * @see de.uniluebeck.sourcegen.ElemImpl#toString(java.lang.StringBuffer, int)

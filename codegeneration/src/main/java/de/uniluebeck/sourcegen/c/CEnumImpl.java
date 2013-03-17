@@ -213,8 +213,8 @@ class CEnumImpl extends CElemImpl implements CEnum {
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 
-		// write comment if necessary
-		if (comment != null) {
+		// Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 

@@ -1,4 +1,4 @@
-/** 17.03.2013 01:52 */
+/** 17.03.2013 03:20 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -270,7 +270,7 @@ public class JSFunctionImpl extends JSComplexTypeImpl implements JSFunction
   public void toString(StringBuffer buffer, int tabCount)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
     }

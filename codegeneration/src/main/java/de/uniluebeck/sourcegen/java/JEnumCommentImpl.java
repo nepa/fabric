@@ -22,15 +22,10 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- *
- */
 package de.uniluebeck.sourcegen.java;
-
 
 /**
  * @author wegner
- *
  */
 public class JEnumCommentImpl extends JElemImpl implements JEnumComment {
 
@@ -55,7 +50,15 @@ public class JEnumCommentImpl extends JElemImpl implements JEnumComment {
 		this.description = description;
 	}
 
-	/* (non-Javadoc)
+  /**
+   * @see de.uniluebeck.sourcegen.java.JComment#isEmpty()
+	 */
+  @Override
+  public boolean isEmpty() {
+    return (null != this.description && this.description.isEmpty());
+  }
+
+	/**
 	 * @see de.uniluebeck.sourcegen.ElemImpl#toString(java.lang.StringBuffer, int)
 	 */
 	@Override

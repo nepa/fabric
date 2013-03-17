@@ -1,4 +1,4 @@
-/** 17.03.2013 01:47 */
+/** 17.03.2013 03:21 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -205,7 +205,7 @@ public class JSFieldImpl extends JSElementImpl implements JSField
   public void toString(StringBuffer buffer, int tabCount, boolean inClassContext)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
     }

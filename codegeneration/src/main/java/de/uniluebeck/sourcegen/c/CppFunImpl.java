@@ -95,7 +95,7 @@ class CppFunImpl extends CElemImpl implements CppFun {
     public String getSignature() {
 
     	StringBuffer buffer = new StringBuffer();
-    	if (comment != null) {
+    	if (null != this.comment && !this.comment.isEmpty()) {
     		buffer.append(Cpp.newline);
     		buffer.append(comment.toString());
     	}
@@ -115,7 +115,7 @@ class CppFunImpl extends CElemImpl implements CppFun {
     @Override
     public void toString(StringBuffer buffer, int tabCount, boolean isLast) {
         // Write comment if necessary
-        if (comment != null) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             comment.toString(buffer, tabCount);
         }
 

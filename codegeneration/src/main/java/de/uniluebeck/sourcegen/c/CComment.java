@@ -25,5 +25,6 @@
 package de.uniluebeck.sourcegen.c;
 
 public interface CComment extends CppLangElem {
-
+  public String getDescription();
+  public boolean isEmpty();
 }
