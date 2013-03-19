@@ -1,4 +1,4 @@
-/** 02.03.2013 01:27 */
+/** 19.03.2013 23:23 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -207,7 +207,10 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "  <properties>\n" +
 "    <!--\n" +
 "      Custom property to define which version of\n" +
-"      the Atmosphere Framework should be used.\n" +
+"      the Atmosphere Framework should be used.\n\n" +
+
+"      To force update of snapshot and release\n" +
+"      dependencies run: mvn -U clean install\n" +
 "    -->\n" +
 "    <atmo-version>1.1.0-SNAPSHOT</atmo-version>\n" +
 "  </properties>\n\n" +

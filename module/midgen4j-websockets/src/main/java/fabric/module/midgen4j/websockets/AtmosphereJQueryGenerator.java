@@ -1,4 +1,4 @@
-/** 06.03.2013 15:18 */
+/** 19.03.2013 23:17 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -798,7 +798,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
 
 "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\n" +
 
-"  <script type=\"text/javascript\" src=\"./jquery/jquery-1.7.2.js\"></script>\n" +
+"  <script type=\"text/javascript\" src=\"./jquery/jquery-1.9.0.js\"></script>\n" +
 "  <script type=\"text/javascript\" src=\"./jquery/jquery.atmosphere.js\"></script>\n" +
 "  <script type=\"text/javascript\" src=\"./javascript/logger.js\"></script>\n" +
 "  <script type=\"text/javascript\" src=\"./javascript/%s.js\"></script>\n\n" +
