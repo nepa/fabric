@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -37,7 +37,7 @@ public class CppHeaderFileImpl extends CppSourceFileImpl implements CppHeaderFil
         prepare();
 
         // Write comment if necessary
-        if (null != this.comment) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             this.comment.toString(buffer, tabCount);
             buffer.append(Cpp.newline);
         }

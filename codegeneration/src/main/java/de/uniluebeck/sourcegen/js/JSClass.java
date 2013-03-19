@@ -1,4 +1,4 @@
-/** 01.08.2012 22:18 */
+/** 17.03.2013 01:42 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -105,4 +105,5 @@ public interface JSClass extends JSComplexType
   public boolean contains(final JSMethod method);
 
   public JSClass setComment(final JSComment comment);
+  public JSClass setComment(final String comment);
 }

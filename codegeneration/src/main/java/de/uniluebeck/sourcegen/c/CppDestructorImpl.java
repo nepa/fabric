@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -44,8 +44,8 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
 		return this;
 	}
 
-	public CppDestructor appendCode(String str) {
-		this.body.append(str + Cpp.newline);
+	public CppDestructor appendCode(String code) {
+		this.body.append(code + Cpp.newline);
 		return this;
 	}
 
@@ -57,19 +57,26 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
 		return body.toString();
 	}
 
+  @Override
 	public CppDestructor setComment(CComment comment) {
 		this.comment = comment;
 		return this;
 	}
 
+  @Override
+	public CppDestructor setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
+
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 
-		if (comment != null) {
+    // Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
-        buffer.append(getParents() + this.clazz.getName() + "::~");
+    buffer.append(getParents() + this.clazz.getName() + "::~");
 		signature.toString(buffer, 0);
 
 		buffer.append(" {" + Cpp.newline);
@@ -90,7 +97,7 @@ class CppDestructorImpl extends CElemImpl implements CppDestructor {
     	if(this.clazz != null) {
 	    	for (String s : this.clazz.getParents()) {
 	    		myParents.append(s + "::");
-			}
+        }
     	}
     	return myParents.toString();
     }

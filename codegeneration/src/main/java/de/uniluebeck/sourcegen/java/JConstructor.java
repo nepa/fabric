@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -70,7 +70,15 @@ public interface JConstructor extends JLangElem {
     public JMethodSignature getSignature();
     public JMethodBody getBody();
 
-    JConstructor setComment(JConstructorComment comment);
+    /**
+     * Set the Javadoc comment for the current constructor.
+     *
+     * @param comment The Java constructor comment.
+     * @return This object.
+     */
+    public JConstructor setComment(JConstructorComment comment);
+
+    public JConstructor setComment(String comment);
 
     /**
      * Adds an annotation to this class.
@@ -79,4 +87,6 @@ public interface JConstructor extends JLangElem {
      * @return This object.
      */
     public JConstructor addAnnotation(JConstructorAnnotation... annotations);
+
+    public JConstructor addAnnotation(String... annotations);
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -34,8 +34,6 @@ import de.uniluebeck.sourcegen.exceptions.JConflictingModifierException;
 import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
 
-
-
 /**
  * Simple implementation of the Java 5 Enum-Datatype. Implementation is
  * currently limited to a simple Constant-Listing wrapped inside an enum
@@ -47,9 +45,7 @@ import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
  *
  * may follow.
  *
- *
  * @author Daniel Bimschas
- *
  */
 class JEnumImpl extends JComplexTypeImpl implements JEnum {
 
@@ -119,6 +115,7 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return parentClass == null ? (parentInterface == null ? null : parentInterface) : parentClass;
 	}
 
+  @Override
 	public JEnum addConstant(String... constants) throws JDuplicateException {
 		for(String c : constants)
 			addConstantInternal(c);
@@ -134,12 +131,12 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 
-		// write comment if necessary
-		if (comment != null) {
+		// Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
-		// write annotations if there are any
+		// Write annotations if there are any
     for (JEnumAnnotation ann: this.annotations) {
       ann.toString(buffer, tabCount);
     }
@@ -167,6 +164,7 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		buffer.append("}");
 	}
 
+  @Override
 	public boolean containsConstant(String constant) {
 
 		for(String c : constants)
@@ -202,13 +200,13 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 			JModifier.isTransient(modifiers) ||
 			JModifier.isVolatile(modifiers);
 
-		if(invalid)
+		if (invalid)
 			throw new JInvalidModifierException(
 					res.getString("exception.modifier.invalid") + //$NON-NLS-1$
 					JModifier.toString(modifiers)
 			);
 
-		if(JModifier.isConflict(modifiers))
+		if (JModifier.isConflict(modifiers))
 			throw new JConflictingModifierException(
 					res.getString("exception.modifier.conflict") //$NON-NLS-1$
 			);
@@ -216,15 +214,17 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 
 	}
 
+  @Override
 	public JEnum add(JConstructor... constructor) throws JDuplicateException {
 		for (JConstructor constr : constructor) {
 			if (contains(constr))
-				throw new JDuplicateException("Duplicate Constructor " + constr);
+				throw new JDuplicateException("Duplicate constructor " + constr);
 			this.constructors.add((JConstructorImpl)constr);
 		}
 		return this;
 	}
 
+  @Override
 	public boolean contains(JConstructor constructor) {
 		for (JConstructor c : constructors)
 			if (c.equals(constructor))
@@ -232,15 +232,17 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return false;
 	}
 
+  @Override
 	public JEnum add(JMethod... method) throws JDuplicateException {
 		for (JMethod meth : method) {
 			if (contains(meth))
-				throw new JDuplicateException("Duplicate Method " + meth);
+				throw new JDuplicateException("Duplicate method " + meth);
 			this.methods.add((JMethodImpl)meth);
 		}
 		return this;
 	}
 
+  @Override
 	public boolean contains(JMethod method) {
 		for (JMethod m : methods)
 			if (m.equals(method))
@@ -248,15 +250,17 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return false;
 	}
 
+  @Override
 	public JEnum add(JField... field) throws JDuplicateException {
 		for (JField f : field) {
 			if (contains(f))
-				throw new JDuplicateException("Duplicate Field " + f);
+				throw new JDuplicateException("Duplicate field " + f);
 			this.fields .add(f);
 		}
 		return this;
 	}
 
+  @Override
 	public boolean contains(JField field) {
 		for (JField f : fields)
 			if (f.equals(field))
@@ -264,6 +268,7 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return false;
 	}
 
+  @Override
 	public JConstructor getJConstructorByName(String name) {
 		for (JConstructor i : constructors)
 			if (i.equals(name))
@@ -271,6 +276,7 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return null;
 	}
 
+  @Override
 	public JField getJFieldByName(String name) {
 		for (JField i : fields)
 			if (i.equals(name))
@@ -278,21 +284,38 @@ class JEnumImpl extends JComplexTypeImpl implements JEnum {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see de.uniluebeck.sourcegen.JEnum#setComment(de.uniluebeck.sourcegen.JEnumComment)
 	 */
+  @Override
 	public JEnum setComment(JEnumComment comment) {
 		this.comment  = comment;
 		return this;
 	}
 
+  @Override
+  public JEnum setComment(String comment) {
+    this.comment = new JEnumCommentImpl(comment);
+    return this;
+  }
+
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JEnum#addAnnotation(de.uniluebeck.sourcegen.java.JEnumAnnotation[])
 	 */
+  @Override
 	public JEnum addAnnotation(JEnumAnnotation... annotations) {
 	    for (JEnumAnnotation ann : annotations) {
 	        this.annotations.add(ann);
 	    }
 	    return this;
 	}
+
+  @Override
+  public JEnum addAnnotation(String... annotations) {
+      for (String annotation: annotations) {
+          this.annotations.add(new JEnumAnnotationImpl(annotation));
+      }
+
+      return this;
+  }
 }

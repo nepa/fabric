@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -427,8 +427,8 @@ abstract class CStructBaseImpl extends CElemImpl implements CStructBase {
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 
-		// write comment if necessary
-		if (comment != null) {
+		// Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
@@ -478,9 +478,15 @@ abstract class CStructBaseImpl extends CElemImpl implements CStructBase {
 		System.out.println("----------");
 	}
 
+  @Override
 	public CStructBase setComment(CComment comment) {
 		this.comment = comment;
 		return this;
 	}
+
+  @Override
+	public CStructBase setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
 
 }

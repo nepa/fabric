@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -51,8 +51,9 @@ public interface CppDestructor extends CppLangElem {
 	public static final CppDestructorFactory factory = CppDestructorFactory.getInstance();
 
 	public CppDestructor add(CppVar... vars) throws CppDuplicateException;
-	public CppDestructor appendCode(String string);
+	public CppDestructor appendCode(String code);
 	public CppDestructor setComment(CComment comment);
+	public CppDestructor setComment(String comment);
 	public String getSignature();
 
 	/**

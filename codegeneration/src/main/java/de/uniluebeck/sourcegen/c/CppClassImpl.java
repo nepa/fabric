@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -652,7 +652,7 @@ class CppClassImpl extends CElemImpl implements CppClass {
         // TODO: Maybe beforeDirectives, globalDeclarations
 
         // Write comment if necessary
-        if (comment != null) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             comment.toString(buffer, tabCount);
         }
 
@@ -819,6 +819,11 @@ class CppClassImpl extends CElemImpl implements CppClass {
     public CppClass setComment(CComment comment) {
         this.comment = comment;
         return this;
+    }
+
+    @Override
+    public CppClass setComment(String comment) {
+      return this.setComment(new CCommentImpl(comment));
     }
 
     /**

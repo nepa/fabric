@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -107,6 +107,21 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	}
 
 	/**
+	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#setComment(de.uniluebeck.sourcegen.java.JMethodComment)
+	 */
+  @Override
+	public JInterfaceMethod setComment(JMethodComment comment) {
+		this.comment = comment;
+		return this;
+	}
+
+  @Override
+  public JInterfaceMethod setComment(String comment) {
+    this.comment = new JMethodCommentImpl(comment);
+    return this;
+  }
+
+	/**
 	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#addAnnotation(de.uniluebeck.sourcegen.java.JMethodAnnotation[])
 	 */
   @Override
@@ -117,14 +132,14 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	    return this;
 	}
 
-	/**
-	 * @see de.uniluebeck.sourcegen.java.JInterfaceMethod#setComment(de.uniluebeck.sourcegen.java.JMethodComment)
-	 */
   @Override
-	public JInterfaceMethod setComment(JMethodComment comment) {
-		this.comment = comment;
-		return this;
-	}
+  public JInterfaceMethod addAnnotation(String... annotations) {
+      for (String annotation: annotations) {
+          this.annotations.add(new JMethodAnnotationImpl(annotation));
+      }
+
+      return this;
+  }
 
   @Override
 	public boolean equals(JInterfaceMethod other) {
@@ -171,12 +186,12 @@ class JInterfaceMethodImpl extends JElemImpl implements JInterfaceMethod {
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
 
-    // write comment if necessary
-    if (comment != null) {
+    // Write comment if necessary
+    if (null != this.comment && !this.comment.isEmpty()) {
       comment.toString(buffer, tabCount);
     }
 
-    // write annotations if there are any
+    // Write annotations if there are any
     for (JMethodAnnotation ann: this.annotations) {
       ann.toString(buffer, tabCount);
     }

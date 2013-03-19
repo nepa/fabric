@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -43,7 +43,7 @@ public interface JField extends JLangElem {
 
 		public JField create(String type, String name) {
 
-			return new JFieldImpl(type, name);
+      return new JFieldImpl(type, name);
 		}
 
 		public JField create(int modifiers, String type, String name)
@@ -65,9 +65,9 @@ public interface JField extends JLangElem {
 
 	}
 
-	public static final JavaFieldFactory factory = JavaFieldFactory.getInstance();
+  public static final JavaFieldFactory factory = JavaFieldFactory.getInstance();
 
-	public boolean equals(JField other);
+  public boolean equals(JField other);
 
 	/**
 	 * Set the Javadoc comment for the current field.
@@ -75,7 +75,9 @@ public interface JField extends JLangElem {
 	 * @param comment The Java field comment.
 	 * @return This object.
 	 */
-	public JField setComment(JFieldComment comment);
+  public JField setComment(JFieldComment comment);
+
+  public JField setComment(String comment);
 
   /**
 	 * Adds an annotation to this field.
@@ -83,5 +85,7 @@ public interface JField extends JLangElem {
 	 * @param annotations The annotation's name.
 	 * @return This object.
 	 */
-	public JField addAnnotation       (JFieldAnnotation... annotations);
+  public JField addAnnotation(JFieldAnnotation... annotations);
+
+  public JField addAnnotation(String... annotations);
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -123,15 +123,22 @@ class JParameterImpl extends JElemImpl implements JParameter {
 	 * @see de.uniluebeck.sourcegen.java.JParameter#addAnnotation(de.uniluebeck.sourcegen.java.JParameterAnnotation[])
 	 */
 	@Override
-	public JParameter addAnnotation(JParameterAnnotation... annotations)
-	{
-		for (JParameterAnnotation annotation: annotations)
-		{
+	public JParameter addAnnotation(JParameterAnnotation... annotations) {
+		for (JParameterAnnotation annotation: annotations) {
 			this.annotations.add(annotation);
 		}
 
 		return this;
 	}
+
+  @Override
+  public JParameter addAnnotation(String... annotations) {
+    for (String annotation: annotations) {
+      this.annotations.add(new JParameterAnnotationImpl(annotation));
+    }
+
+    return this;
+  }
 
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {

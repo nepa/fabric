@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -76,12 +76,15 @@ public interface CppVar extends CppLangElem {
 	}
 
   public static final CppVarFactory factory = CppVarFactory.getInstance();
-  public CppVar setComment(CComment comment);
+
 
   public Long getVisability();
   public String getTypeName();
   public String getVarName();
   public String getInitCode();
   public String getInit();
+
+  public CppVar setComment(CComment comment);
+  public CppVar setComment(String comment);
 
 }

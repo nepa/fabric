@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -22,11 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- *
- */
 package de.uniluebeck.sourcegen.java;
-
 
 /**
  * @author Marco Wegner
@@ -54,7 +50,15 @@ public class JFieldCommentImpl extends JElemImpl implements JFieldComment {
 		this.description = description;
 	}
 
-	/**
+  /**
+   * @see de.uniluebeck.sourcegen.java.JComment#isEmpty()
+	 */
+  @Override
+  public boolean isEmpty() {
+    return (null != this.description && this.description.isEmpty());
+  }
+
+  /**
 	 * @see de.uniluebeck.sourcegen.ElemImpl#toString(java.lang.StringBuffer, int)
 	 */
 	@Override

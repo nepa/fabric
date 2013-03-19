@@ -1,4 +1,4 @@
-/** 23.10.2012 17:47 */
+/** 17.03.2013 03:07 */
 package de.uniluebeck.sourcegen.js;
 
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class JSClassTest
     // Test comment
     assertTrue("Class must contain a header comment.", jsc.toString().startsWith("/**"));
     assertTrue("Class comment must match initial value.", jsc.toString().contains("The 'Apple' class."));
-    jsc.setComment(null);
+    jsc.setComment("");
     assertFalse("Class comment must be empty.", jsc.toString().startsWith("/**"));
   }
 

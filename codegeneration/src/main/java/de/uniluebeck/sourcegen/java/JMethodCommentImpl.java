@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -22,12 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- *
- */
 package de.uniluebeck.sourcegen.java;
-
-
 
 /**
  * The actual implementation for a Java method comment.
@@ -83,6 +78,16 @@ public class JMethodCommentImpl extends JConstructorCommentImpl implements JMeth
 	public String getReturnTypeDescription() {
 		return returnType;
 	}
+
+  /**
+   * @see de.uniluebeck.sourcegen.java.JComment#isEmpty()
+	 */
+  @Override
+  public boolean isEmpty() {
+    boolean noReturnType = (null != this.returnType && this.returnType.isEmpty());
+
+    return super.isEmpty() && noReturnType;
+  }
 
 	/* (non-Javadoc)
 	 * @see de.uniluebeck.sourcegen.ElemImpl#toString(java.lang.StringBuffer, int)

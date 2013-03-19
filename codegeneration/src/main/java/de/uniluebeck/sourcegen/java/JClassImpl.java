@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -101,12 +101,14 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		this.className = className;
 	}
 
+  @Override
 	public JClass add(JConstructor... constructors) throws JDuplicateException, JCodeValidationException {
 		for (JConstructor c : constructors)
 			addInternal(c);
 		return this;
 	}
 
+  @Override
 	public JClass add(JEnum... jEnum) throws JDuplicateException {
 		for(JEnum e : jEnum) {
 			if(contains(e))
@@ -117,24 +119,28 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return this;
 	}
 
+  @Override
 	public JClass add(JField... field) throws JDuplicateException {
 		for (JField f : field)
 			addInternal(f);
 		return this;
 	}
 
+  @Override
 	public JClass addImplements(JInterface... iface) throws JDuplicateException {
 		for (JInterface i : iface)
 			addInternalImplements(i);
 		return this;
 	}
 
+  @Override
 	public JClass add(JMethod... methods) throws JDuplicateException, JCodeValidationException {
 		for (JMethod m : methods)
 			addInternal(m);
 		return this;
 	}
 
+  @Override
 	public JClass add(JClass... classes) throws JDuplicateException {
 		for (JClass c : classes) {
 			if(contains(c) || ((JClassImpl)c).getParent() != null)
@@ -145,6 +151,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return this;
 	}
 
+  @Override
 	public JClass add(JInterface... ifaces) throws JDuplicateException {
 		for (JInterface iface : ifaces) {
 			if(contains(iface) || ((JInterfaceImpl)iface).getParent() != null)
@@ -201,12 +208,12 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
-		// write comment if necessary
-		if (comment != null) {
+		// Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
-		// write annotations if there are any
+		// Write annotations if there are any
     for (JClassAnnotation ann: this.annotations) {
       ann.toString(buffer, tabCount);
     }
@@ -250,7 +257,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 			int end = 0;
 			int staticCodeLength = staticCode.length();
 
-			while(begin < staticCodeLength) {
+			while (begin < staticCodeLength) {
 				end = staticCode.indexOf("\n", begin);
 				end = (end == -1) ? staticCodeLength : end;
 				indent(buffer, tabCount+2);
@@ -273,6 +280,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		buffer.append("}");
 	}
 
+  @Override
 	public boolean contains(JConstructor constructor) {
 
 		for (JConstructor con : constructors)
@@ -283,6 +291,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	}
 
+  @Override
 	public boolean contains(JEnum jEnum) {
 
 		for(JEnum e : enums)
@@ -293,6 +302,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	}
 
+  @Override
 	public boolean contains(JField field) {
 
 		for (JField f : fields)
@@ -303,6 +313,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	}
 
+  @Override
 	public boolean containsImplements(JInterface iface) {
 
 		for (JInterface i : implementedInterfaces)
@@ -313,6 +324,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	}
 
+  @Override
 	public boolean contains(JMethod method) {
 
 		for (JMethod m : methods)
@@ -323,36 +335,40 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	}
 
+  @Override
 	public boolean contains(JClass nestedClass) {
 
-		for (JClass jnc : classes)
+    for (JClass jnc : classes)
 			if (jnc.equals(nestedClass))
 				return true;
 
 		return false;
 
-	}
+  }
 
+  @Override
 	public boolean contains(JInterface iface) {
 
-		for (JInterface jni : interfaces)
+    for (JInterface jni : interfaces)
 			if (jni.equals(iface))
 				return true;
 
 		return false;
 
-	}
+  }
 
 	@Override
 	public String getName() {
 		return className;
 	}
 
+  @Override
 	public JClass setExtends(JClass extendedClass) {
 		this.extendedClass = (JClassImpl) extendedClass;
 		return this;
 	}
 
+  @Override
 	public JClass setExtends(String extendedClass) {
 		this.extendedClass = new JClassImpl(extendedClass);
 		return this;
@@ -390,12 +406,14 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 
 	}
 
+  @Override
 	public JClass appendStaticCode(String... code) {
 		for (String c : code)
 			staticCode.append(c);
 		return this;
 	}
 
+  @Override
 	public JInterface getImplementedJInterfaceByName(String name) {
 		for (JInterface i : implementedInterfaces)
 			if (i.getName().equals(name))
@@ -403,6 +421,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return null;
 	}
 
+  @Override
 	public JClass getJClassByName(String name) {
 		for (JClass c : classes)
 			if (c.getName().equals(name))
@@ -410,6 +429,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return null;
 	}
 
+  @Override
 	public JConstructor getJConstructorByName(String name) {
 		for (JConstructor i : constructors)
 			if (i.equals(name))
@@ -417,6 +437,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return null;
 	}
 
+  @Override
 	public JEnum getJEnumByName(String name) {
 		for (JEnum i : enums)
 			if (i.equals(name))
@@ -424,6 +445,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return null;
 	}
 
+  @Override
 	public JField getJFieldByName(String name) {
 		for (JField i : fields)
 			if (i.equals(name))
@@ -431,6 +453,7 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 		return null;
 	}
 
+  @Override
 	public JInterface getJInterfaceByName(String name) {
 		for (JInterface i : interfaces)
 			if (i.equals(name))
@@ -466,17 +489,25 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
     return result;
   }
 
-	/* (non-Javadoc)
+	/**
 	 * @see de.uniluebeck.sourcegen.JClass#setComment(de.uniluebeck.sourcegen.JClassComment)
 	 */
+  @Override
 	public JClass setComment(JClassComment comment) {
 		this.comment = comment;
 		return this;
 	}
 
+  @Override
+  public JClass setComment(String comment) {
+    this.comment = new JClassCommentImpl(comment);
+    return this;
+  }
+
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JClass#addAnnotation(de.uniluebeck.sourcegen.java.JClassAnnotation[])
 	 */
+  @Override
 	public JClass addAnnotation(JClassAnnotation... annotations) {
 	    for (JClassAnnotation ann : annotations) {
 	        this.annotations.add(ann);
@@ -484,8 +515,17 @@ class JClassImpl extends JComplexTypeImpl implements JClass {
 	    return this;
 	}
 
-	public List<JMethod> getMethods()
-	{
+  @Override
+  public JClass addAnnotation(String... annotations) {
+      for (String annotation: annotations) {
+          this.annotations.add(new JClassAnnotationImpl(annotation));
+      }
+
+      return this;
+  }
+
+  @Override
+	public List<JMethod> getMethods() {
 		return new LinkedList<JMethod>(this.methods);
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -365,7 +365,7 @@ public class CppSourceFileImpl extends CElemImpl implements CppSourceFile {
 	    prepare();
 
 	    // Write comment if necessary
-	    if (null != this.comment) {
+	    if (null != this.comment && !this.comment.isEmpty()) {
 	        this.comment.toString(buffer, tabCount);
 	        buffer.append(Cpp.newline);
 	    }
@@ -622,6 +622,11 @@ public class CppSourceFileImpl extends CElemImpl implements CppSourceFile {
 		this.comment = comment;
 		return this;
 	}
+
+	@Override
+	public CppSourceFile setComment(String comment) {
+    return this.setComment(new CCommentImpl(comment));
+  }
 
 	public void prepare() {
     if (isPrepared) {

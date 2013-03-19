@@ -1,4 +1,4 @@
-/** 25.10.2012 22:56 */
+/** 17.03.2013 03:21 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -349,6 +349,20 @@ public class JSClassImpl extends JSComplexTypeImpl implements JSClass
   }
 
   /**
+   * Set comment for the JavaScript class. The comment
+   * will be printed above of the class header.
+   *
+   * @param comment Comment for JavaScript class
+   *
+   * @return JSClass object
+   */
+  @Override
+  public JSClass setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
+  }
+
+  /**
    * Compare current JavaScript class with another object of
    * the same type. Equality comparison is based on the class
    * name, its parent class and its argument list as well as
@@ -432,7 +446,7 @@ public class JSClassImpl extends JSComplexTypeImpl implements JSClass
   public void toString(StringBuffer buffer, int tabCount)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
     }

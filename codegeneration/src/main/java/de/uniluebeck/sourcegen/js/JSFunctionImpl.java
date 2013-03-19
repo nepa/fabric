@@ -1,4 +1,4 @@
-/** 01.08.2012 22:57 */
+/** 17.03.2013 03:20 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -166,6 +166,20 @@ public class JSFunctionImpl extends JSComplexTypeImpl implements JSFunction
   }
 
   /**
+   * Set comment for the JavaScript function. The comment
+   * will be printed above of the function header.
+   *
+   * @param comment Comment for JavaScript function
+   *
+   * @return JSFunction object
+   */
+  @Override
+  public JSFunction setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
+  }
+
+  /**
    * Add further parameters to the list of existing
    * function arguments.
    *
@@ -256,7 +270,7 @@ public class JSFunctionImpl extends JSComplexTypeImpl implements JSFunction
   public void toString(StringBuffer buffer, int tabCount)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
     }

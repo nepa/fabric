@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -231,6 +231,7 @@ public interface CStructBase extends CComplexType {
 	 *
 	 * @return the name
 	 */
+  @Override
 	public String getName();
 
 	/**
@@ -240,5 +241,13 @@ public interface CStructBase extends CComplexType {
 	 * @return this
 	 */
 	public CStructBase setComment(CComment comment);
+
+	/**
+	 * Add a comment to the struct
+	 *
+	 * @param comment The comment
+	 * @return this
+	 */
+	public CStructBase setComment(String comment);
 
 }

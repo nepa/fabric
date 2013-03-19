@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -63,6 +63,7 @@ public interface CppSourceFile extends SourceFile, CppElem {
 
 	public CppSourceFile 	addUsingNamespace			(String... namespaces)					throws CppDuplicateException;
 	public CppSourceFile 	setComment(CComment comment);
+	public CppSourceFile 	setComment(String comment);
 
 	public boolean 			contains					(CEnum enumObj);
 	public boolean 			contains					(CFun function);

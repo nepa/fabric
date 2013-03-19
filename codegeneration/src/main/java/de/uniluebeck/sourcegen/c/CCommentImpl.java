@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -43,9 +43,15 @@ public class CCommentImpl extends CElemImpl implements CComment {
 		this.description = description;
 	}
 
+  @Override
 	public String getDescription() {
 		return this.description;
 	}
+
+  @Override
+  public boolean isEmpty() {
+    return (null != this.description && this.description.isEmpty());
+  }
 
 	/**
 	 * @see de.uniluebeck.sourcegen.ElemImpl#toString(java.lang.StringBuffer, int)

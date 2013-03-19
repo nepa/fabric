@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -53,9 +53,10 @@ public interface CppConstructor extends CppLangElem {
 
 	public CppConstructor add(CppVar... create) throws CppDuplicateException;
 	public CppConstructor add(String... pExtendeds) throws CppDuplicateException;
-	public CppConstructor appendCode(String string);
+	public CppConstructor appendCode(String code);
 	public String getSignature();
 	public CppConstructor setComment(CComment comment);
+	public CppConstructor setComment(String comment);
 
 	/**
 	 * This method is only used by the CppClass

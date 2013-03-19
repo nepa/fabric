@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -95,7 +95,7 @@ class CppFunImpl extends CElemImpl implements CppFun {
     public String getSignature() {
 
     	StringBuffer buffer = new StringBuffer();
-    	if (comment != null) {
+    	if (null != this.comment && !this.comment.isEmpty()) {
     		buffer.append(Cpp.newline);
     		buffer.append(comment.toString());
     	}
@@ -115,7 +115,7 @@ class CppFunImpl extends CElemImpl implements CppFun {
     @Override
     public void toString(StringBuffer buffer, int tabCount, boolean isLast) {
         // Write comment if necessary
-        if (comment != null) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             comment.toString(buffer, tabCount);
         }
 
@@ -185,6 +185,11 @@ class CppFunImpl extends CElemImpl implements CppFun {
     public CppFun setComment(CComment comment) {
     	this.comment = comment;
     	return this;
+    }
+
+    @Override
+    public CppFun setComment(String comment) {
+      return this.setComment(new CCommentImpl(comment));
     }
 
     /**

@@ -1,4 +1,4 @@
-/** 02.08.2012 20:30 */
+/** 17.03.2013 03:22 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -11,4 +11,5 @@ public interface JSComment extends JSElement
 {
   public JSComment setDescription(final String description);
   public String getDescription();
+  public boolean isEmpty();
 }

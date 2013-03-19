@@ -1,4 +1,4 @@
-/** 23.10.2012 17:29 */
+/** 17.03.2013 03:20 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -232,6 +232,20 @@ public class JSMethodImpl extends JSComplexTypeImpl implements JSMethod
   }
 
   /**
+   * Set comment for the JavaScript method. The comment
+   * will be printed above of the method header.
+   *
+   * @param comment Comment for JavaScript method
+   *
+   * @return JSMethod object
+   */
+  @Override
+  public JSMethod setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
+  }
+
+  /**
    * Add further parameters to the list of existing
    * method arguments.
    *
@@ -324,7 +338,7 @@ public class JSMethodImpl extends JSComplexTypeImpl implements JSMethod
   public void toString(StringBuffer buffer, int tabCount)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
     }

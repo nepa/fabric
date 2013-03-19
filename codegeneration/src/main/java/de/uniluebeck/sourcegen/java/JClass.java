@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -31,8 +31,6 @@ import de.uniluebeck.sourcegen.exceptions.JConflictingModifierException;
 import de.uniluebeck.sourcegen.exceptions.JDuplicateException;
 import de.uniluebeck.sourcegen.exceptions.JInvalidModifierException;
 
-
-
 public interface JClass extends JComplexType {
 
 	class JavaClassFactory {
@@ -57,39 +55,39 @@ public interface JClass extends JComplexType {
 
 	}
 
-	public static final JavaClassFactory factory = JavaClassFactory.getInstance();
+  public static final JavaClassFactory factory = JavaClassFactory.getInstance();
 
-	public JClass 	add				(JConstructor... constructor) 	throws JDuplicateException, JCodeValidationException;
-	public JClass 	add				(JEnum... jEnum) 				throws JDuplicateException;
-	public JClass 	add				(JField... field) 				throws JDuplicateException;
-	public JClass 	add				(JInterface... iface) 			throws JDuplicateException;
-	public JClass 	add				(JMethod... method) 				throws JDuplicateException, JCodeValidationException;
-	public JClass 	add				(JClass... classes) 			throws JDuplicateException;
-	public JClass	addImplements	(JInterface... iface) 			throws JDuplicateException;
+  public JClass add(JConstructor... constructor) throws JDuplicateException, JCodeValidationException;
+  public JClass add(JEnum... jEnum) throws JDuplicateException;
+  public JClass add(JField... field) throws JDuplicateException;
+  public JClass add(JInterface... iface) throws JDuplicateException;
+  public JClass add(JMethod... method) throws JDuplicateException, JCodeValidationException;
+  public JClass add(JClass... classes) throws JDuplicateException;
+  public JClass addImplements(JInterface... iface) throws JDuplicateException;
 
-	public boolean 	contains		(JConstructor constructor);
-	public boolean 	contains		(JEnum jEnum);
-	public boolean 	contains		(JField field);
-	public boolean 	contains		(JInterface iface);
-	public boolean 	contains		(JMethod method);
-	public boolean 	contains		(JClass nestedClass);
-	public boolean 	containsImplements(JInterface iface);
+  public boolean contains(JConstructor constructor);
+  public boolean contains(JEnum jEnum);
+  public boolean contains(JField field);
+  public boolean contains(JInterface iface);
+  public boolean contains(JMethod method);
+  public boolean contains(JClass nestedClass);
+  public boolean containsImplements(JInterface iface);
 
-	public List<JMethod> 		getMethods						();
+  public List<JMethod> getMethods();
+  public JConstructor getJConstructorByName(String name);
+  public JEnum getJEnumByName(String name);
+  public JField getJFieldByName(String name);
+  public JInterface getJInterfaceByName(String name);
+  public JClass getJClassByName(String name);
+  public JInterface getImplementedJInterfaceByName(String name);
+  public List<JMethod> getJMethodsByName(String name);
 
-	public JConstructor   getJConstructorByName           (String name);
-	public JEnum          getJEnumByName                	(String name);
-	public JField         getJFieldByName       					(String name);
-	public JInterface     getJInterfaceByName           	(String name);
-	public JClass         getJClassByName             		(String name);
-	public JInterface     getImplementedJInterfaceByName  (String name);
-  public List<JMethod>  getJMethodsByName               (String name);
+  public JClass setExtends(JClass extendedClass);
+  public JClass setExtends(String extendedClass);
 
-	public JClass 	setExtends		(JClass extendedClass);
-	public JClass 	setExtends		(String extendedClass);
-
-	public String 	toString		();
-	public JClass 	appendStaticCode(String... code);
+  @Override
+  public String toString();
+  public JClass appendStaticCode(String... code);
 
 	/**
 	 * Set the Javadoc comment for the current class.
@@ -97,7 +95,9 @@ public interface JClass extends JComplexType {
 	 * @param comment The Java class comment.
 	 * @return This object.
 	 */
-	public JClass	setComment(JClassComment comment);
+  public JClass setComment(JClassComment comment);
+
+  public JClass setComment(String comment);
 
   /**
 	 * Adds an annotation to this class.
@@ -105,5 +105,7 @@ public interface JClass extends JComplexType {
 	 * @param annotations The Java class annotation.
 	 * @return This object.
 	 */
-	public JClass addAnnotation       (JClassAnnotation... annotations);
+  public JClass addAnnotation(JClassAnnotation... annotations);
+
+  public JClass addAnnotation(String... annotations);
 }

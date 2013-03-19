@@ -1,4 +1,4 @@
-/** 01.08.2012 22:47 */
+/** 17.03.2013 01:51 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.ArrayList;
@@ -81,6 +81,7 @@ public interface JSFunction extends JSComplexType
   public JSFunctionBody getBody();
 
   public JSFunction setComment(final JSComment comment);
+  public JSFunction setComment(final String comment);
 
   public JSFunction add(final String... arguments) throws JSDuplicateException;
 }

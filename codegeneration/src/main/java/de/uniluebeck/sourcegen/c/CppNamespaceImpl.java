@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -106,7 +106,7 @@ class CppNamespaceImpl extends CElemImpl implements CppNamespace {
         prepare();
 
         // Write comment if necessary
-        if (comment != null) {
+        if (null != this.comment && !this.comment.isEmpty()) {
             comment.toString(buffer, tabCount);
         }
 
@@ -164,6 +164,11 @@ class CppNamespaceImpl extends CElemImpl implements CppNamespace {
     public CppNamespace setComment(CComment comment) {
         this.comment = comment;
         return this;
+    }
+
+    @Override
+    public CppNamespace setComment(String comment) {
+        return this.setComment(new CCommentImpl(comment));
     }
 
     /**

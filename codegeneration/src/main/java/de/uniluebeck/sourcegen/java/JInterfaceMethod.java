@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -50,18 +50,28 @@ public interface JInterfaceMethod extends JLangElem {
 
 	}
 
-	public static final JavaInterfaceMethodFactory factory = JavaInterfaceMethodFactory.getInstance();
+  public static final JavaInterfaceMethodFactory factory = JavaInterfaceMethodFactory.getInstance();
 
-	public JInterfaceMethod add(JParameter... params) throws JDuplicateException;
+  public JInterfaceMethod add(JParameter... params) throws JDuplicateException;
 
-	public JInterfaceMethod addException(String... exception) throws JDuplicateException;
-	public boolean containsException(String exception);
+  public JInterfaceMethod addException(String... exception) throws JDuplicateException;
+  public boolean containsException(String exception);
 
   public int getModifiers();
   public String getReturnType();
-  public JMethodSignature	getSignature();
+  public JMethodSignature getSignature();
 
   public boolean equals(JInterfaceMethod other);
+  
+  /**
+	 * Set the Javadoc comment for the current method.
+	 *
+	 * @param comment The Java method comment.
+	 * @return This object.
+	 */
+  public JInterfaceMethod setComment(JMethodComment comment);
+
+  public JInterfaceMethod setComment(String comment);
 
   /**
 	 * Adds an annotation to this method.
@@ -69,13 +79,7 @@ public interface JInterfaceMethod extends JLangElem {
 	 * @param annotations The Java method annotation.
 	 * @return This object.
 	 */
-	public JInterfaceMethod addAnnotation(JMethodAnnotation... annotations);
+  public JInterfaceMethod addAnnotation(JMethodAnnotation... annotations);
 
-	/**
-	 * Set the Javadoc comment for the current method.
-	 *
-	 * @param comment The Java method comment.
-	 * @return This object.
-	 */
-	public JInterfaceMethod setComment(JMethodComment comment);
+  public JInterfaceMethod addAnnotation(String... annotations);
 }

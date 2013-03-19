@@ -1,4 +1,4 @@
-/** 23.10.2012 18:34 */
+/** 17.03.2013 03:21 */
 package de.uniluebeck.sourcegen.js;
 
 /**
@@ -100,6 +100,19 @@ public class JSFieldImpl extends JSElementImpl implements JSField
   }
 
   /**
+   * Set comment for the JavaScript field.
+   *
+   * @param comment Comment for JavaScript field
+   *
+   * @return JSField object
+   */
+  @Override
+  public JSField setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
+  }
+
+  /**
    * Compare current JavaScript field with another object
    * of the same type. Equality comparison is based on the
    * field's name and its initial value.
@@ -192,7 +205,7 @@ public class JSFieldImpl extends JSElementImpl implements JSField
   public void toString(StringBuffer buffer, int tabCount, boolean inClassContext)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
     }

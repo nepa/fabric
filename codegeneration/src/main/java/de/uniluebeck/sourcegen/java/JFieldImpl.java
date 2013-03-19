@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -94,12 +94,12 @@ class JFieldImpl extends JElemImpl implements JField {
 	 */
 	@Override
 	public void toString(StringBuffer buffer, int tabCount) {
-		// write comment if necessary
-		if (comment != null) {
+		// Write comment if necessary
+		if (null != this.comment && !this.comment.isEmpty()) {
 			comment.toString(buffer, tabCount);
 		}
 
-    // write annotations if there are any
+    // Write annotations if there are any
     for (JFieldAnnotation ann: this.annotations) {
       ann.toString(buffer, tabCount);
     }
@@ -118,6 +118,7 @@ class JFieldImpl extends JElemImpl implements JField {
 		buffer.append(";");
 	}
 
+  @Override
 	public boolean equals(JField other) {
 		return this.name.equals(((JFieldImpl)other).name);
 	}
@@ -126,20 +127,37 @@ class JFieldImpl extends JElemImpl implements JField {
 		return name;
 	}
 
+  @Override
 	public JField setComment(JFieldComment comment) {
 		this.comment = comment;
 		return this;
 	}
 
+  @Override
+  public JField setComment(String comment) {
+    this.comment = new JFieldCommentImpl(comment);
+    return this;
+  }
+
 	/**
 	 * @see de.uniluebeck.sourcegen.java.JField#addAnnotation(de.uniluebeck.sourcegen.java.JFieldAnnotation[])
 	 */
+  @Override
 	public JField addAnnotation(JFieldAnnotation... annotations) {
 	    for (JFieldAnnotation ann : annotations) {
 	        this.annotations.add(ann);
 	    }
 	    return this;
 	}
+
+  @Override
+  public JField addAnnotation(String... annotations) {
+      for (String annotation: annotations) {
+          this.annotations.add(new JFieldAnnotationImpl(annotation));
+      }
+
+      return this;
+  }
 
 	protected void validateModifiers() throws JInvalidModifierException, JConflictingModifierException {
 
@@ -162,18 +180,18 @@ class JFieldImpl extends JElemImpl implements JField {
 			JModifier.isFinal(modifiers) &&
 			JModifier.isVolatile(modifiers);
 
-		if(invalid)
+		if (invalid)
 			throw new JInvalidModifierException(
 					res.getString("exception.modifier.invalid") + //$NON-NLS-1$
 					JModifier.toString(modifiers)
 			);
 
-		if(conflictFinalVolatile)
+		if (conflictFinalVolatile)
 			throw new JConflictingModifierException(
 					res.getString("exception.modifier.final_volatile") //$NON-NLS-1$
 			);
 
-		if(JModifier.isConflict(modifiers))
+		if (JModifier.isConflict(modifiers))
 			throw new JConflictingModifierException(
 					res.getString("exception.modifier.conflict") //$NON-NLS-1$
 			);

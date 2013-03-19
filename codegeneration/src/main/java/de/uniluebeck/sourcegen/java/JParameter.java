@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -60,17 +60,17 @@ public interface JParameter extends JLangElem {
 
 	public static final JavaParameterFactory factory = JavaParameterFactory.getInstance();
 
-	/**
-	 * Please use typeEquals() or nameEquals() instead.
-	 * 
-	 * @deprecated Use typeEquals() or nameEquals() instead.
-	 */
-	@Deprecated
-	public boolean equals(JParameter other);
-	public boolean nameEquals(JParameter other);
-	public boolean nameEquals(String name);
-	public boolean typeEquals(JParameter other);
-	public boolean typeEquals(String type);
+  /**
+   * Please use typeEquals() or nameEquals() instead.
+   *
+   * @deprecated Use typeEquals() or nameEquals() instead.
+   */
+  @Deprecated
+  public boolean equals(JParameter other);
+  public boolean nameEquals(JParameter other);
+  public boolean nameEquals(String name);
+  public boolean typeEquals(JParameter other);
+  public boolean typeEquals(String type);
 
 	/**
    * Add Java annotations to the method parameter.
@@ -79,5 +79,7 @@ public interface JParameter extends JLangElem {
    *
 	 * @return Reference to this object
 	 */
-	public JParameter addAnnotation(JParameterAnnotation... annotations);
+  public JParameter addAnnotation(JParameterAnnotation... annotations);
+
+  public JParameter addAnnotation(String... annotations);
 }

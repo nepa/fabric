@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2012, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
+ * Copyright (c) 2010-2013, Institute of Telematics (Dennis Pfisterer, Marco Wegner, Dennis Boldt,
  * Sascha Seidel, Joss Widderich, et al.), University of Luebeck
  *
  * All rights reserved.
@@ -22,18 +22,13 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- *
- */
 package de.uniluebeck.sourcegen.java;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-
 /**
  * @author wegner
- *
  */
 public class JConstructorCommentImpl extends JElemImpl implements JConstructorComment {
 
@@ -70,7 +65,7 @@ public class JConstructorCommentImpl extends JElemImpl implements JConstructorCo
 		return description;
 	}
 
-	/**
+  /**
 	 * Adds a parameter to the list of method parameters.
 	 *
 	 * @param name The parameter's name.
@@ -87,7 +82,18 @@ public class JConstructorCommentImpl extends JElemImpl implements JConstructorCo
 		return params;
 	}
 
-	/* (non-Javadoc)
+  /**
+   * @see de.uniluebeck.sourcegen.java.JComment#isEmpty()
+	 */
+  @Override
+  public boolean isEmpty() {
+    boolean noDescription = (null != this.description && this.description.isEmpty());
+    boolean noParams = (null != this.params && this.params.isEmpty());
+
+    return noDescription && noParams;
+  }
+
+  /* (non-Javadoc)
 	 * @see de.uniluebeck.sourcegen.ElemImpl#toString(java.lang.StringBuffer, int)
 	 */
 	@Override

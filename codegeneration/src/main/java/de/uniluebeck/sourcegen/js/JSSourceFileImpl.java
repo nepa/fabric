@@ -1,4 +1,4 @@
-/** 03.11.2012 19:58 */
+/** 17.03.2013 03:20 */
 package de.uniluebeck.sourcegen.js;
 
 import java.util.LinkedList;
@@ -389,6 +389,20 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   }
 
   /**
+   * Set a comment that will be printed right at the
+   * beginning of the JavaScript source file.
+   *
+   * @param comment Comment to be added
+   *
+   * @return JavaScript source file with comment
+   */
+  @Override
+  public JSSourceFile setComment(final String comment)
+  {
+    return this.setComment(new JSCommentImpl(comment));
+  }
+
+  /**
    * Compare current JavaScript source file with another object
    * of the same type. Equality comparison is based on the path
    * and file name as well as all fields, classes and functions
@@ -474,7 +488,7 @@ public class JSSourceFileImpl extends JSComplexTypeImpl implements JSSourceFile
   public void toString(StringBuffer buffer, int tabCount)
   {
     // Write comment if necessary
-    if (null != this.comment)
+    if (null != this.comment && !this.comment.isEmpty())
     {
       this.comment.toString(buffer, tabCount);
       buffer.append("\n");
