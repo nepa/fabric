@@ -1,4 +1,4 @@
-/** 03.09.2012 16:30 */
+/** 21.06.2013 02:30 */
 package fabric.wsdlschemaparser.wsdl;
 
 import org.slf4j.Logger;
@@ -413,40 +413,46 @@ public class FWSDL
                     operation.getName(), methodType));
 
             // Create input message for binding operation
-            FBindingOperationInputMessage inputMessage =
-                    new FBindingOperationInputMessage(operation.getBindingInput().getName());
-
-            // Add per-message information for input message
-            for (Object ee: operation.getBindingInput().getExtensibilityElements())
+            FBindingOperationInputMessage inputMessage = null;
+            if (null != operation.getBindingInput())
             {
-              if (ee instanceof ExtensibilityElement)
+              inputMessage = new FBindingOperationInputMessage(operation.getBindingInput().getName());
+
+              // Add per-message information for input message
+              for (Object ee: operation.getBindingInput().getExtensibilityElements())
               {
-                ExtensibilityElement element = (ExtensibilityElement)ee;
-                FExtensibilityElement extensibilityElement = new FExtensibilityElement(element);
+                if (ee instanceof ExtensibilityElement)
+                {
+                  ExtensibilityElement element = (ExtensibilityElement)ee;
+                  FExtensibilityElement extensibilityElement = new FExtensibilityElement(element);
 
-                inputMessage.addPerMessageInformation(extensibilityElement);
+                  inputMessage.addPerMessageInformation(extensibilityElement);
 
-                LOGGER.debug(String.format("          └ Adding per-message information of type '%s' to input message.",
-                        extensibilityElement.getImplementationName()));
+                  LOGGER.debug(String.format("          └ Adding per-message information of type '%s' to input message.",
+                          extensibilityElement.getImplementationName()));
+                }
               }
             }
 
             // Create output message for binding operation
-            FBindingOperationOutputMessage outputMessage =
-                    new FBindingOperationOutputMessage(operation.getBindingOutput().getName());
-
-            // Add per-message information for output message
-            for (Object ee: operation.getBindingOutput().getExtensibilityElements())
+            FBindingOperationOutputMessage outputMessage = null;
+            if (null != operation.getBindingOutput())
             {
-              if (ee instanceof ExtensibilityElement)
+              outputMessage = new FBindingOperationOutputMessage(operation.getBindingOutput().getName());
+
+              // Add per-message information for output message
+              for (Object ee: operation.getBindingOutput().getExtensibilityElements())
               {
-                ExtensibilityElement element = (ExtensibilityElement)ee;
-                FExtensibilityElement extensibilityElement = new FExtensibilityElement(element);
+                if (ee instanceof ExtensibilityElement)
+                {
+                  ExtensibilityElement element = (ExtensibilityElement)ee;
+                  FExtensibilityElement extensibilityElement = new FExtensibilityElement(element);
 
-                outputMessage.addPerMessageInformation(extensibilityElement);
+                  outputMessage.addPerMessageInformation(extensibilityElement);
 
-                LOGGER.debug(String.format("          └ Adding per-message information of type '%s' to output message.",
-                        extensibilityElement.getImplementationName()));
+                  LOGGER.debug(String.format("          └ Adding per-message information of type '%s' to output message.",
+                          extensibilityElement.getImplementationName()));
+                }
               }
             }
 
