@@ -1,4 +1,4 @@
-/** 19.03.2013 23:23 */
+/** 29.06.2013 17:40 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -149,6 +149,32 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "      <groupId>org.slf4j</groupId>\n" +
 "      <artifactId>slf4j-simple</artifactId>\n" +
 "      <version>1.6.6</version>\n" +
+"    </dependency>\n\n" +
+
+"    <!-- Jackson for JSONMarshaller class -->\n" +
+"    <dependency>\n" +
+"      <groupId>com.fasterxml.jackson.core</groupId>\n" +
+"      <artifactId>jackson-core</artifactId>\n" +
+"      <version>2.1.0</version>\n" +
+"    </dependency>\n\n" +
+
+"    <dependency>\n" +
+"      <groupId>com.fasterxml.jackson.core</groupId>\n" +
+"      <artifactId>jackson-databind</artifactId>\n" +
+"      <version>2.1.0</version>\n" +
+"    </dependency>\n\n" +
+
+"    <dependency>\n" +
+"      <groupId>com.fasterxml.jackson.core</groupId>\n" +
+"      <artifactId>jackson-annotations</artifactId>\n" +
+"      <version>2.1.0</version>\n" +
+"    </dependency>\n\n" +
+
+"    <!-- JAXB annotations for Jackson -->\n" +
+"    <dependency>\n" +
+"      <groupId>com.fasterxml.jackson.module</groupId>\n" +
+"      <artifactId>jackson-module-jaxb-annotations</artifactId>\n" +
+"      <version>2.1.0</version>\n" +
 "    </dependency>\n\n" +
 
 "    <!-- Atmosphere Framework: Server-side runtime -->\n" +

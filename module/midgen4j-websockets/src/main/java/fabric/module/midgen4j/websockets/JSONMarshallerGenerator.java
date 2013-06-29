@@ -1,4 +1,4 @@
-/** 06.03.2013 14:57 */
+/** 29.06.2013 17:32 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -139,7 +139,7 @@ public class JSONMarshallerGenerator extends FDefaultWSDLHandler
     JParameter beanObject = JParameter.factory.create(JModifier.FINAL, "T", "beanObject");
     JMethodSignature jms = JMethodSignature.factory.create(beanObject);
 
-    JMethod instanceToJSON = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC,
+    JMethod instanceToJSON = JMethod.factory.create(JModifier.PUBLIC,
             "String", "instanceToJSON", jms, new String[] { "Exception" });
     instanceToJSON.setComment(new JMethodCommentImpl("Serialize bean object to JSON document."));
 
@@ -176,7 +176,7 @@ public class JSONMarshallerGenerator extends FDefaultWSDLHandler
     JParameter jsonDocument = JParameter.factory.create(JModifier.FINAL, "String", "jsonDocument");
     JMethodSignature jms = JMethodSignature.factory.create(beanClass, jsonDocument);
 
-    JMethod jsonToInstance = JMethod.factory.create(JModifier.PUBLIC | JModifier.STATIC,
+    JMethod jsonToInstance = JMethod.factory.create(JModifier.PUBLIC,
             "T", "jsonToInstance", jms, new String[] { "Exception" });
     jsonToInstance.setComment(new JMethodCommentImpl("Deserialize JSON document to bean object."));
 

@@ -1,4 +1,4 @@
-/** 12.03.2013 22:34 */
+/** 29.06.2013 17:46 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -519,6 +519,16 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
   {
     String methodBody = "";
 
+    // Create JSON marshaller object
+    if (null != operation.getInputMessage() || null != operation.getOutputMessage())
+    {
+      methodBody += String.format(
+              "// Create JSON marshaller\n" +
+              "%s marshaller = new %s();\n\n",
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME,
+              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME);
+    }
+
     // Operation has input message?
     if (null != operation.getInputMessage())
     {
@@ -527,9 +537,8 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
       // Create code to convert JSON code to a bean object
       methodBody += String.format(
               "// Unmarshal JSON code from request\n" +
-              "%s requestBeanObject = (%s)%s.jsonToInstance(%s.class, this.requestMessage.payload());\n\n",
-              inputMessageClassName, inputMessageClassName,
-              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, inputMessageClassName);
+              "%s requestBeanObject = (%s)marshaller.jsonToInstance(%s.class, this.requestMessage.payload());\n\n",
+              inputMessageClassName, inputMessageClassName, inputMessageClassName);
     }
 
     // Get name of output message (if any)
@@ -556,9 +565,9 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
       methodBody += String.format(
               "\n\n" +
               "// Marshal bean and create response message\n" +
-              "String jsonResponse = %s.instanceToJSON(responseBeanObject);\n" +
+              "String jsonResponse = marshaller.instanceToJSON(responseBeanObject);\n" +
               "%s responseMessage = new %s(this.requestMessage.uuid(), this.requestMessage.method(), jsonResponse);\n\n",
-              JSONMarshallerGenerator.MARSHALLER_CLASS_NAME, this.messageClassFullName, this.messageClassFullName);
+              this.messageClassFullName, this.messageClassFullName);
 
       // Create code to send response
       methodBody += String.format(
