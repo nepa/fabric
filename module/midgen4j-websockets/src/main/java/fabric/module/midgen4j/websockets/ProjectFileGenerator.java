@@ -1,4 +1,4 @@
-/** 29.06.2013 17:40 */
+/** 29.06.2013 17:56 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -149,6 +149,24 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "      <groupId>org.slf4j</groupId>\n" +
 "      <artifactId>slf4j-simple</artifactId>\n" +
 "      <version>1.6.6</version>\n" +
+"    </dependency>\n\n" +
+
+"    <!--\n" +
+"      The following two dependencies are only required,\n" +
+"      if you create a REST interface for your service\n" +
+"      that uses JAX-RS/Jersey.\n" +
+"    -->\n" +
+"    <dependency>\n" +
+"      <groupId>com.sun.jersey</groupId>\n" +
+"      <artifactId>jersey-bundle</artifactId>\n" +
+"      <version>1.14</version>\n" +
+"    </dependency>\n\n" +
+
+"    <!-- ASM for JAX-RS/Jersey -->\n" +
+"    <dependency>\n" +
+"      <groupId>asm</groupId>\n" +
+"      <artifactId>asm</artifactId>\n" +
+"      <version>3.3.1</version>\n" +
 "    </dependency>\n\n" +
 
 "    <!-- Jackson for JSONMarshaller class -->\n" +
