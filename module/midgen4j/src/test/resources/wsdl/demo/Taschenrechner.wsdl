@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="Taschenrechner"
+  targetNamespace="urn:Taschenrechner"
+  xmlns:tns="urn:Taschenrechner"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- **************** Messages **************** -->
+
+  <!-- Summation -->
+  <message name="addiereRequest">
+    <part name="ErsterSummand" type="xs:int" />
+    <part name="ZweiterSummand" type="xs:int" />
+  </message>
+
+  <message name="addiereResponse">
+    <part name="Summe" type="xs:int" />
+  </message>
+
+  <!-- Subtraction -->
+  <message name="subtrahiereRequest">
+    <part name="Minuend" type="xs:int" />
+    <part name="Subtrahend" type="xs:int" />
+  </message>
+
+  <message name="subtrahiereResponse">
+    <part name="Differenz" type="xs:int" />
+  </message>
+
+  <!-- Multiplication -->
+  <message name="multipliziereRequest">
+    <part name="Multiplikand" type="xs:int" />
+    <part name="Multiplikator" type="xs:int" />
+  </message>
+
+  <message name="multipliziereResponse">
+    <part name="Produkt" type="xs:int" />
+  </message>
+
+  <!-- Division -->
+  <message name="dividiereRequest">
+    <part name="Dividend" type="xs:int" />
+    <part name="Divisor" type="xs:int" />
+  </message>
+
+  <message name="dividiereResponse">
+    <part name="Quotient" type="xs:int" />
+  </message>
+
+  <!-- Random number -->
+  <message name="zufallszahlResponse">
+    <part name="Zufallszahl" type="xs:int" />
+  </message>
+
+  <!-- **************** Port types **************** -->
+
+  <!-- Interfaces for data exchange -->
+  <portType name="taschenrechnerPortType">
+    <!-- Operation for summation -->
+    <operation name="addiere">
+      <input message="tns:addiereRequest" />
+      <output message="tns:addiereResponse" />
+    </operation>
+
+    <!-- Operation for subtraction -->
+    <operation name="subtrahiere">
+      <input message="tns:subtrahiereRequest" />
+      <output message="tns:subtrahiereResponse" />
+    </operation>
+
+    <!-- Operation for multiplication -->
+    <operation name="multipliziere">
+      <input message="tns:multipliziereRequest" />
+      <output message="tns:multipliziereResponse" />
+    </operation>
+
+    <!-- Operation for division -->
+    <operation name="dividiere">
+      <input message="tns:dividiereRequest" />
+      <output message="tns:dividiereResponse" />
+    </operation>
+
+    <!-- Operation to request a random number -->
+    <operation name="zufallszahl">
+      <output message="tns:zufallszahlResponse" />
+    </operation>
+  </portType>
+
+  <!-- **************** Bindings **************** -->
+
+  <!-- Protocol and data format for communication -->
+  <binding name="taschenrechnerBinding" type="tns:taschenrechnerPortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <!-- Summation -->
+    <operation name="addiere">
+      <soap:operation soapAction="urn:beispiel#Taschenrechner" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <!-- Subtraction -->
+    <operation name="subtrahiere">
+      <soap:operation soapAction="urn:beispiel#Taschenrechner" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <!-- Multiplication -->
+    <operation name="multipliziere">
+      <soap:operation soapAction="urn:beispiel#Taschenrechner" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <!-- Division -->
+    <operation name="dividiere">
+      <soap:operation soapAction="urn:beispiel#Taschenrechner" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <!-- Random number -->
+    <operation name="zufallszahl">
+      <soap:operation soapAction="urn:beispiel#Taschenrechner" />
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+  </binding>
+
+  <!-- **************** Services **************** -->
+
+  <!-- Endpoint for calculator service -->
+  <service name="TaschenrechnerService">
+    <port name="taschenrechnerPortType" binding="taschenrechnerBinding">
+      <soap:address location="http://www.example.com/Taschenrechner.php" />
+    </port>
+  </service>
+</definitions>

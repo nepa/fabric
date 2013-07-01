@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="WetterDienst"
+  targetNamespace="urn:WetterDienst"
+  xmlns:tns="urn:WetterDienst"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- Message for temperature requests -->
+  <message name="holeTemperaturRequest">
+    <part name="Ort" type="xs:string" />
+  </message>
+
+  <!-- Message for temperature responses -->
+  <message name="holeTemperaturResponse">
+    <part name="Temperatur" type="xs:double" />
+  </message>
+
+  <!-- Interface for data exchange -->
+  <portType name="holeTemperaturPortType">
+    <operation name="holeTemperatur">
+      <input message="tns:holeTemperaturRequest" />
+      <output message="tns:holeTemperaturResponse" />
+    </operation>
+  </portType>
+
+  <!-- Protocol and data format for communication -->
+  <binding name="holeTemperaturBinding" type="tns:holeTemperaturPortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="holeTemperatur">
+      <soap:operation soapAction="urn:beispiel#WetterDienst" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+  </binding>
+
+  <!-- Endpoint for concrete weather service -->
+  <service name="WetterDienstService">
+    <port name="holeTemperaturPortType" binding="holeTemperaturBinding">
+      <soap:address location="http://www.example.com/WetterDienstServer.php" />
+    </port>
+  </service>
+</definitions>
