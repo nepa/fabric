@@ -1,4 +1,4 @@
-/** 01.07.2013 17:45 */
+/** 01.07.2013 19:20 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -490,8 +490,11 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
             "null == this.request.method() || null == this.request.uuid() || null == this.request.payload()) {\n" +
             "\tthrow new Exception(\"Initialize '%s' object properly before building.\");\n" +
             "}\n\n" +
-            "return new %s(this.serviceProvider, this.webSocket, this.request);",
-            workerThreadClassName, workerThreadClassName);
+            "// Message is a per-request object, so we need to create a DEEP COPY here!\n" +
+            "%s requestCopy = new %s(this.request.asString());\n\n" +
+            "return new %s(this.serviceProvider, this.webSocket, requestCopy);",
+            workerThreadClassName, this.messageClassFullName,
+            this.messageClassFullName, workerThreadClassName);
     buildMethod.getBody().setSource(methodBody);
 
     // Add method to class
