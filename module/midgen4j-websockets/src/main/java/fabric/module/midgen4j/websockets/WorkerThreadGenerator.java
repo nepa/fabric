@@ -1,4 +1,4 @@
-/** 29.06.2013 17:46 */
+/** 30.06.2013 00:37 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -391,7 +391,7 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
 
     // Set method body
     methodBody = String.format(
-            "if (null != %s.instance) {\n" +
+            "if (null == %s.instance) {\n" +
             "\t %s.instance = new %s();\n" +
             "}\n\n" +
             "return %s.instance;",
@@ -579,13 +579,16 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
     }
 
     // Surround code with try..catch-block
-    methodBody =
+    methodBody = String.format(
             "try {\n" +
             WorkerThreadGenerator.indentCode(methodBody) +
             "}\n" +
             "catch (Exception e) {\n" +
-            "\tLOGGER.error(\"Error: \" + e.getMessage());\n" +
-            "}";
+            "\tString errorMessage = \"Error: \" + e.getMessage();\n\n" +
+            "\tLOGGER.error(errorMessage);\n" +
+            "\t%s.sendMessage(this.webSocket, errorMessage);\n" +
+            "}",
+            this.interfaceName);
 
     return methodBody;
   }
