@@ -1,4 +1,4 @@
-/** 30.06.2013 00:37 */
+/** 01.07.2013 17:45 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -584,10 +584,12 @@ public class WorkerThreadGenerator extends FDefaultWSDLHandler
             WorkerThreadGenerator.indentCode(methodBody) +
             "}\n" +
             "catch (Exception e) {\n" +
-            "\tString errorMessage = \"Error: \" + e.getMessage();\n\n" +
-            "\tLOGGER.error(errorMessage);\n" +
-            "\t%s.sendMessage(this.webSocket, errorMessage);\n" +
+            "\tString jsonResponse = String.format(\"{ \\\"Error\\\": \\\"%%s\\\" }\", e.getMessage());\n" +
+            "\t%s responseMessage = new %s(this.requestMessage.uuid(), this.requestMessage.method(), jsonResponse);\n\n" +
+            "\tLOGGER.error(\"Error: \" + e.getMessage());\n" +
+            "\t%s.sendMessage(this.webSocket, responseMessage.asString());\n" +
             "}",
+            this.messageClassFullName, this.messageClassFullName,
             this.interfaceName);
 
     return methodBody;
