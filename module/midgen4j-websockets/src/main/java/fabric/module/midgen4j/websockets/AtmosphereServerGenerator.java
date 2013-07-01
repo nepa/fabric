@@ -1,4 +1,4 @@
-/** 13.03.2013 17:21 */
+/** 29.06.2013 23:27 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -334,8 +334,8 @@ public class AtmosphereServerGenerator extends FDefaultWSDLHandler
             "catch (Exception e) {\n" +
             "\tString errorMessage = \"Could not parse message: \" + e.getMessage();\n\n" +
 
-            "LOGGER.error(errorMessage);\n" +
-            "%s.sendMessage(webSocket, errorMessage);\n" +
+            "\tLOGGER.error(errorMessage);\n" +
+            "\t%s.sendMessage(webSocket, errorMessage);\n" +
             "}",
             this.messageClassFullName, this.messageClassFullName,
             DispatcherGenerator.DISPATCHER_CLASS_NAME,
