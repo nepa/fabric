@@ -1,4 +1,4 @@
-/** 19.03.2013 23:17 */
+/** 01.07.2013 15:44 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -299,7 +299,7 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "var data = response.split(this.delimiter);\n\n" +
 
             "if (data.length != 3) {\n" +
-            "\tlogMessage(\'Invalid message format. This is not an RPC response.\');\n" +
+            "\tlogMessage(\'Invalid message format. This is not an RPC response.\', LogTarget.LOG);\n" +
             "}\n" +
             "else {\n" +
             "\tvar uuid = data[0];\n" +
@@ -426,7 +426,11 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "if (target & LogTarget.CONSOLE)\n" +
             "{\n" +
             "\tvar consoleWindow = document.getElementById('console');\n\n" +
-            
+
+            "\t// Clean output of JSON definitions\n" +
+            "\tmessage = message.replace(/^ +/gm, '');      // Strip whitespaces from start of each line\n" +
+            "\tmessage = message.replace(/\\r?\\n|\\r/gm, ''); // Strip all newline characters\n\n" +
+
             "\tconsoleWindow.value += createLogLine(message);\n" +
             "\tconsoleWindow.scrollTop = consoleWindow.scrollHeight;\n" +
             "}\n\n" +
@@ -948,8 +952,11 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "if (dispatcher != undefined) {\n" +
             "\tdispatcher.trackedCall(\'%s\', JSON.stringify(%s),\n" +
             "\t\tfunction(response) {\n" +
-            "\t\t\tlogMessage('Got response to \\'%s()\\' request: ' + JSON.parse(response).result);\n\n" +
-            "\t\t\t/* TODO: Add your custom callback code here */\n" +
+            "\t\t\tlogMessage('Got response to \\'%s()\\' request.');\n\n" +
+            "\t\t\t/**\n" +
+            "\t\t\t * TODO: Add your custom code here to parse response:\n" +
+            "\t\t\t *         JSON.parse(response).YourAttribute\n" +
+            "\t\t\t */\n" +
             "\t\t});\n" +
             "}",
             name, inputMessage, name);
