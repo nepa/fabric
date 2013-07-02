@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="Summenbilder"
+  targetNamespace="urn:Summenbilder"
+  xmlns:tns="urn:Summenbilder"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- Data types for summator -->
+  <types>
+    <schema targetNamespace="urn:Summentypen"
+            xmlns="http://www.w3.org/2001/XMLSchema">
+
+      <!-- Global simple type for a list of numbers -->
+      <xs:simpleType name="Zahlenliste">
+        <xs:list itemType="xs:int" />
+      </xs:simpleType>
+
+    </schema>
+  </types>
+
+  <!-- Message for summation request -->
+  <message name="summiereRequest">
+    <part name="Zahlen" type="Zahlenliste" />
+  </message>
+
+  <!-- Message for summation response -->
+  <message name="summiereResponse">
+    <part name="Summe" type="xs:int" />
+  </message>
+
+  <!-- Interface for data exchange -->
+  <portType name="summierePortType">
+    <operation name="summiere">
+      <input message="tns:summiereRequest" />
+      <output message="tns:summiereResponse" />
+    </operation>
+  </portType>
+
+  <!-- Protocol and data format for communication -->
+  <binding name="summiereBinding" type="tns:summierePortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="summiere">
+      <soap:operation soapAction="urn:beispiel#Summenbilder" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+  </binding>
+
+  <!-- Endpoint for summator service -->
+  <service name="SummenbilderService">
+    <port name="summierePortType" binding="summiereBinding">
+      <soap:address location="http://www.example.com/summator" />
+    </port>
+  </service>
+</definitions>
