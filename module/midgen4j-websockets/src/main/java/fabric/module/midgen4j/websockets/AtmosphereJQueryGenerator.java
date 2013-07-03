@@ -1,4 +1,4 @@
-/** 01.07.2013 15:44 */
+/** 03.07.2013 13:09 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -184,7 +184,10 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     // Add global function to close connection
     JSFunction closeConnection = JSFunction.factory.create("closeConnection");
     closeConnection.setComment(new JSCommentImpl("Close connection to server."));
-    methodBody = "socket.unsubscribe();";
+    methodBody =
+            "socket.unsubscribe();\n\n" +
+            "subSocket = null;\n" +
+            "dispatcher = null;";
     closeConnection.getBody().setCode(methodBody);
     jssf.add(closeConnection);
 
@@ -192,9 +195,14 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     JSFunction sendMessage = JSFunction.factory.create("sendMessage", "message");
     sendMessage.setComment(new JSCommentImpl("Send untracked message to server."));
     methodBody =
-            "logMessage(\'Now sending untracked message \\'\' + message + \'\\'.\');\n\n" +
-            "// This bypasses the tracking mechanism!\n" +
-            "subSocket.push(message);";
+            "if (subSocket != undefined) {\n" +
+            "\tlogMessage(\'Now sending untracked message \\'\' + message + \'\\'.\');\n\n" +
+            "\t// This bypasses the tracking mechanism!\n" +
+            "\tsubSocket.push(message);\n" +
+            "}\n" +
+            "else {\n" +
+            "\tlogMessage(\'Not connected to server.\');\n" +
+            "}";
     sendMessage.getBody().setCode(methodBody);
     jssf.add(sendMessage);
 
@@ -958,6 +966,9 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
             "\t\t\t *         JSON.parse(response).YourAttribute\n" +
             "\t\t\t */\n" +
             "\t\t});\n" +
+            "}\n" +
+            "else {\n" +
+            "\tlogMessage(\'Not connected to server.\');\n" +
             "}",
             name, inputMessage, name);
     rpcFunction.getBody().setCode(methodBody);
