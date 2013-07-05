@@ -1,4 +1,4 @@
-/** 03.07.2013 13:09 */
+/** 05.07.2013 19:18 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -176,8 +176,10 @@ public class AtmosphereJQueryGenerator extends FDefaultWSDLHandler
     JSFunction openConnection = JSFunction.factory.create("openConnection");
     openConnection.setComment(new JSCommentImpl("Open connection to server."));
     String methodBody =
-            "subSocket = socket.subscribe(request);\n\n" +
-            "dispatcher = new Dispatcher(subSocket);";
+            "if (subSocket == null) {\n" +
+            "\tsubSocket = socket.subscribe(request);\n\n" +
+            "\tdispatcher = new Dispatcher(subSocket);\n" +
+            "}";
     openConnection.getBody().setCode(methodBody);
     jssf.add(openConnection);
 
