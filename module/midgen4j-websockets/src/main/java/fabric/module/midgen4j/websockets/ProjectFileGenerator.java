@@ -1,4 +1,4 @@
-/** 29.06.2013 17:56 */
+/** 05.07.2013 20:18 */
 package fabric.module.midgen4j.websockets;
 
 import org.slf4j.Logger;
@@ -204,9 +204,9 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 
 "    <!-- Atmosphere Framework: Client-side JavaScript -->\n" +
 "    <dependency>\n" +
-"      <groupId>org.atmosphere</groupId>\n" +
-"      <artifactId>atmosphere-jquery</artifactId>\n" +
-"      <version>${atmo-version}</version>\n" +
+"      <groupId>org.atmosphere.client</groupId>\n" +
+"      <artifactId>jquery</artifactId>\n" +
+"      <version>${atmo-client-version}</version>\n" +
 "      <type>war</type>\n" +
 "    </dependency>\n\n" +
 
@@ -256,7 +256,8 @@ public class ProjectFileGenerator extends FDefaultWSDLHandler
 "      To force update of snapshot and release\n" +
 "      dependencies run: mvn -U clean install\n" +
 "    -->\n" +
-"    <atmo-version>1.1.0-SNAPSHOT</atmo-version>\n" +
+"    <atmo-version>1.1.0.RC4</atmo-version>\n" +
+"    <atmo-client-version>2.0.0.RC2</atmo-client-version>\n" +
 "  </properties>\n\n" +
 
 "</project>",
