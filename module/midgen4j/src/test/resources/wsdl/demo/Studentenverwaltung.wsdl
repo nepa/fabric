@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions name="Studentenverwaltung"
+  targetNamespace="urn:Studentenverwaltung"
+  xmlns:tns="urn:Studentenverwaltung"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- **************** Data types **************** -->
+
+  <!-- Data types for student management -->
+  <types>
+    <schema targetNamespace="urn:Studententypen"
+            xmlns="http://www.w3.org/2001/XMLSchema">
+
+      <!-- Global complex type for master data -->
+      <xs:complexType name="Stammdaten">
+        <xs:sequence>
+          <xs:element name="Name" type="xs:string" />
+          <xs:element name="Alter" type="xs:int" />
+          <xs:element name="Studiengang" type="xs:string" />
+          <xs:element name="Veranstaltung" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:complexType>
+
+      <!-- Global complex type for students -->
+      <xs:complexType name="Student">
+        <xs:sequence>
+          <xs:element name="Matrikelnummer" type="xs:string" />
+          <xs:element name="Name" type="xs:string" />
+          <xs:element name="Alter" type="xs:int" />
+          <xs:element name="Studiengang" type="xs:string" />
+          <xs:element name="Veranstaltung" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:complexType>
+
+    </schema>
+  </types>
+
+  <!-- **************** Messages **************** -->
+
+  <!-- Student creation request -->
+  <message name="erzeugeStudentRequest">
+    <part name="Stammdaten" type="Stammdaten" />
+  </message>
+
+  <!-- Student creation response -->
+  <message name="erzeugeStudentResponse">
+    <part name="Matrikelnummer" type="xs:string" />
+  </message>
+
+  <!-- Student data request -->
+  <message name="holeStudentRequest">
+    <part name="Matrikelnummer" type="xs:string" />
+  </message>
+
+  <!-- Student data response -->
+  <message name="holeStudentResponse">
+    <part name="Student" type="Student" />
+  </message>
+
+  <!-- **************** Port types **************** -->
+
+  <!-- Interface for data exchange -->
+  <portType name="studentenverwaltungPortType">
+    <!-- Operation for student creation -->
+    <operation name="erzeugeStudent">
+      <input message="tns:erzeugeStudentRequest" />
+      <output message="tns:erzeugeStudentResponse" />
+    </operation>
+
+    <!-- Operation for student data retrieval -->
+    <operation name="holeStudent">
+      <input message="tns:holeStudentRequest" />
+      <output message="tns:holeStudentResponse" />
+    </operation>
+  </portType>
+
+  <!-- **************** Bindings **************** -->
+
+  <!-- Protocol and data format for communication -->
+  <binding name="studentenverwaltungBinding" type="tns:studentenverwaltungPortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <!-- Student creation -->
+    <operation name="erzeugeStudent">
+      <soap:operation soapAction="urn:beispiel#Studentenverwaltung" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+    <!-- Student data retrieval -->
+    <operation name="holeStudent">
+      <soap:operation soapAction="urn:beispiel#Studentenverwaltung" />
+      <input>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:beispiel"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+
+  </binding>
+
+  <!-- **************** Services **************** -->
+
+  <!-- Endpoint for student management service -->
+  <service name="StudentenverwaltungService">
+    <port name="studentenverwaltungPortType" binding="studentenverwaltungBinding">
+      <soap:address location="http://www.example.com/studentManagement" />
+    </port>
+  </service>
+</definitions>
