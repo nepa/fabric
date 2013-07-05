@@ -3,7 +3,7 @@
 ----------------------------------------
 
 Fabric is a framework for code generation based on several scientific
-publications [1,2,3,4]. It is comprised of components for
+publications [1,2,3,4,5]. It is comprised of components for
 
   - parsing XML Schema and WSDL files into a tree structure, for
 
@@ -21,8 +21,15 @@ In addition, a number of modules are contained that generate code:
     specification (http://www.w3.org/TR/exi) for XML (de-)
     serialization.
 
-  - midgen4j: A framework to create a universal service provider
-    for various message-oriented Java middleware technologies.
+  - midgen4j: A framework [5] to create a service provider for
+    various message-oriented Java middleware technologies.
+
+  - midgen4j-rest: A MidGen4J extension to create a REST
+    interface for the Java service provider.
+
+  - midgen4j-websockets: A MidGen4J extension to create a
+    WebSockets interface for the Java service provider as
+    well as a test client to use the service in a browser.
 
 Formerly, the framework also contained the following modules,
 which are no longer included and/or maintained:
@@ -143,3 +150,6 @@ appreciate if the papers below are referenced.
 
 [4] Sascha Seidel: Metaebene - Fabric als Code Generation Framework
   für Java, C und C++. In Proceedings of LinuxTag Berlin, May 2012.
+
+[5] Sascha Seidel: Middleware generation based upon machine-readable
+  service descriptions. Master thesis. Lübeck, July 2013.
